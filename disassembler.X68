@@ -30,9 +30,9 @@ start:      BSR     print_intro         * Intro
             MOVEA.L A2,A6               * reference to start of good buffer
     
 in_start    BSR     INPUT
-            BSR     CHECK_ADD            
-            CMP     #badFlag,D5
-            BEQ     in_start 
+            ;BSR     CHECK_ADD            
+            ;CMP     #badFlag,D5
+            ;BEQ     in_start 
             BSR     buffPrep
             MOVE.B  #task1,D0
             LEA     str_more,A1
@@ -88,45 +88,6 @@ CLEARALL    CLR     D0
             CLR     D7
             RTS
                
-CHECK_ADD:
-ca_Start
-            CMP.B   #$00,D5
-            BEQ     ca_error
-            MOVE.B  #goodFlag,D5   * set flag to good
-
-firstAdd    MOVE.L  A0,D2       * load address to data register
-            MOVE.L  D2,D3
-            ANDI.B  #1,D3       * check last bit in D2
-            CMP.B   #1,D3
-            BNE     lastAdd      * if 0, jump to even branch
-            
-lastAdd     MOVE.L  A4,D2
-            MOVE.L  D2,D3
-            ANDI.B  #1,D3
-            CMP.B   #1,D3
-            BNE     equ1 
-            
-equ1      * Check if starting address < $00FFFFFF 
-            CMP.L   #$00FFFFFF,A0
-            BLT     equ2
-         
-            JMP     ca_Error
-            
-            * Check if ending address <= $00FFFFFF 
-equ2        CMP.L   #$00FFFFFF,A4
-            BLE     equ3
-            JMP     ca_Error                     
-            
-            * Check if ending address > starting address
-equ3        CMPA.L  A0,A4
-            BGT     ca_End
-               
-ca_Error    ***print error***
-            MOVE.B  #task0,D0
-            LEA     string3,A1
-            MOVE.W  str_len3,D1
-            TRAP    #15            
-            MOVE.B  #badFlag,D5
                         
 ca_End      RTS
 INPUT:
@@ -245,8 +206,9 @@ return      MOVE.L  D4,A0
 * A1: Trap Address
 * A2: Pointer of buffer
 FILL_ADDRESS: MOVEA.L  A2,A1              *load trap address with A2                     JSR      getLongtLong
-            MOVE.B   #$09,(A2)+                                   
-            RTS
+              JSR getLong
+              MOVE.B   #$09,(A2)+                                   
+             RTS
           
             
 
