@@ -30,9 +30,6 @@ start:      BSR     print_intro         * Intro
             MOVEA.L A2,A6               * reference to start of good buffer
     
 in_start    BSR     INPUT
-            ;BSR     CHECK_ADD            
-            ;CMP     #badFlag,D5
-            ;BEQ     in_start 
             BSR     buffPrep
             MOVE.B  #task1,D0
             LEA     str_more,A1
@@ -144,54 +141,51 @@ asciiTOhex
             JSR     clrRegs
             MOVE    #0,D6      
       
-loop2       MOVE.B  (A1)+,D3            * store current ascii byte into D3 (user's input)
-            CMP.B   #$30,D3             * is ascii byte < 30??  if so, throw ascii exception
-            BLT     asciiError
-            CMP.B   #$3A,D3             * is ascii byte < 3A??  if so, convert to number
+loop2       MOVE.B  (A1)+,D3            
+            CMP.B   #$30,D3             
+            BLT     finish      
+            CMP.B   #$3A,D3             
             BLT     num_to_hex      
-            CMP.B   #$41,D3             * is ascii byte < 41??  if so, error
-            BLT     asciiError
-            CMP.B   #$47,D3             * is ascii byte < 47?   if so, convert to capital letter
+            CMP.B   #$41,D3             
+            BLT     finish      
+            CMP.B   #$47,D3             
             BLT     cap_to_hex
-            CMP.B   #$61,D3             * is ascii byte < 61?   if so, error
-            BLT     asciiError
-            CMP.B   #$67,D3             * is ascii byte < 67?   if so, convert to lowercase letter
+            CMP.B   #$61,D3             
+            BLT     finish      
+            CMP.B   #$67,D3             
             BLT     lower_to_hex
-            CMP.B   #$66,D3             * is ascii byte > 66?   if so, error
-            BGT     asciiError  
+            CMP.B   #$66,D3             
+            BGT     finish      
       
 resume    
-            ADD     #1,D6               * increment length counter
-            CMP     #6,D6               * compare to 6
-            BEQ     return              * if length is 6 digits long, jump to return              
-            CMP.B   #$00,(A1)           * null terminator? if so, we are done
-            BEQ     return              * move to clean-up duties
-            ASL.L   #4,D4               * shift D4 left by 4 bits in order to make room for next value            
-            JMP     loop2               * perform clean-up duties & exit subroutine
+            ADD     #1,D6               
+            CMP     #6,D6               
+            BEQ     finish      
+            CMP.B   #$00,(A1)          
+            BEQ     finish      
+            ASL.L   #4,D4                         
+            JMP     loop2               
 
 num_to_hex
-            SUBI.B  #$30,D3             * subtracting hex values leaves us with appropriate single-digit hex value
-            ADD.B   D3,D4               * add latest hex value to temporary storage
-            JMP     resume              * resume regularly sheduled programming
+            SUBI.B  #$30,D3             
+            ADD.B   D3,D4               
+            JMP     resume              
 
 cap_to_hex
 
-            SUBI.B  #$37,D3             * subtracting hex values leaves us with appropriate capital letter hex value
-            ADD.B   D3,D4               * add latest hex value to temporary storag
-            JMP     resume              * resume regularly sheduled programming
+            SUBI.B  #$37,D3             
+            ADD.B   D3,D4               
+            JMP     resume              
 
 lower_to_hex
-            SUBI.B  #$57,D3             * subtracting hex values leaves us with appropriate lowercase letter hex value
-            ADD.B   D3,D4               * add latest hex value to temporary storag
-            JMP     resume              * resume regularly sheduled programming
+            SUBI.B  #$57,D3             
+            ADD.B   D3,D4               
+            JMP     resume              
 
-asciiError  MOVE.B  #00,D5              * set bad flag      
-            JMP     return              * perform clean-up duties & exit subroutine
-
-return      MOVE.L  D4,A0
-            CLR     D6                  * clear counter
-            MOVEM.L (SP)+,D0-D4         * load data registers from stack      
-            RTS                         * return from subroutine
+finish      MOVE.L  D4,A0
+            CLR     D6                  
+            MOVEM.L (SP)+,D0-D4             
+            RTS                         
         
             
 ***************************** End of asciiTOhex routine **************************************************************
@@ -1183,6 +1177,8 @@ message_buffer    DC.B   1
 *************************************************************************************************************************        
 END         STOP    #$2700
             END     $1000
+
+
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
