@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 12/15/2021 3:41:33 PM
+Created On: 12/15/2021 3:45:26 PM
 
 00000000                             1  *-----------------------------------------------------------------
 00000000                             2  * Title      : 68K Disassembler
@@ -1059,45 +1059,35 @@ Created On: 12/15/2021 3:41:33 PM
 00001AF0  5848                    1055              ADDQ.W  #4,A0       * advancing memory pointer by long
 00001AF2  4E75                    1056              RTS                 * return from subroutine
 00001AF4                          1057  
-00001AF4                          1058  *********************************************************************************************************************
-00001AF4                          1059  * Beginning of data space:
-00001AF4                          1060  *********************************************************************************************************************     
-00004000                          1061               ORG   $4000
-00004000= 48 65 6C 6C 6F 2C ...   1062  intro        DC.B    'Hello, please enter beginning and ending addresses',CR,LF
-00004034                          1063  
-00004034= 0034                    1064  intro_len   DC.W    intro_len-intro
-00004036                          1065          
-00004036= 45 6E 74 65 72 20 ...   1066  string1     DC.B    'Enter starting address: $',0
-00004050= 001A                    1067  str_len1    DC.W    str_len1-string1  *Get the length of the string
-00004052                          1068  
-00004052= 45 6E 74 65 72 20 ...   1069  string2     DC.B    'Enter ending address: $',0
-0000406A= 0018                    1070  str_len2    DC.W    str_len2-string2  *Get the length of the string
-0000406C                          1071  
-0000406C                          1072  *string3     DC.B    'Error: starting or ending address has equality error',0
-0000406C                          1073  *str_len3    DC.W    str_len3-string3
-0000406C                          1074  *
-0000406C                          1075  *err_start   DC.B    'Error: invalid hex values for starting address.',0
-0000406C                          1076  *err_len1    DC.W    err_start-err_len1
-0000406C                          1077  *
-0000406C                          1078  *err_end     DC.B    'Error: invalid hex values for ending address.',0
-0000406C                          1079  *err_len2    DC.W    err_end-err_len2
-0000406C                          1080  
-0000406C= 50 72 65 73 73 20 ...   1081  str_enter   DC.B    'Press enter to read more data',0
-0000408A= FFE2                    1082  str_en_len  DC.W    str_enter-str_en_len
-0000408C                          1083  
-0000408C= 44 69 73 61 73 73 ...   1084  str_more    DC.B    'Disassemble more code? 1 for yes, 0 for no. ',0
-000040BA= 002E                    1085  strMore_len DC.W    strMore_len-str_more       
-000040BC                          1086  
-000040BC= 43 6C 6F 73 69 6E ...   1087  exit        DC.B    'Closing program',0
-000040CC= 0010                    1088  exit_len    DC.W    exit_len-exit           
-000040CE                          1089  
-000040CE= 01                      1090  message_buffer    DC.B   1
-000040CF                          1091                                   
-000040CF                          1092  *************************************************************************************************************************
-000040CF                          1093  * End of program:
-000040CF                          1094  *************************************************************************************************************************        
-000040D0  4E72 2700               1095  END         STOP    #$2700
-000040D4                          1096              END     $1000
+00001AF4                          1058  
+00001AF4                          1059                     
+00004000                          1060               ORG   $4000 ; Make sure data starts at $4000
+00004000= 48 65 6C 6C 6F 2C ...   1061  intro        DC.B    'Hello, please enter beginning and ending addresses',CR,LF
+00004034                          1062  
+00004034= 0034                    1063  intro_len   DC.W    intro_len-intro
+00004036                          1064          
+00004036= 45 6E 74 65 72 20 ...   1065  string1     DC.B    'Enter starting address: $',0
+00004050= 001A                    1066  str_len1    DC.W    str_len1-string1  *Get the length of the string
+00004052                          1067  
+00004052= 45 6E 74 65 72 20 ...   1068  string2     DC.B    'Enter ending address: $',0
+0000406A= 0018                    1069  str_len2    DC.W    str_len2-string2  *Get the length of the string
+0000406C                          1070  
+0000406C= 50 72 65 73 73 20 ...   1071  str_enter   DC.B    'Press enter to read more data',0
+0000408A= FFE2                    1072  str_en_len  DC.W    str_enter-str_en_len
+0000408C                          1073  
+0000408C= 44 69 73 61 73 73 ...   1074  str_more    DC.B    'Disassemble more code? 1 for yes, 0 for no. ',0
+000040BA= 002E                    1075  strMore_len DC.W    strMore_len-str_more       
+000040BC                          1076  
+000040BC= 43 6C 6F 73 69 6E ...   1077  exit        DC.B    'Closing program',0
+000040CC= 0010                    1078  exit_len    DC.W    exit_len-exit           
+000040CE                          1079  
+000040CE= 01                      1080  message_buffer    DC.B   1
+000040CF                          1081                                   
+000040CF                          1082  *************************************************************************************************************************
+000040CF                          1083  * End of program:
+000040CF                          1084  *************************************************************************************************************************        
+000040D0  4E72 2700               1085  END         STOP    #$2700
+000040D4                          1086              END     $1000
 
 No errors detected
 No warnings generated
