@@ -64,6 +64,16 @@ CLEARALL    CLR     D0
             CLR     D7
             RTS
                         
+CLEARRIGSTERS     CLR.L   D0                 
+            CLR.L   D1
+            CLR.L   D2
+            CLR.L   D3
+            CLR.L   D4
+            CLR.L   D6
+            CLR.L   D7
+            RTS
+
+                        
 EndUtil      RTS
 
 INPUT:
@@ -98,7 +108,7 @@ endInput    RTS
 asciiTOhex
             MOVEM.L D0-D4,-(SP)         
             MOVE.B  #1,D5        
-            JSR     clrRegs
+            JSR     CLEARRIGSTERS
             MOVE    #0,D6      
       
 loop2       MOVE.B  (A1)+,D3            
@@ -123,7 +133,7 @@ resume      ADD     #1,D6
             CMP.B   #$00,(A1)          
             BEQ     finish      
             ASL.L   #4,D4                         
-            JMP     loop2               
+            JMP     loop2                              
 
 num_to_hex  SUBI.B  #$30,D3             
             ADD.B   D3,D4               
@@ -143,27 +153,20 @@ finish      MOVE.L  D4,A0
             MOVEM.L (SP)+,D0-D4             
             RTS                         
         
-; Fill the message buffer with address so that the format can be: address DATA hex
-FILL_ADDRESS: MOVEA.L  A2,A1              *load trap address with A2                     JSR      getLongtLong
-              JSR getLong
-              MOVE.B   #$09,(A2)+                                   
-              RTS
-         
 ; Print stuff in the buffer
 buffPrep    MOVEA.L A6,A2         
-            BSR     FILL_ADDRESS        * fill buffer with current address
+            MOVEA.L A2,A1
+            JSR getLong
+            MOVE.B #$09, (A2)+
             JSR     opDecode
-            MOVE.B  #00,(A2)            * null terminater
+            MOVE.B  #00,(A2)            
             MOVE.B  #13,D0
-            TRAP    #15                 * print decoded Op
-                              
-            CMPA.L   A0,A4              * have we reached the end of our address range?
+            TRAP    #15                
+            CMPA.L   A0,A4              
             BLE      endBuff
-            
-            ADDI    #1,D7               * increment counter
+            ADDI    #1,D7              
             CMP     #printCount,D7
             BNE     buffPrep
-            
             MOVE.B  #1,D0
             LEA     str_enter,A1
             MOVE.W  str_en_len,D1
@@ -180,11 +183,11 @@ buffPrep    MOVEA.L A6,A2
 endBuff     RTS         
           
 opDecode    MOVEM.L A4-A6/D0-D4/D6-D7,-(SP)      * Save registers
-            JSR     clrRegs             * Clear registers for use
+            JSR     CLEARRIGSTERS             * Clear registers for use
             MOVE.B  #1,D5        * Set good flag until fail
             MOVE.W  (A0)+,D7            * Move instruction to D7 & Increment pointer
             MOVEA.L A2,A3               * Store buffer location                 
-            JSR     getOp               * Decode instruction Test
+            getOpCode               * Decode instruction Test
 
 
 
@@ -193,39 +196,34 @@ opDecode    MOVEM.L A4-A6/D0-D4/D6-D7,-(SP)      * Save registers
 ********************************************************************************************************************** 
 opReturn    MOVEM.L (SP)+,D6-D7/D0-D4/A4-A6 
             RTS              
-            
-                                    
-getOp       MOVE.W  D7,D6               * Move instruction to shift
+     
+getOpCode   MOVE.W  D7,D6               * Move instruction to shift
             MOVE.B  #shift12bits,D4         * Load shifter register
             LSR.W   D4,D6               * Shift right 12 bits
             MULU    #6,D6               * Form offset           
-            LEA     tbl_op,A5           * Index into the table                                                                                   
+            LEA     jmp_table,A5           * Index into the table                                                                                   
             JSR     00(A5,D6)           * Jump indirect with index (00 indicates word movement)
             RTS
 
 
 
 ********************************************************************************************************************** 
-* Beginning of the main table: tbl_op
+* Beginning of the main table: jmp_table
 * Contains the functions per the first 4 bits of current instruction.
 ********************************************************************************************************************** 
-tbl_op      
+jmp_table      
             JMP     hex1_0000            
-            JMP     hex1_0001            
-            ;JMP     hex1_0010
+            JMP     hex1_0001        
             JMP     hex1_0011
             JMP     hex1_0100
             JMP     hex1_0101
             JMP     hex1_0110
             JMP     hex1_0111
-            ;JMP     hex1_1000
             JMP     hex1_1001
             JMP     hex1_1010
             JMP     hex1_1011
             JMP     hex1_1100
             JMP     hex1_1101
-            ;JMP     hex1_1110
-            ;JMP     hex1_1111
 
 ********************************************************************************************************************** 
 * Case for: first four bits = 0000
@@ -237,7 +235,7 @@ hex1_0000   MOVE.W  D7,D6               * Fresh copy of instruction to shift
             LSR.L   D4,D6               * Shift to LSB
             CMP.B   #$0,D6              * Is this ORI?
             BEQ     opORI               * Jump to opORI section
-            BNE     badInst             * No - bad instruction                  
+            BNE     illegalCode             * No - bad instruction                  
 
 opORI       MOVE.B  #'O',(A2)+          * Populate ORI into buffer
             MOVE.B  #'R',(A2)+
@@ -366,7 +364,7 @@ moveSize    MOVE.W  D7,D6               * get fresh copy to determine MOVE size
             CMP.B   #$2,D6              * is this a L?
             BEQ     moveSizeL           * yes - Or L size to D3 bits 6-7
             CMP.B   #$3,D6              * is this a W?
-            BNE     badInst             * No- then badInst        
+            BNE     illegalCode             * No- then illegalCode        
 moveSizeW   ORI.W   #$0040,D3           * add size 01 in bits 6-7 (4) into D3
             JMP     mSizeEnd            * skip to end once done
 moveSizeL   ORI.W   #$0080,D3           * add size 10 in bits 6-7 (4) into D3
@@ -374,10 +372,7 @@ mSizeEnd    RTS
 
 
 
-********************************************************************************************************************** 
-* Case for: first four bits = 0100
-* --(MOVEM,LEA,NOP)
-********************************************************************************************************************** 
+; 0100 MOVEM, LEA, NOP
 hex1_0100   MOVE.W  D7,D6               * Fresh copy of instruction to shift
             ANDI.W  #$0100,D6           * Test isolate 8th bit for LEA
             CMP.W   #$0100,D6           * Test if LEA
@@ -407,23 +402,20 @@ opLEA       MOVE.B  #'L',(A2)+          * Start input of LEA
             MOVE.B  D6,(A2)+            * register # to buffer
 end0100     RTS
 
-hex1_0101   JSR     badInst             * Invalid Instruction
+hex1_0101   JSR     illegalCode             * Invalid Instruction
             RTS
             
             ***** MOVEM Command
-hex1_0110   JSR     badInst
+hex1_0110   JSR     illegalCode
             ADDQ.W  #2,A0
             RTS
 
-hex1_0111   JSR     badInst             * Invalid Instruction
+hex1_0111   JSR     illegalCode             * Invalid Instruction
             RTS
            
 
 
-********************************************************************************************************************** 
-* Case for: first four bits = 1001
-* --(SUB,SUBA) - Need to look into possibilites with immediate
-********************************************************************************************************************** 
+; 1001 SUB
 hex1_1001   MOVE.B  #'S',(A2)+          * Put ADD into Buff
             MOVE.B  #'U',(A2)+
             MOVE.B  #'B',(A2)+
@@ -472,7 +464,7 @@ opSUB01     MOVE.B  #'D',(A2)+          * start register entry
             
 end1001     RTS            
 
-hex1_1010   JSR     badInst             * Invalid Instruction
+hex1_1010   JSR     illegalCode             * Invalid Instruction
             RTS
 
 
@@ -546,10 +538,10 @@ muluMode    MOVE.W  D7,D6               * fresh copy
             ANDI.W  #$7,D6              * mask for mode bits
             CMP.B   #$7,D6              *
             BEQ     movePTR             * increment pointer by word
-            JMP     badInst     
+            JMP     illegalCode     
 
 movePTR     ADDQ.W  #2,A0               * increment pointer
-            JMP     badInst
+            JMP     illegalCode
         
 
 end1100     RTS
@@ -630,21 +622,21 @@ tbl_0100    *Jump table for all op codes that start with 4XXX
             JMP     hex4_1110
             JMP     hex4_1111
             
-hex4_0000   JSR     badInst
+hex4_0000   JSR     illegalCode
             RTS
             
-hex4_0001   JSR     badInst
+hex4_0001   JSR     illegalCode
             RTS
             
-hex4_0011   JSR     badInst
+hex4_0011   JSR     illegalCode
             RTS
                           
             
-hex4_0101   JSR     badInst
+hex4_0101   JSR     illegalCode
             RTS
         
             
-hex4_0111   JSR     badInst
+hex4_0111   JSR     illegalCode
             RTS
             
             
@@ -659,31 +651,31 @@ hex4_1000   MOVE.W  D7,D6           * copy instruction
 
             RTS            
 
-opMOVEM     JSR     badInst
+opMOVEM     JSR     illegalCode
             RTS   
 
-hex4_1001   JSR     badInst
+hex4_1001   JSR     illegalCode
             RTS   
-hex4_1010   JSR     badInst
+hex4_1010   JSR     illegalCode
             RTS   
-hex4_1011   JSR     badInst
+hex4_1011   JSR     illegalCode
             RTS
-hex4_1100   JSR     badInst
+hex4_1100   JSR     illegalCode
             RTS
-hex4_1101   JSR     badInst
+hex4_1101   JSR     illegalCode
             RTS
-hex4_1111   JSR     badInst
+hex4_1111   JSR     illegalCode
             RTS   
 
 
 ********************************************************************************************************************** 
 * Case for: 0100 1110 (NOP)                                                      
 ********************************************************************************************************************** 
-hex4_1110   JSR     getSize             * determine the size for (JSR,JMP)
-            CMP.B   #%10,D6             * test size bits is this JSR? (0100 1110 10..)
-            BNE     badInst             * No set badFlag for illegal instruction
+hex4_1110   JSR     getSize             
+            CMP.B   #%10,D6             
+            BNE     illegalCode             
              
-            MOVE.B  #'N',(A2)+          * yes - print NOP to goodBuff
+            MOVE.B  #'N',(A2)+          ; print nop
             MOVE.B  #'O',(A2)+
             MOVE.B  #'P',(A2)+
             RTS
@@ -693,7 +685,7 @@ hex2_1111   RTS
 
 
 ********************************************************************************************************************** 
-* Beginning of functions: badInst, getSize, size2Buffer, 
+* Beginning of functions: illegalCode, getSize, size2Buffer, 
 ********************************************************************************************************************** 
 getSize     MOVE.W  D7,D6               * copy current instruction to shift
             LSR.W   #6,D6               * move the size bits in 6-7 to LSB
@@ -706,7 +698,7 @@ size2Buffer JSR     getSize             * run sizing Commands
             CMP.B   #%01,D6             * is this a word?
             BEQ     mainW               * yes, add teh W to buffer
             CMP.B   #%10,D6             * is this a long?
-            BNE     badInst             * No? then bad instruction
+            BNE     illegalCode             * No? then bad instruction
       
             MOVE.B  #'L',(A2)+          * add L to buffer
             JMP     mainEnd             * end size2Buffer sub  
@@ -733,7 +725,7 @@ getDirBit   MOVE.W  D7,D6               * get fresh copy of instruction
 getAddr     CMP.B   #%00,D6             * test if value is a byte - assumes D6 already loaded
             BEQ     putbytebuffer         * yes? - load B worth of address into buffer
             CMP.B   #%01,D6             * test if value is a word - assumes D6 already loaded
-            BEQ     word2Buffer         * yes? - load W worth of address into buffer
+            BEQ     appendWordBuffer         * yes? - load W worth of address into buffer
             CMP.B   #%10,D6             * test if value is a long - assumes D6 already loaded
             BEQ     long2Buffer         * yes? - load L worth of address into buffer
             RTS
@@ -779,7 +771,7 @@ cmdSh4      LSR.L   D4,D6               * Shift
             JSR     cmdSh3              * Reset D6 for next shift
             RTS
             
-badInst     MOVE.B  #0,D5         
+illegalCode     MOVE.B  #0,D5         
             MOVEA.L A3,A2               
             MOVE.B  #'D',(A2)+          
             MOVE.B  #'A',(A2)+
@@ -811,15 +803,6 @@ loadDataBuffer      MOVEQ   #$0,D6
                     JSR     converToHex           
                     RTS
             
-clrRegs     CLR.L   D0                 
-            CLR.L   D1
-            CLR.L   D2
-            CLR.L   D3
-            CLR.L   D4
-            CLR.L   D6
-            CLR.L   D7
-            RTS
-
 ; Convert hex to ascii
 converToHex   CMP.B   #$A,D6              * Confirm hex character?
             BGE     letter              * Is it a letter or number?
@@ -831,7 +814,7 @@ hexToBuffer MOVE.B  D6,(A2)+
             RTS
             
 getEA       
-            LEA         ea_mode_table,A5 * load EA_mode jump table
+            LEA         addresstable,A5 * load EA_mode jump table
             CLR.L   D2
             CLR.L   D3
             CLR.L   D4           
@@ -848,15 +831,15 @@ getEA
         
             JMP         END                    * Return
 
-ea_mode_table                             * table holds the different EA modes
-            JMP     EAcode000             * Direct Data Register
-            JMP     EAcode001             * Direct Address Register
-            JMP     EAcode010             * Indirect Address Register
-            JMP     EAcode011             * Indirect Address Register with Post Increment
-            JMP     EAcode100             * Indirect Address Register with Pre Decrement
-            JMP     EAcode101             * Indirect Address Register using Index
-            JMP     EAcode110             * 
-            JMP     EAcode111             * Absolute or Immediate EA
+addresstable                             
+            JMP     EAcode000             ; Data Register Direct (mode 0)
+            JMP     EAcode001             ; Address Register Direct (mode 1)
+            JMP     EAcode010             ; Address Register Indirect (mode 2)
+            JMP     EAcode011             ; Address Register Indirect with Post Increment (mode 3)
+            JMP     EAcode100             ; Address Register Indirect with Pre Decrement (mode 4)
+            JMP     EAcode101             ; Absolute Word Address (mode 7, subclass 0)
+            JMP     EAcode110             ; Absolute Long Address (mode 7, subclass 1)
+            JMP     EAcode111             * Immediate Data (mode 7 subclass 4)
 
 EAcode000
             MOVE.W      D7,D6                   * move current working word into temp storage
@@ -910,14 +893,14 @@ EAcode100   MOVE.W      D7,D6                   * move current working word into
             RTS                                     * Return
             
 EAcode101
-             JMP    badInst          * set bad instruction flag
+            JMP    illegalCode          * set bad instruction flag
 EAcode110
-            JMP       badInst             * set bad instruction flag
+            JMP       illegalCode             * set bad instruction flag
 
 EAcode111   MOVE.W D7, D6
             ANDI.W #$07, D6
             CMPI.B   #$0,D6              
-            BEQ      word2Buffer         
+            BEQ      appendWordBuffer         
             CMPI.B   #$1,D6              
             BEQ      long2Buffer         
             CMPI.B   #$2,D6
@@ -925,10 +908,10 @@ EAcode111   MOVE.W D7, D6
             BEQ      pctobuffer  
             RTS
 
- 
+;;; Adding things to buffer 
 ; Add '(pc)' to buffer
 pctobuffer
-            JSR         word2Buffer
+            JSR         appendWordBuffer
             MOVE.B      #'(',(A2)+                        
             MOVE.B      #'P',(A2)+              
             MOVE.B      #'C',(A2)+              
@@ -942,7 +925,7 @@ putbytebuffer
             CLR.L   D4          
             MOVE.B  #2,D4       
             
-word2Buffer 
+appendWordBuffer 
             MOVE.B  #'$',(A2)+  
             CLR.L   D4          * pre-emptive clearout
             MOVE.B  #$24,(A2)+  * put dollar sign in buffer (before address)
@@ -950,31 +933,12 @@ word2Buffer
             CLR.L   D4          * pre-emptive clearout
             MOVE.B  #4,D4       * load a counter
             
-rtnEA1      MOVE.W  D7,D6       * re-load current word for temp storage            
-            ADDQ.W  #2,A0       * advancing memory pointer by word   
-            RTS                 * return from subroutine
-
 long2Buffer
             MOVE.B  #'$',(A2)+
             CLR.L   D4          * pre-emptive clearout
             MOVE.L  (A0),D2       * move current word into D2 for rolling purposes
             CLR.L   D4          * pre-emptive clearout
             MOVE.B  #8,D4       * load a counter
-
-l2bLoop                 
-            CMP.B   #$00,D4     * compare counter with 0
-            BEQ     rtnEA2      * if zero, return
-            ROL.L   #4,D2       * roll the bits in D2 to the left
-            MOVE.W  D2,D6       * move rolled bits into temp storage
-            ANDI.W  #$000F,D6   * and the bits to isolate ascii char   
-            JSR     converToHex   * load ascii char into buffer            
-            SUBQ.B  #$1,D4      * subtract from counter
-            JMP     l2bLoop     * keep looping until counter hits zero
-            
-rtnEA2      MOVE.W  D7,D6       * re-load current word for temp storage
-            ADDQ.W  #4,A0       * advancing memory pointer by long
-            RTS                 * return from subroutine
-
 
                    
              ORG   $4000 ; Make sure data starts at $4000

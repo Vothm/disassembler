@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 12/15/2021 4:24:45 PM
+Created On: 12/15/2021 4:57:33 PM
 
 00000000                             1  *-----------------------------------------------------------------
 00000000                             2  * Title      : 68K Disassembler
@@ -27,7 +27,7 @@ Created On: 12/15/2021 4:24:45 PM
 0000100E  45F9 000040CA             23              LEA     message_buffer,A2         * buffer resides in A2
 00001014  2C4A                      24              MOVEA.L A2,A6               * reference to start of good buffer
 00001016                            25      
-00001016  6100 0076                 26  in_start    BSR     INPUT
+00001016  6100 0086                 26  in_start    BSR     INPUT
 0000101A  6100 016E                 27              BSR     buffPrep
 0000101E  103C 0001                 28              MOVE.B  #1,D0
 00001022  43F9 00004088             29              LEA     str_more,A1
@@ -68,1080 +68,1046 @@ Created On: 12/15/2021 4:24:45 PM
 00001088  4247                      64              CLR     D7
 0000108A  4E75                      65              RTS
 0000108C                            66                          
-0000108C  4E75                      67  EndUtil      RTS
-0000108E                            68  
-0000108E                            69  INPUT:
-0000108E  103C 0001                 70              MOVE.B  #1,D0
-00001092  43F9 00004036             71              LEA     string1,A1
-00001098  3239 0000404E             72              MOVE.W  str_len1,D1         
-0000109E  4E4F                      73              TRAP    #15
-000010A0  D3FC 0000404E             74              ADDA.L  #str_len1,A1         
-000010A6  103C 0002                 75              MOVE.B  #2,D0      
-000010AA  4E4F                      76              TRAP    #15
-000010AC  4EB9 000010F0             77              JSR     asciiTOhex           
-000010B2  BA3C 0000                 78              CMP.B   #$00,D5
-000010B6  6700 0036                 79              BEQ     endInput            
-000010BA  2848                      80              MOVEA.L A0,A4         
-000010BC  103C 0001                 81              MOVE.B  #1,D0
-000010C0  43F9 00004050             82              LEA     string2,A1
-000010C6  3239 00004066             83              MOVE.W  str_len2,D1         
-000010CC  4E4F                      84              TRAP    #15         
-000010CE  D3FC 00004066             85              ADDA.L  #str_len2,A1
-000010D4  103C 0002                 86              MOVE.B  #2,D0
-000010D8  4E4F                      87              TRAP    #15
-000010DA  4EB9 000010F0             88              JSR     asciiTOhex
-000010E0  BA3C 0000                 89              CMP.B   #$00,D5
-000010E4  6700 0008                 90              BEQ          endInput           
-000010E8  264C                      91              MOVEA.L A4,A3               
-000010EA  2848                      92              MOVEA.L A0,A4               
-000010EC  204B                      93              MOVEA.L A3,A0        
-000010EE                            94                      
-000010EE  4E75                      95  endInput    RTS
-000010F0                            96  
-000010F0                            97  ; Take D3 (user input) and put the converted ascii to hex on A4
-000010F0                            98  asciiTOhex
-000010F0  48E7 F800                 99              MOVEM.L D0-D4,-(SP)         
-000010F4  1A3C 0001                100              MOVE.B  #1,D5        
-000010F8  4EB9 000018FC            101              JSR     clrRegs
-000010FE  3C3C 0000                102              MOVE    #0,D6      
-00001102                           103        
-00001102  1619                     104  loop2       MOVE.B  (A1)+,D3            
-00001104  B63C 0030                105              CMP.B   #$30,D3             
-00001108  6D00 0068                106              BLT     finish      
-0000110C  B63C 003A                107              CMP.B   #$3A,D3             
-00001110  6D00 0042                108              BLT     num_to_hex      
-00001114  B63C 0041                109              CMP.B   #$41,D3             
-00001118  6D00 0058                110              BLT     finish      
-0000111C  B63C 0047                111              CMP.B   #$47,D3             
-00001120  6D00 003C                112              BLT     cap_to_hex
-00001124  B63C 0061                113              CMP.B   #$61,D3             
-00001128  6D00 0048                114              BLT     finish      
-0000112C  B63C 0067                115              CMP.B   #$67,D3             
-00001130  6D00 0036                116              BLT     lower_to_hex
-00001134  B63C 0066                117              CMP.B   #$66,D3             
-00001138  6E00 0038                118              BGT     finish      
-0000113C                           119        
-0000113C  5246                     120  resume      ADD     #1,D6               
-0000113E  BC7C 0006                121              CMP     #6,D6               
-00001142  6700 002E                122              BEQ     finish      
-00001146  0C11 0000                123              CMP.B   #$00,(A1)          
-0000114A  6700 0026                124              BEQ     finish      
-0000114E  E984                     125              ASL.L   #4,D4                         
-00001150  4EF8 1102                126              JMP     loop2               
-00001154                           127  
-00001154  0403 0030                128  num_to_hex  SUBI.B  #$30,D3             
-00001158  D803                     129              ADD.B   D3,D4               
-0000115A  4EF8 113C                130              JMP     resume              
-0000115E                           131  
-0000115E  0403 0037                132  cap_to_hex  SUBI.B  #$37,D3             
-00001162  D803                     133              ADD.B   D3,D4               
-00001164  4EF8 113C                134              JMP     resume              
-00001168                           135  
-00001168                           136  lower_to_hex
-00001168  0403 0057                137              SUBI.B  #$57,D3             
-0000116C  D803                     138              ADD.B   D3,D4               
-0000116E  4EF8 113C                139              JMP     resume              
-00001172                           140  
-00001172  2044                     141  finish      MOVE.L  D4,A0
-00001174  4246                     142              CLR     D6                  
-00001176  4CDF 001F                143              MOVEM.L (SP)+,D0-D4             
-0000117A  4E75                     144              RTS                         
-0000117C                           145          
-0000117C                           146  ; Fill the message buffer with address so that the format can be: address DATA hex
-0000117C  224A                     147  FILL_ADDRESS: MOVEA.L  A2,A1              *load trap address with A2                     JSR      getLongtLong
-0000117E  4EB9 000017FC            148                JSR getLong
-00001184  14FC 0009                149                MOVE.B   #$09,(A2)+                                   
-00001188  4E75                     150                RTS
-0000118A                           151           
-0000118A                           152  ; Print stuff in the buffer
-0000118A  244E                     153  buffPrep    MOVEA.L A6,A2         
-0000118C  61EE                     154              BSR     FILL_ADDRESS        * fill buffer with current address
-0000118E  4EB9 000011D0            155              JSR     opDecode
-00001194  14BC 0000                156              MOVE.B  #00,(A2)            * null terminater
-00001198  103C 000D                157              MOVE.B  #13,D0
-0000119C  4E4F                     158              TRAP    #15                 * print decoded Op
-0000119E                           159                                
-0000119E  B9C8                     160              CMPA.L   A0,A4              * have we reached the end of our address range?
-000011A0  6F00 002C                161              BLE      endBuff
-000011A4                           162              
-000011A4  5247                     163              ADDI    #1,D7               * increment counter
-000011A6  BE7C 0014                164              CMP     #printCount,D7
-000011AA  66DE                     165              BNE     buffPrep
-000011AC                           166              
-000011AC  103C 0001                167              MOVE.B  #1,D0
-000011B0  43F9 00004068            168              LEA     str_enter,A1
-000011B6  3239 00004086            169              MOVE.W  str_en_len,D1
-000011BC  4E4F                     170              TRAP    #15
-000011BE                           171              
-000011BE  103C 0002                172              MOVE.B  #2,D0
-000011C2  4E4F                     173              TRAP    #15
-000011C4                           174              
-000011C4  12BC 0050                175              MOVE.B  #$50,(A1)
-000011C8                           176              
-000011C8  4247                     177              CLR     D7                  *reset counter
-000011CA  4EF8 118A                178              JMP     buffPrep
-000011CE                           179              
-000011CE  4E75                     180  endBuff     RTS         
-000011D0                           181            
-000011D0  48E7 FB0E                182  opDecode    MOVEM.L A4-A6/D0-D4/D6-D7,-(SP)      * Save registers
-000011D4  4EB9 000018FC            183              JSR     clrRegs             * Clear registers for use
-000011DA  1A3C 0001                184              MOVE.B  #1,D5        * Set good flag until fail
-000011DE  3E18                     185              MOVE.W  (A0)+,D7            * Move instruction to D7 & Increment pointer
-000011E0  264A                     186              MOVEA.L A2,A3               * Store buffer location                 
-000011E2  4EB9 000011EE            187              JSR     getOp               * Decode instruction Test
-000011E8                           188  
-000011E8                           189  
-000011E8                           190  
-000011E8                           191  ********************************************************************************************************************** 
-000011E8                           192  * Start of opReturn section - clean up process and return to IO
-000011E8                           193  ********************************************************************************************************************** 
-000011E8  4CDF 70DF                194  opReturn    MOVEM.L (SP)+,D6-D7/D0-D4/A4-A6 
-000011EC  4E75                     195              RTS              
-000011EE                           196              
-000011EE                           197                                      
-000011EE  3C07                     198  getOp       MOVE.W  D7,D6               * Move instruction to shift
-000011F0  183C 000C                199              MOVE.B  #shift12bits,D4         * Load shifter register
-000011F4  E86E                     200              LSR.W   D4,D6               * Shift right 12 bits
-000011F6  CCFC 0006                201              MULU    #6,D6               * Form offset           
-000011FA  4BF9 00001206            202              LEA     tbl_op,A5           * Index into the table                                                                                   
-00001200  4EB5 6000                203              JSR     00(A5,D6)           * Jump indirect with index (00 indicates word movement)
-00001204  4E75                     204              RTS
-00001206                           205  
-00001206                           206  
-00001206                           207  
-00001206                           208  ********************************************************************************************************************** 
-00001206                           209  * Beginning of the main table: tbl_op
-00001206                           210  * Contains the functions per the first 4 bits of current instruction.
-00001206                           211  ********************************************************************************************************************** 
-00001206                           212  tbl_op      
-00001206  4EF9 0000124E            213              JMP     hex1_0000            
-0000120C  4EF9 000012A8            214              JMP     hex1_0001            
-00001212                           215              ;JMP     hex1_0010
-00001212  4EF9 0000130E            216              JMP     hex1_0011
-00001218  4EF9 000013C8            217              JMP     hex1_0100
-0000121E  4EF9 0000142C            218              JMP     hex1_0101
-00001224  4EF9 00001434            219              JMP     hex1_0110
-0000122A  4EF9 0000143E            220              JMP     hex1_0111
-00001230                           221              ;JMP     hex1_1000
-00001230  4EF9 00001446            222              JMP     hex1_1001
-00001236  4EF9 00001504            223              JMP     hex1_1010
-0000123C  4EF9 0000150C            224              JMP     hex1_1011
-00001242  4EF9 000015C0            225              JMP     hex1_1100
-00001248  4EF9 000015F0            226              JMP     hex1_1101
-0000124E                           227              ;JMP     hex1_1110
-0000124E                           228              ;JMP     hex1_1111
-0000124E                           229  
-0000124E                           230  ********************************************************************************************************************** 
-0000124E                           231  * Case for: first four bits = 0000
-0000124E                           232  * --(ORI) 
-0000124E                           233  ********************************************************************************************************************** 
-0000124E  3C07                     234  hex1_0000   MOVE.W  D7,D6               * Fresh copy of instruction to shift
-00001250  0246 0F00                235              ANDI.W  #$0F00,D6           * Isolate second byte
-00001254  183C 0008                236              MOVE.B  #shift8bits,D4          * Load shifter
-00001258  E8AE                     237              LSR.L   D4,D6               * Shift to LSB
-0000125A  BC3C 0000                238              CMP.B   #$0,D6              * Is this ORI?
-0000125E  6700 0006                239              BEQ     opORI               * Jump to opORI section
-00001262  6600 062C                240              BNE     badInst             * No - bad instruction                  
-00001266                           241  
-00001266  14FC 004F                242  opORI       MOVE.B  #'O',(A2)+          * Populate ORI into buffer
-0000126A  14FC 0052                243              MOVE.B  #'R',(A2)+
-0000126E  14FC 0049                244              MOVE.B  #'I',(A2)+
-00001272  14FC 002E                245              MOVE.B  #'.',(A2)+
-00001276  4EB9 00001790            246              JSR     size2Buffer         * determine & add size to buffer
-0000127C  14FC 0020                247              MOVE.B  #' ',(A2)+
-00001280  14FC 0020                248              MOVE.B  #' ',(A2)+
-00001284  14FC 0020                249              MOVE.B  #' ',(A2)+
-00001288  14FC 0020                250              MOVE.B  #' ',(A2)+            
-0000128C  14FC 0023                251              MOVE.B  #'#',(A2)+            
-00001290  4EB9 000017E2            252              JSR     getAddr             * Add immediate source
-00001296  14FC 002C                253              MOVE.B  #',',(A2)+          * Add comma
-0000129A  4EB9 00001924            254              JSR     getEA               * Print off desitination operand
-000012A0  4EF9 000012A6            255              JMP     end0000             * Skip to end of sub: hex1_0000
-000012A6                           256  
-000012A6  4E75                     257  end0000     RTS
-000012A8                           258  ********************************************************************************************************************** 
-000012A8                           259  * Case for: first four bits = 0011                                   
-000012A8                           260  * MOVE.B
-000012A8                           261  ********************************************************************************************************************** 
-000012A8                           262  
-000012A8                           263  *hex1_0011  MOVE.B  #'M',(A2)+          * Start of MOVE.B OpCode
-000012A8                           264  *            MOVE.B  #'O',(A2)+
-000012A8                           265  *            MOVE.B  #'V',(A2)+
-000012A8                           266  *            MOVE.B  #'E',(A2)+
-000012A8                           267  *            MOVE.B  #'.',(A2)+
-000012A8                           268  *            MOVE.B  #'B',(A2)+
-000012A8                           269  *            MOVE.B  #' ',(A2)+
-000012A8                           270  *            MOVE.B  #' ',(A2)+
-000012A8                           271  *            MOVE.B  #' ',(A2)+  
-000012A8                           272  *            JSR     getEA               * get source destination
-000012A8                           273  *            MOVE.B  #',',(A2)+
-000012A8                           274  *            JSR     swap4Move           * swap destination and source regs for getEA
-000012A8                           275  *            JSR     getEA     
-000012A8                           276  *end0001     RTS 
-000012A8                           277  *            
-000012A8                           278              
-000012A8                           279              
-000012A8                           280              
-000012A8                           281  ********************************************************************************************************************** 
-000012A8                           282  * Case for: first four bits = 0001                                 
-000012A8                           283  * MOVE.L, MOVEA.L
-000012A8                           284  ********************************************************************************************************************** 
-000012A8  14FC 004D                285  hex1_0001   MOVE.B  #'M',(A2)+          * Start of MOVE/A.L OpCodes
-000012AC  14FC 004F                286              MOVE.B  #'O',(A2)+
-000012B0  14FC 0056                287              MOVE.B  #'V',(A2)+
-000012B4  14FC 0045                288              MOVE.B  #'E',(A2)+
-000012B8  1C07                     289              MOVE.B  D7,D6               * copy fresh instruction to Shift
-000012BA  EC8E                     290              LSR.L   #6,D6               * shift by 6 to isolate bits 6-8 in LSB
-000012BC  0246 0007                291              ANDI.W  #$07,D6             * determine if MoveA?
-000012C0  BC3C 0001                292              CMP.B   #$1,D6              * is this a MOVEA Function?
-000012C4  6600 001C                293              BNE     moveL               * no then move to . portion
-000012C8  14FC 0041                294              MOVE.B  #'A',(A2)+
-000012CC  14FC 002E                295              MOVE.B  #'.',(A2)+
-000012D0  14FC 004C                296              MOVE.B  #'L',(A2)+
-000012D4  14FC 0020                297              MOVE.B  #' ',(A2)+
-000012D8  14FC 0020                298              MOVE.B  #' ',(A2)+
-000012DC  4EF9 000012F6            299              JMP     moveLEA             * skip to filling out source destination
-000012E2  14FC 002E                300  moveL       MOVE.B  #'.',(A2)+
-000012E6  14FC 004C                301              MOVE.B  #'L',(A2)+
-000012EA  14FC 0020                302              MOVE.B  #' ',(A2)+
-000012EE  14FC 0020                303              MOVE.B  #' ',(A2)+
-000012F2  14FC 0020                304              MOVE.B  #' ',(A2)+  
-000012F6  4EB9 00001924            305  moveLEA     JSR     getEA               * get source destination
-000012FC  14FC 002C                306              MOVE.B  #',',(A2)+
-00001300  4EB9 00001374            307              JSR     swapDestReg  * swap destination and source regs for getEA
-00001306  4EB9 00001924            308              JSR     getEA     
-0000130C  4E75                     309  end0010     RTS
-0000130E                           310   
-0000130E                           311   
-0000130E                           312   
-0000130E                           313  ********************************************************************************************************************** 
-0000130E                           314  * Case for: first four bits = 0011                                    
-0000130E                           315  * MOVE.W, MOVEA.W
-0000130E                           316  ********************************************************************************************************************** 
-0000130E  14FC 004D                317  hex1_0011   MOVE.B  #'M',(A2)+          * Start of MOVE/A.W OpCodes
-00001312  14FC 004F                318              MOVE.B  #'O',(A2)+
-00001316  14FC 0056                319              MOVE.B  #'V',(A2)+
-0000131A  14FC 0045                320              MOVE.B  #'E',(A2)+
-0000131E  1C07                     321              MOVE.B  D7,D6               * copy fresh instruction to Shift
-00001320  EC8E                     322              LSR.L   #6,D6               * shift by 6 to isolate bits 6-8 in LSB
-00001322  0246 0007                323              ANDI.W  #$07,D6             * determin if move A?
-00001326  BC3C 0001                324              CMP.B   #$1,D6              * is this a MOVEA Function?
-0000132A  6600 001C                325              BNE     moveW               * no then move to . portion
-0000132E  14FC 0041                326              MOVE.B  #'A',(A2)+          * yes - populate A
-00001332  14FC 002E                327              MOVE.B  #'.',(A2)+
-00001336  14FC 0057                328              MOVE.B  #'W',(A2)+
-0000133A  14FC 0020                329              MOVE.B  #' ',(A2)+
-0000133E  14FC 0020                330              MOVE.B  #' ',(A2)+
-00001342  4EF9 0000135C            331              JMP     moveWEA             * skip to filling out source destination
-00001348  14FC 002E                332  moveW       MOVE.B  #'.',(A2)+
-0000134C  14FC 0057                333              MOVE.B  #'W',(A2)+
-00001350  14FC 0020                334              MOVE.B  #' ',(A2)+
-00001354  14FC 0020                335              MOVE.B  #' ',(A2)+
-00001358  14FC 0020                336              MOVE.B  #' ',(A2)+  
-0000135C  4EB9 00001924            337  moveWEA     JSR     getEA               * get source destination
-00001362  14FC 002C                338              MOVE.B  #',',(A2)+
-00001366  4EB9 00001374            339              JSR     swapDestReg  * swap destination and source regs for getEA
-0000136C  4EB9 00001924            340              JSR     getEA     
-00001372  4E75                     341  end0011     RTS 
-00001374                           342  
-00001374                           343  
-00001374                           344  
-00001374  4283                     345  swapDestReg CLR.L   D3                  * Clear (0000) D3 to hold swap value
-00001376  3C07                     346              MOVE.W  D7,D6               * Copy to initial shift get reg bits 9-11
-00001378  E04E                     347              LSR.W   #shift8bits,D6          * shift by 8 (9 total)
-0000137A  E24E                     348              LSR.W   #1,D6               * shift by 1 (9 total)
-0000137C  0246 0007                349              ANDI.W  #$0007,D6           * Mask/Isolate last 3 bits
-00001380  8646                     350              OR.W    D6,D3               * Place Reg Bits Into D3 for swap
-00001382  3C07                     351              MOVE.W  D7,D6               * Copy to get mode bits 6-8
-00001384  E64E                     352              LSR.W   #3,D6               * shift bits 6-8 down 3 to normal ea position 3-5
-00001386  0246 0038                353              ANDI.W  #$0038,D6           * mask bits 3-5
-0000138A  8646                     354              OR.W    D6,D3               * add the move bits into D3
-0000138C  4EB9 00001396            355              JSR     moveSize            * add the move size bits (6-7) into D3 for ea
-00001392  3E03                     356              MOVE.W  D3,D7               * swap register mode to determine destination from ea functions
-00001394  4E75                     357              RTS
-00001396                           358              
-00001396                           359              
-00001396  3C07                     360  moveSize    MOVE.W  D7,D6               * get fresh copy to determine MOVE size
-00001398  E04E                     361              LSR.W   #shift8bits,D6          * shift move size bits 12-13 to LSB
-0000139A  E84E                     362              LSR.W   #shift4bits,D6          
-0000139C  0246 0003                363              ANDI.W  #$0003,D6           * Isolate move bits
-000013A0  BC3C 0001                364              CMP.B   #$1,D6              * is this a byte?
-000013A4  6700 0020                365              BEQ     mSizeEnd            * yes - byte size already in bits 6-7 of D3
-000013A8  BC3C 0002                366              CMP.B   #$2,D6              * is this a L?
-000013AC  6700 0014                367              BEQ     moveSizeL           * yes - Or L size to D3 bits 6-7
-000013B0  BC3C 0003                368              CMP.B   #$3,D6              * is this a W?
-000013B4  6600 04DA                369              BNE     badInst             * No- then badInst        
-000013B8  0043 0040                370  moveSizeW   ORI.W   #$0040,D3           * add size 01 in bits 6-7 (4) into D3
-000013BC  4EF9 000013C6            371              JMP     mSizeEnd            * skip to end once done
-000013C2  0043 0080                372  moveSizeL   ORI.W   #$0080,D3           * add size 10 in bits 6-7 (4) into D3
-000013C6  4E75                     373  mSizeEnd    RTS 
-000013C8                           374  
-000013C8                           375  
-000013C8                           376  
-000013C8                           377  ********************************************************************************************************************** 
-000013C8                           378  * Case for: first four bits = 0100
-000013C8                           379  * --(MOVEM,LEA,NOP)
-000013C8                           380  ********************************************************************************************************************** 
-000013C8  3C07                     381  hex1_0100   MOVE.W  D7,D6               * Fresh copy of instruction to shift
-000013CA  0246 0100                382              ANDI.W  #$0100,D6           * Test isolate 8th bit for LEA
-000013CE  BC7C 0100                383              CMP.W   #$0100,D6           * Test if LEA
-000013D2  6700 0022                384              BEQ     opLEA               * Yes finish testing for LEA
-000013D6  3C07                     385              MOVE.W  D7,D6               * Copy fresh copy of instruction to shift
-000013D8  183C 0008                386              MOVE.B  #shift8bits,D4          * Load 8 bit shifter
-000013DC  E86E                     387              LSR.W   D4,D6               * Shift current instruction
-000013DE  0246 000F                388              ANDI.W  #$000F,D6           * Isolate last 4 bits (LSB)
-000013E2  CCFC 0006                389              MULU    #6,D6               * Form offset for next JMP table
-000013E6  4BF9 000016AE            390              LEA     tbl_0100,A5         * Load next JMP table 
-000013EC  4EB5 6000                391              JSR     00(A5,D6)           * Jump to next instruction per next 4 bits
-000013F0  4EF9 0000142A            392              JMP     end0100             * Once returned from jump table, skip to end
-000013F6                           393              
-000013F6  14FC 004C                394  opLEA       MOVE.B  #'L',(A2)+          * Start input of LEA
-000013FA  14FC 0045                395              MOVE.B  #'E',(A2)+
-000013FE  14FC 0041                396              MOVE.B  #'A',(A2)+
-00001402  14FC 0020                397              MOVE.B  #' ',(A2)+
-00001406  14FC 0009                398              MOVE.B  #$09,(A2)+ 
-0000140A  4EB9 00001924            399              JSR     getEA               * Determine address to go to buffer
-00001410  14FC 002C                400              MOVE.B  #',',(A2)+          * Add comma
-00001414  14FC 0041                401              MOVE.B  #'A',(A2)+          * Add A(x)
-00001418  3C07                     402              MOVE.W  D7,D6               * Copy fresh copy of instruction to shift
-0000141A  183C 0009                403              MOVE.B  #9,D4               * Load 9 bit shifter
-0000141E  E86E                     404              LSR.W   D4,D6               * Shift current instruction
-00001420  0246 000F                405              ANDI.W  #$000F,D6           * Isolate last 4 bits (LSB)
-00001424  0606 0030                406              ADD.B   #$30,D6             * convert data register # to hex digit
-00001428  14C6                     407              MOVE.B  D6,(A2)+            * register # to buffer
-0000142A  4E75                     408  end0100     RTS
-0000142C                           409  
-0000142C  4EB9 00001890            410  hex1_0101   JSR     badInst             * Invalid Instruction
-00001432  4E75                     411              RTS
-00001434                           412              
-00001434                           413              ***** MOVEM Command
-00001434  4EB9 00001890            414  hex1_0110   JSR     badInst
-0000143A  5448                     415              ADDQ.W  #2,A0
-0000143C  4E75                     416              RTS
-0000143E                           417  
-0000143E  4EB9 00001890            418  hex1_0111   JSR     badInst             * Invalid Instruction
-00001444  4E75                     419              RTS
-00001446                           420             
-00001446                           421  
-00001446                           422  
-00001446                           423  ********************************************************************************************************************** 
-00001446                           424  * Case for: first four bits = 1001
-00001446                           425  * --(SUB,SUBA) - Need to look into possibilites with immediate
-00001446                           426  ********************************************************************************************************************** 
-00001446  14FC 0053                427  hex1_1001   MOVE.B  #'S',(A2)+          * Put ADD into Buff
-0000144A  14FC 0055                428              MOVE.B  #'U',(A2)+
-0000144E  14FC 0042                429              MOVE.B  #'B',(A2)+
-00001452  4EB9 00001786            430              JSR     getSize             * return size  in 6 & 7 into D6
-00001458  BC3C 0003                431              CMP.B   #%11,D6             * determine if a ADD or ADDA
-0000145C  6600 004E                432              BNE     opSUB               * not size 11, then skip to ADD
-00001460  14FC 0041                433              MOVE.B  #'A',(A2)+          * yep, detected 11 then ADDA
-00001464  14FC 002E                434              MOVE.B  #'.',(A2)+
-00001468  3C07                     435              MOVE.W  D7,D6               * fresh copy of instruction
-0000146A  E08E                     436              LSR.L   #shift8bits,D6          * shift to right to isolate 8th bits
-0000146C  0246 0001                437              ANDI.W  #$0001,D6           * Isolate last bit for size
-00001470  BC3C 0001                438              CMP.B   #%1,D6              * compare for a 1 to determine
-00001474  6700 000C                439              BEQ     subaL               * jump to long, else word
-00001478  14FC 0057                440              MOVE.B  #'W',(A2)+          * add word size into buffer
-0000147C  4EF9 00001486            441              JMP     opSUBA
-00001482  14FC 004C                442  subaL       MOVE.B  #'L',(A2)+          * add long size into buffer           
-00001486  14FC 0020                443  opSUBA      MOVE.B  #' ',(A2)+
-0000148A  14FC 0020                444              MOVE.B  #' ',(A2)+
-0000148E  14FC 0020                445              MOVE.B  #' ',(A2)+
-00001492                           446              **** NOTE NEED TO TEST FOR EA to ADD $
-00001492  4EB9 00001924            447              JSR     getEA               * get source operand
-00001498  14FC 002C                448              MOVE.B  #',',(A2)+
-0000149C  14FC 0041                449              MOVE.B  #'A',(A2)+  
-000014A0  4EB9 000017C6            450              JSR     highRegBits         * Add register number to buffer
-000014A6  4EF9 000016AC            451              JMP     end1101
-000014AC                           452              
-000014AC  14FC 002E                453  opSUB       MOVE.B  #'.',(A2)+          * finish putting Add.x to buffer
-000014B0  4EB9 00001790            454              JSR     size2Buffer         * Determine Size and Add to Buffer
-000014B6  14FC 0020                455              MOVE.B  #' ',(A2)+
-000014BA  14FC 0020                456              MOVE.B  #' ',(A2)+
-000014BE  14FC 0020                457              MOVE.B  #' ',(A2)+
-000014C2  14FC 0020                458              MOVE.B  #' ',(A2)+
-000014C6  4EB9 000017D8            459              JSR     getDirBit           * get Direction Bit 0 = EA 1 =regs
-000014CC  BC3C 0000                460              CMP.B   #%0,D6              * is this EA first?
-000014D0  6600 001C                461              BNE     opSUB01             * no, jmp to reg mode first
-000014D4  4EB9 00001924            462              JSR     getEA               * print off effective address
-000014DA  14FC 002C                463              MOVE.B  #',',(A2)+          * add comma
-000014DE  14FC 0044                464              MOVE.B  #'D',(A2)+          * add register BAM!
-000014E2  4EB9 000017C6            465              JSR     highRegBits         * Add register number to buffer
-000014E8  4EF9 00001502            466              JMP     end1001             * jump to exit of sub: hex1_1101
-000014EE                           467              
-000014EE  14FC 0044                468  opSUB01     MOVE.B  #'D',(A2)+          * start register entry
-000014F2  4EB9 000017C6            469              JSR     highRegBits         * add register number
-000014F8  14FC 002C                470              MOVE.B  #',',(A2)+          * add comma
-000014FC  4EB9 00001924            471              JSR     getEA               * finish with EA          
-00001502                           472              
-00001502  4E75                     473  end1001     RTS            
-00001504                           474  
-00001504  4EB9 00001890            475  hex1_1010   JSR     badInst             * Invalid Instruction
-0000150A  4E75                     476              RTS
-0000150C                           477  
-0000150C                           478  
-0000150C                           479  
-0000150C                           480  ********************************************************************************************************************** 
-0000150C                           481  * Case for: first four bits = 1011
-0000150C                           482  * --(CMP)
-0000150C                           483  ********************************************************************************************************************** 
-0000150C  4EB9 00001786            484  hex1_1011   JSR     getSize             * return size  in 6 & 7 into D6
-00001512  BC3C 0003                485              CMP.B   #%11,D6             * determine if a CMPA
-00001516  6600 005A                486              BNE     opCMPEOR
-0000151A  14FC 0043                487              MOVE.B  #'C',(A2)+          * Put SUBA into Buff
-0000151E  14FC 004D                488              MOVE.B  #'M',(A2)+
-00001522  14FC 0050                489              MOVE.B  #'P',(A2)+
-00001526  14FC 0041                490              MOVE.B  #'A',(A2)+
-0000152A  14FC 002E                491              MOVE.B  #'.',(A2)+
-0000152E  3C07                     492              MOVE.W  D7,D6               * fresh copy of instruction
-00001530  E08E                     493              LSR.L   #shift8bits,D6          * shift to right to isolate 8th bits
-00001532  0246 0001                494              ANDI.W  #$0001,D6           * Isolate last bit for size
-00001536  BC3C 0001                495              CMP.B   #%1,D6              * compare for a 1 to determine
-0000153A  6700 000C                496              BEQ     cmpaL               * jump to long, else word
-0000153E  14FC 0057                497              MOVE.B  #'W',(A2)+          * add word size into buffer
-00001542  4EF9 0000154C            498              JMP     opCMPA              * Skip to adding padding and destination
-00001548  14FC 004C                499  cmpaL       MOVE.B  #'L',(A2)+          * add long size into buffer           
-0000154C  14FC 0020                500  opCMPA      MOVE.B  #' ',(A2)+
-00001550  14FC 0020                501              MOVE.B  #' ',(A2)+
-00001554  14FC 0020                502              MOVE.B  #' ',(A2)+
-00001558                           503  
-00001558  4EB9 00001924            504              JSR     getEA               * get source operand
-0000155E  14FC 002C                505              MOVE.B  #',',(A2)+
-00001562  14FC 0041                506              MOVE.B  #'A',(A2)+
-00001566  4EB9 000017C6            507              JSR     highRegBits         * Get address register number
-0000156C  4EF9 000015BE            508              JMP     end1011             * Skip to end of sub: hex1_1011
-00001572                           509              
-00001572  3C07                     510  opCMPEOR    MOVE.W  D7,D6               * fresh value
-00001574  4EB9 000017D8            511              JSR     getDirBit           * determine the direction bit 1 = eor 0 = cmp
-0000157A  BC3C 0000                512              CMP.B   #%0,D6              * yes, go into CMP     
-0000157E                           513                     
-0000157E  14FC 0043                514  opCMP       MOVE.B  #'C',(A2)+          * Populate CMP
-00001582  14FC 004D                515              MOVE.B  #'M',(A2)+
-00001586  14FC 0050                516              MOVE.B  #'P',(A2)+
-0000158A  14FC 002E                517              MOVE.B  #'.',(A2)+
-0000158E  4EB9 00001790            518              JSR     size2Buffer         * Determine & add size to buffer
-00001594  14FC 0020                519              MOVE.B  #' ',(A2)+
-00001598  14FC 0020                520              MOVE.B  #' ',(A2)+
-0000159C  14FC 0020                521              MOVE.B  #' ',(A2)+
-000015A0  14FC 0020                522              MOVE.B  #' ',(A2)+
-000015A4  4EB9 00001924            523              JSR     getEA               * Source Operand
-000015AA  14FC 002C                524              MOVE.B  #',',(A2)+
-000015AE  14FC 0044                525              MOVE.B  #'D',(A2)+  
-000015B2  4EB9 000017C6            526              JSR     highRegBits         * Add register number to buffer
-000015B8  4EF9 000015BE            527              JMP     end1011             * Skip to end of sub: hex1_1011
-000015BE                           528        
-000015BE                           529  
-000015BE  4E75                     530  end1011     RTS
-000015C0                           531  
-000015C0                           532  
-000015C0                           533  
-000015C0                           534  
-000015C0                           535  ********************************************************************************************************************** 
-000015C0                           536  * Case for: first four bits = 1100
-000015C0                           537  * MULU
-000015C0                           538  ********************************************************************************************************************** 
-000015C0  3C07                     539  hex1_1100   MOVE.W  D7,D6               * copy instruction for testing
-000015C2  EC8E                     540  opMULU      LSR.L   #6,D6               * shift 6 to prep for mulu testing
-000015C4  0246 0003                541              ANDI.W  #$3,D6              * mask last 3 bits
-000015C8  BC3C 0003                542              CMP.B   #$3,D6              * is this MULU or MULS?
-000015CC  6700 0002                543              BEQ     muluMode            * head to mulu  mode to determine immediate  
-000015D0  3C07                     544  muluMode    MOVE.W  D7,D6               * fresh copy
-000015D2  E68E                     545              LSR.L   #3,D6               * shift bits 3-5 into LSB
-000015D4  0246 0007                546              ANDI.W  #$7,D6              * mask for mode bits
-000015D8  BC3C 0007                547              CMP.B   #$7,D6              *
-000015DC  6700 0008                548              BEQ     movePTR             * increment pointer by word
-000015E0  4EF9 00001890            549              JMP     badInst     
+0000108C  4280                      67  CLEARRIGSTERS     CLR.L   D0                 
+0000108E  4281                      68              CLR.L   D1
+00001090  4282                      69              CLR.L   D2
+00001092  4283                      70              CLR.L   D3
+00001094  4284                      71              CLR.L   D4
+00001096  4286                      72              CLR.L   D6
+00001098  4287                      73              CLR.L   D7
+0000109A  4E75                      74              RTS
+0000109C                            75  
+0000109C                            76                          
+0000109C  4E75                      77  EndUtil      RTS
+0000109E                            78  
+0000109E                            79  INPUT:
+0000109E  103C 0001                 80              MOVE.B  #1,D0
+000010A2  43F9 00004036             81              LEA     string1,A1
+000010A8  3239 0000404E             82              MOVE.W  str_len1,D1         
+000010AE  4E4F                      83              TRAP    #15
+000010B0  D3FC 0000404E             84              ADDA.L  #str_len1,A1         
+000010B6  103C 0002                 85              MOVE.B  #2,D0      
+000010BA  4E4F                      86              TRAP    #15
+000010BC  4EB9 00001100             87              JSR     asciiTOhex           
+000010C2  BA3C 0000                 88              CMP.B   #$00,D5
+000010C6  6700 0036                 89              BEQ     endInput            
+000010CA  2848                      90              MOVEA.L A0,A4         
+000010CC  103C 0001                 91              MOVE.B  #1,D0
+000010D0  43F9 00004050             92              LEA     string2,A1
+000010D6  3239 00004066             93              MOVE.W  str_len2,D1         
+000010DC  4E4F                      94              TRAP    #15         
+000010DE  D3FC 00004066             95              ADDA.L  #str_len2,A1
+000010E4  103C 0002                 96              MOVE.B  #2,D0
+000010E8  4E4F                      97              TRAP    #15
+000010EA  4EB9 00001100             98              JSR     asciiTOhex
+000010F0  BA3C 0000                 99              CMP.B   #$00,D5
+000010F4  6700 0008                100              BEQ          endInput           
+000010F8  264C                     101              MOVEA.L A4,A3               
+000010FA  2848                     102              MOVEA.L A0,A4               
+000010FC  204B                     103              MOVEA.L A3,A0        
+000010FE                           104                      
+000010FE  4E75                     105  endInput    RTS
+00001100                           106  
+00001100                           107  ; Take D3 (user input) and put the converted ascii to hex on A4
+00001100                           108  asciiTOhex
+00001100  48E7 F800                109              MOVEM.L D0-D4,-(SP)         
+00001104  1A3C 0001                110              MOVE.B  #1,D5        
+00001108  4EB8 108C                111              JSR     CLEARRIGSTERS
+0000110C  3C3C 0000                112              MOVE    #0,D6      
+00001110                           113        
+00001110  1619                     114  loop2       MOVE.B  (A1)+,D3            
+00001112  B63C 0030                115              CMP.B   #$30,D3             
+00001116  6D00 0068                116              BLT     finish      
+0000111A  B63C 003A                117              CMP.B   #$3A,D3             
+0000111E  6D00 0042                118              BLT     num_to_hex      
+00001122  B63C 0041                119              CMP.B   #$41,D3             
+00001126  6D00 0058                120              BLT     finish      
+0000112A  B63C 0047                121              CMP.B   #$47,D3             
+0000112E  6D00 003C                122              BLT     cap_to_hex
+00001132  B63C 0061                123              CMP.B   #$61,D3             
+00001136  6D00 0048                124              BLT     finish      
+0000113A  B63C 0067                125              CMP.B   #$67,D3             
+0000113E  6D00 0036                126              BLT     lower_to_hex
+00001142  B63C 0066                127              CMP.B   #$66,D3             
+00001146  6E00 0038                128              BGT     finish      
+0000114A                           129        
+0000114A  5246                     130  resume      ADD     #1,D6               
+0000114C  BC7C 0006                131              CMP     #6,D6               
+00001150  6700 002E                132              BEQ     finish      
+00001154  0C11 0000                133              CMP.B   #$00,(A1)          
+00001158  6700 0026                134              BEQ     finish      
+0000115C  E984                     135              ASL.L   #4,D4                         
+0000115E  4EF8 1110                136              JMP     loop2                              
+00001162                           137  
+00001162  0403 0030                138  num_to_hex  SUBI.B  #$30,D3             
+00001166  D803                     139              ADD.B   D3,D4               
+00001168  4EF8 114A                140              JMP     resume              
+0000116C                           141  
+0000116C  0403 0037                142  cap_to_hex  SUBI.B  #$37,D3             
+00001170  D803                     143              ADD.B   D3,D4               
+00001172  4EF8 114A                144              JMP     resume              
+00001176                           145  
+00001176                           146  lower_to_hex
+00001176  0403 0057                147              SUBI.B  #$57,D3             
+0000117A  D803                     148              ADD.B   D3,D4               
+0000117C  4EF8 114A                149              JMP     resume              
+00001180                           150  
+00001180  2044                     151  finish      MOVE.L  D4,A0
+00001182  4246                     152              CLR     D6                  
+00001184  4CDF 001F                153              MOVEM.L (SP)+,D0-D4             
+00001188  4E75                     154              RTS                         
+0000118A                           155          
+0000118A                           156  ; Print stuff in the buffer
+0000118A  244E                     157  buffPrep    MOVEA.L A6,A2         
+0000118C  224A                     158              MOVEA.L A2,A1
+0000118E  4EB9 000017F2            159              JSR getLong
+00001194  14FC 0009                160              MOVE.B #$09, (A2)+
+00001198  4EB9 000011DA            161              JSR     opDecode
+0000119E  14BC 0000                162              MOVE.B  #00,(A2)            
+000011A2  103C 000D                163              MOVE.B  #13,D0
+000011A6  4E4F                     164              TRAP    #15                
+000011A8  B9C8                     165              CMPA.L   A0,A4              
+000011AA  6F00 002C                166              BLE      endBuff
+000011AE  5247                     167              ADDI    #1,D7              
+000011B0  BE7C 0014                168              CMP     #printCount,D7
+000011B4  66D4                     169              BNE     buffPrep
+000011B6  103C 0001                170              MOVE.B  #1,D0
+000011BA  43F9 00004068            171              LEA     str_enter,A1
+000011C0  3239 00004086            172              MOVE.W  str_en_len,D1
+000011C6  4E4F                     173              TRAP    #15
+000011C8                           174              
+000011C8  103C 0002                175              MOVE.B  #2,D0
+000011CC  4E4F                     176              TRAP    #15
+000011CE                           177              
+000011CE  12BC 0050                178              MOVE.B  #$50,(A1)
+000011D2                           179              
+000011D2  4247                     180              CLR     D7                  *reset counter
+000011D4  4EF8 118A                181              JMP     buffPrep
+000011D8                           182              
+000011D8  4E75                     183  endBuff     RTS         
+000011DA                           184            
+000011DA  48E7 FB0E                185  opDecode    MOVEM.L A4-A6/D0-D4/D6-D7,-(SP)      * Save registers
+000011DE  4EB8 108C                186              JSR     CLEARRIGSTERS             * Clear registers for use
+000011E2  1A3C 0001                187              MOVE.B  #1,D5        * Set good flag until fail
+000011E6  3E18                     188              MOVE.W  (A0)+,D7            * Move instruction to D7 & Increment pointer
+000011E8  264A                     189              MOVEA.L A2,A3               * Store buffer location                 
+Line 190 ERROR: Invalid opcode
+000011EA                           190       getOpR     getOpCode               * Decode instruction Test
+000011EA                           191  
+000011EA                           192  
+000011EA                           193  
+000011EA                           194  ********************************************************************************************************************** 
+000011EA                           195  * Start of opReturn section - clean up process and return to IO
+000011EA                           196  ********************************************************************************************************************** 
+000011EA  4CDF 70DF                197  opReturn    MOVEM.L (SP)+,D6-D7/D0-D4/A4-A6 
+000011EE  4E75                     198              RTS             
+000011F0                           199                       
+000011F0  3C07                     200  getOpCode   MOVE.W  D7,D6               * Move instruction to shift
+000011F2  183C 000C                201              MOVE.B  #shift12bits,D4         * Load shifter register
+000011F6  E86E                     202              LSR.W   D4,D6               * Shift right 12 bits
+000011F8  CCFC 0006                203              MULU    #6,D6               * Form offset           
+000011FC  4BF9 00001208            204              LEA     jmp_table,A5           * Index into the table                                                                                   
+00001202  4EB5 6000                205              JSR     00(A5,D6)           * Jump indirect with index (00 indicates word movement)
+00001206  4E75                     206              RTS
+00001208                           207  
+00001208                           208  
+00001208                           209  
+00001208                           210  ********************************************************************************************************************** 
+00001208                           211  * Beginning of ttbl_opable: jmp_table
+00001208                           212  * Contains the functions per the first 4 bits of current instruction.
+00001208                           213  **********************************************************************************************************tbl_op*** 
+00001208                           214  jmp_table      
+00001208  4EF9 00001244            215              JMP     hex1_0000            
+Line 216 ERROR: Undefined symbol
+0000120E  4EF9 004DBD16            216              JMP     he    
+00001214                           217              ;JMP     hex1_0010x1_0001        
+00001214  4EF9 00001304            218              JMP     hex1_0011
+0000121A  4EF9 000013BE            219              JMP     hex1_0100
+00001220  4EF9 00001422            220              JMP     hex1_0101
+00001226  4EF9 0000142A            221              JMP     hex1_0110
+0000122C                           222              ;JMP     hex1_1000P     hex1_0111
+0000122C  4EF9 0000143C            223              JMP     hex1_1001
+00001232  4EF9 000014FA            224              JMP     hex1_1010
+00001238  4EF9 00001502            225              JMP     hex1_1011
+0000123E  4EF9 000015B6            226              JMP     hex1_1100
+00001244                           227              ;JMP     hex1_1110
+00001244                           228              ;JMP     hex1_1111P     hex1_1101
+00001244                           229  
+00001244                           230  ********************************************************************************************************************** 
+00001244                           231  * Case for: first four bits = 0000
+00001244                           232  * --(ORI) 
+00001244                           233  ********************************************************************************************************************** 
+00001244  3C07                     234  hex1_0000   MOVE.W  D7,D6               * Fresh copy of instruction to shift
+00001246  0246 0F00                235              ANDI.W  #$0F00,D6           * Isolate second byte
+0000124A  183C 0008                236              MOVE.B  #shift8bits,D4          * Load shifter
+0000124E  E8AE                     237              LSR.L   D4,D6               * Shift to LSB
+00001250  BC3C 0000                238              CMP.B   #$0,D6              * Is this ORI?
+00001254  6700 0006                239              BEQ     opORI               * Jump to opORI section
+00001258  6600 062C                240              BNE     illegalCode             * No - bad instruction                  
+0000125C                           241  
+0000125C  14FC 004F                242  opORI       MOVE.B  #'O',(A2)+          * Populate ORI into buffer
+00001260  14FC 0052                243              MOVE.B  #'R',(A2)+
+00001264  14FC 0049                244              MOVE.B  #'I',(A2)+
+00001268  14FC 002E                245              MOVE.B  #'.',(A2)+
+0000126C  4EB9 00001786            246              JSR     size2Buffer         * determine & add size to buffer
+00001272  14FC 0020                247              MOVE.B  #' ',(A2)+
+00001276  14FC 0020                248              MOVE.B  #' ',(A2)+
+0000127A  14FC 0020                249              MOVE.B  #' ',(A2)+
+0000127E  14FC 0020                250              MOVE.B  #' ',(A2)+            
+00001282  14FC 0023                251              MOVE.B  #'#',(A2)+            
+00001286  4EB9 000017D8            252              JSR     getAddr             * Add immediate source
+0000128C  14FC 002C                253              MOVE.B  #',',(A2)+          * Add comma
+00001290  4EB9 0000190A            254              JSR     getEA               * Print off desitination operand
+00001296  4EF9 0000129C            255              JMP     end0000             * Skip to end of sub: hex1_0000
+0000129C                           256  
+0000129C  4E75                     257  end0000     RTS
+0000129E                           258  ********************************************************************************************************************** 
+0000129E                           259  * Case for: first four bits = 0011                                   
+0000129E                           260  * MOVE.B
+0000129E                           261  ********************************************************************************************************************** 
+0000129E                           262  
+0000129E                           263  *hex1_0011  MOVE.B  #'M',(A2)+          * Start of MOVE.B OpCode
+0000129E                           264  *            MOVE.B  #'O',(A2)+
+0000129E                           265  *            MOVE.B  #'V',(A2)+
+0000129E                           266  *            MOVE.B  #'E',(A2)+
+0000129E                           267  *            MOVE.B  #'.',(A2)+
+0000129E                           268  *            MOVE.B  #'B',(A2)+
+0000129E                           269  *            MOVE.B  #' ',(A2)+
+0000129E                           270  *            MOVE.B  #' ',(A2)+
+0000129E                           271  *            MOVE.B  #' ',(A2)+  
+0000129E                           272  *            JSR     getEA               * get source destination
+0000129E                           273  *            MOVE.B  #',',(A2)+
+0000129E                           274  *            JSR     swap4Move           * swap destination and source regs for getEA
+0000129E                           275  *            JSR     getEA     
+0000129E                           276  *end0001     RTS 
+0000129E                           277  *            
+0000129E                           278              
+0000129E                           279              
+0000129E                           280              
+0000129E                           281  ********************************************************************************************************************** 
+0000129E                           282  * Case for: first four bits = 0001                                 
+0000129E                           283  * MOVE.L, MOVEA.L
+0000129E                           284  ********************************************************************************************************************** 
+0000129E  14FC 004D                285  hex1_0001   MOVE.B  #'M',(A2)+          * Start of MOVE/A.L OpCodes
+000012A2  14FC 004F                286              MOVE.B  #'O',(A2)+
+000012A6  14FC 0056                287              MOVE.B  #'V',(A2)+
+000012AA  14FC 0045                288              MOVE.B  #'E',(A2)+
+000012AE  1C07                     289              MOVE.B  D7,D6               * copy fresh instruction to Shift
+000012B0  EC8E                     290              LSR.L   #6,D6               * shift by 6 to isolate bits 6-8 in LSB
+000012B2  0246 0007                291              ANDI.W  #$07,D6             * determine if MoveA?
+000012B6  BC3C 0001                292              CMP.B   #$1,D6              * is this a MOVEA Function?
+000012BA  6600 001C                293              BNE     moveL               * no then move to . portion
+000012BE  14FC 0041                294              MOVE.B  #'A',(A2)+
+000012C2  14FC 002E                295              MOVE.B  #'.',(A2)+
+000012C6  14FC 004C                296              MOVE.B  #'L',(A2)+
+000012CA  14FC 0020                297              MOVE.B  #' ',(A2)+
+000012CE  14FC 0020                298              MOVE.B  #' ',(A2)+
+000012D2  4EF9 000012EC            299              JMP     moveLEA             * skip to filling out source destination
+000012D8  14FC 002E                300  moveL       MOVE.B  #'.',(A2)+
+000012DC  14FC 004C                301              MOVE.B  #'L',(A2)+
+000012E0  14FC 0020                302              MOVE.B  #' ',(A2)+
+000012E4  14FC 0020                303              MOVE.B  #' ',(A2)+
+000012E8  14FC 0020                304              MOVE.B  #' ',(A2)+  
+000012EC  4EB9 0000190A            305  moveLEA     JSR     getEA               * get source destination
+000012F2  14FC 002C                306              MOVE.B  #',',(A2)+
+000012F6  4EB9 0000136A            307              JSR     swapDestReg  * swap destination and source regs for getEA
+000012FC  4EB9 0000190A            308              JSR     getEA     
+00001302  4E75                     309  end0010     RTS
+00001304                           310   
+00001304                           311   
+00001304                           312   
+00001304                           313  ********************************************************************************************************************** 
+00001304                           314  * Case for: first four bits = 0011                                    
+00001304                           315  * MOVE.W, MOVEA.W
+00001304                           316  ********************************************************************************************************************** 
+00001304  14FC 004D                317  hex1_0011   MOVE.B  #'M',(A2)+          * Start of MOVE/A.W OpCodes
+00001308  14FC 004F                318              MOVE.B  #'O',(A2)+
+0000130C  14FC 0056                319              MOVE.B  #'V',(A2)+
+00001310  14FC 0045                320              MOVE.B  #'E',(A2)+
+00001314  1C07                     321              MOVE.B  D7,D6               * copy fresh instruction to Shift
+00001316  EC8E                     322              LSR.L   #6,D6               * shift by 6 to isolate bits 6-8 in LSB
+00001318  0246 0007                323              ANDI.W  #$07,D6             * determin if move A?
+0000131C  BC3C 0001                324              CMP.B   #$1,D6              * is this a MOVEA Function?
+00001320  6600 001C                325              BNE     moveW               * no then move to . portion
+00001324  14FC 0041                326              MOVE.B  #'A',(A2)+          * yes - populate A
+00001328  14FC 002E                327              MOVE.B  #'.',(A2)+
+0000132C  14FC 0057                328              MOVE.B  #'W',(A2)+
+00001330  14FC 0020                329              MOVE.B  #' ',(A2)+
+00001334  14FC 0020                330              MOVE.B  #' ',(A2)+
+00001338  4EF9 00001352            331              JMP     moveWEA             * skip to filling out source destination
+0000133E  14FC 002E                332  moveW       MOVE.B  #'.',(A2)+
+00001342  14FC 0057                333              MOVE.B  #'W',(A2)+
+00001346  14FC 0020                334              MOVE.B  #' ',(A2)+
+0000134A  14FC 0020                335              MOVE.B  #' ',(A2)+
+0000134E  14FC 0020                336              MOVE.B  #' ',(A2)+  
+00001352  4EB9 0000190A            337  moveWEA     JSR     getEA               * get source destination
+00001358  14FC 002C                338              MOVE.B  #',',(A2)+
+0000135C  4EB9 0000136A            339              JSR     swapDestReg  * swap destination and source regs for getEA
+00001362  4EB9 0000190A            340              JSR     getEA     
+00001368  4E75                     341  end0011     RTS 
+0000136A                           342  
+0000136A                           343  
+0000136A                           344  
+0000136A  4283                     345  swapDestReg CLR.L   D3                  * Clear (0000) D3 to hold swap value
+0000136C  3C07                     346              MOVE.W  D7,D6               * Copy to initial shift get reg bits 9-11
+0000136E  E04E                     347              LSR.W   #shift8bits,D6          * shift by 8 (9 total)
+00001370  E24E                     348              LSR.W   #1,D6               * shift by 1 (9 total)
+00001372  0246 0007                349              ANDI.W  #$0007,D6           * Mask/Isolate last 3 bits
+00001376  8646                     350              OR.W    D6,D3               * Place Reg Bits Into D3 for swap
+00001378  3C07                     351              MOVE.W  D7,D6               * Copy to get mode bits 6-8
+0000137A  E64E                     352              LSR.W   #3,D6               * shift bits 6-8 down 3 to normal ea position 3-5
+0000137C  0246 0038                353              ANDI.W  #$0038,D6           * mask bits 3-5
+00001380  8646                     354              OR.W    D6,D3               * add the move bits into D3
+00001382  4EB9 0000138C            355              JSR     moveSize            * add the move size bits (6-7) into D3 for ea
+00001388  3E03                     356              MOVE.W  D3,D7               * swap register mode to determine destination from ea functions
+0000138A  4E75                     357              RTS
+0000138C                           358              
+0000138C                           359              
+0000138C  3C07                     360  moveSize    MOVE.W  D7,D6               * get fresh copy to determine MOVE size
+0000138E  E04E                     361              LSR.W   #shift8bits,D6          * shift move size bits 12-13 to LSB
+00001390  E84E                     362              LSR.W   #shift4bits,D6          
+00001392  0246 0003                363              ANDI.W  #$0003,D6           * Isolate move bits
+00001396  BC3C 0001                364              CMP.B   #$1,D6              * is this a byte?
+0000139A  6700 0020                365              BEQ     mSizeEnd            * yes - byte size already in bits 6-7 of D3
+0000139E  BC3C 0002                366              CMP.B   #$2,D6              * is this a L?
+000013A2  6700 0014                367              BEQ     moveSizeL           * yes - Or L size to D3 bits 6-7
+000013A6  BC3C 0003                368              CMP.B   #$3,D6              * is this a W?
+000013AA  6600 04DA                369              BNE     illegalCode             * No- then illegalCode        
+000013AE  0043 0040                370  moveSizeW   ORI.W   #$0040,D3           * add size 01 in bits 6-7 (4) into D3
+000013B2  4EF9 000013BC            371              JMP     mSizeEnd            * skip to end once done
+000013B8  0043 0080                372  moveSizeL   ORI.W   #$0080,D3           * add size 10 in bits 6-7 (4) into D3
+000013BC  4E75                     373  mSizeEnd    RTS 
+000013BE                           374  
+000013BE                           375  
+000013BE                           376  
+000013BE                           377  ; MOVEM, LEA, NOP
+000013BE  3C07                     378  hex1_0100   MOVE.W  D7,D6               * Fresh copy of instruction to shift
+000013C0  0246 0100                379              ANDI.W  #$0100,D6           * Test isolate 8th bit for LEA
+000013C4  BC7C 0100                380              CMP.W   #$0100,D6           * Test if LEA
+000013C8  6700 0022                381              BEQ     opLEA               * Yes finish testing for LEA
+000013CC  3C07                     382              MOVE.W  D7,D6               * Copy fresh copy of instruction to shift
+000013CE  183C 0008                383              MOVE.B  #shift8bits,D4          * Load 8 bit shifter
+000013D2  E86E                     384              LSR.W   D4,D6               * Shift current instruction
+000013D4  0246 000F                385              ANDI.W  #$000F,D6           * Isolate last 4 bits (LSB)
+000013D8  CCFC 0006                386              MULU    #6,D6               * Form offset for next JMP table
+000013DC  4BF9 000016A4            387              LEA     tbl_0100,A5         * Load next JMP table 
+000013E2  4EB5 6000                388              JSR     00(A5,D6)           * Jump to next instruction per next 4 bits
+000013E6  4EF9 00001420            389              JMP     end0100             * Once returned from jump table, skip to end
+000013EC                           390              
+000013EC  14FC 004C                391  opLEA       MOVE.B  #'L',(A2)+          * Start input of LEA
+000013F0  14FC 0045                392              MOVE.B  #'E',(A2)+
+000013F4  14FC 0041                393              MOVE.B  #'A',(A2)+
+000013F8  14FC 0020                394              MOVE.B  #' ',(A2)+
+000013FC  14FC 0009                395              MOVE.B  #$09,(A2)+ 
+00001400  4EB9 0000190A            396              JSR     getEA               * Determine address to go to buffer
+00001406  14FC 002C                397              MOVE.B  #',',(A2)+          * Add comma
+0000140A  14FC 0041                398              MOVE.B  #'A',(A2)+          * Add A(x)
+0000140E  3C07                     399              MOVE.W  D7,D6               * Copy fresh copy of instruction to shift
+00001410  183C 0009                400              MOVE.B  #9,D4               * Load 9 bit shifter
+00001414  E86E                     401              LSR.W   D4,D6               * Shift current instruction
+00001416  0246 000F                402              ANDI.W  #$000F,D6           * Isolate last 4 bits (LSB)
+0000141A  0606 0030                403              ADD.B   #$30,D6             * convert data register # to hex digit
+0000141E  14C6                     404              MOVE.B  D6,(A2)+            * register # to buffer
+00001420  4E75                     405  end0100     RTS
+00001422                           406  
+00001422  4EB9 00001886            407  hex1_0101   JSR     illegalCode             * Invalid Instruction
+00001428  4E75                     408              RTS
+0000142A                           409              
+0000142A                           410              ***** MOVEM Command
+0000142A  4EB9 00001886            411  hex1_0110   JSR     illegalCode
+00001430  5448                     412              ADDQ.W  #2,A0
+00001432  4E75                     413              RTS
+00001434                           414  
+00001434  4EB9 00001886            415  hex1_0111   JSR     illegalCode             * Invalid Instruction
+0000143A  4E75                     416              RTS
+0000143C                           417             
+0000143C                           418  
+0000143C                           419  
+0000143C                           420  ; 1001 SUB
+0000143C  14FC 0053                421  hex1_1001   MOVE.B  #'S',(A2)+          * Put ADD into Buff
+00001440  14FC 0055                422              MOVE.B  #'U',(A2)+
+00001444  14FC 0042                423              MOVE.B  #'B',(A2)+
+00001448  4EB9 0000177C            424              JSR     getSize             * return size  in 6 & 7 into D6
+0000144E  BC3C 0003                425              CMP.B   #%11,D6             * determine if a ADD or ADDA
+00001452  6600 004E                426              BNE     opSUB               * not size 11, then skip to ADD
+00001456  14FC 0041                427              MOVE.B  #'A',(A2)+          * yep, detected 11 then ADDA
+0000145A  14FC 002E                428              MOVE.B  #'.',(A2)+
+0000145E  3C07                     429              MOVE.W  D7,D6               * fresh copy of instruction
+00001460  E08E                     430              LSR.L   #shift8bits,D6          * shift to right to isolate 8th bits
+00001462  0246 0001                431              ANDI.W  #$0001,D6           * Isolate last bit for size
+00001466  BC3C 0001                432              CMP.B   #%1,D6              * compare for a 1 to determine
+0000146A  6700 000C                433              BEQ     subaL               * jump to long, else word
+0000146E  14FC 0057                434              MOVE.B  #'W',(A2)+          * add word size into buffer
+00001472  4EF9 0000147C            435              JMP     opSUBA
+00001478  14FC 004C                436  subaL       MOVE.B  #'L',(A2)+          * add long size into buffer           
+0000147C  14FC 0020                437  opSUBA      MOVE.B  #' ',(A2)+
+00001480  14FC 0020                438              MOVE.B  #' ',(A2)+
+00001484  14FC 0020                439              MOVE.B  #' ',(A2)+
+00001488                           440              **** NOTE NEED TO TEST FOR EA to ADD $
+00001488  4EB9 0000190A            441              JSR     getEA               * get source operand
+0000148E  14FC 002C                442              MOVE.B  #',',(A2)+
+00001492  14FC 0041                443              MOVE.B  #'A',(A2)+  
+00001496  4EB9 000017BC            444              JSR     highRegBits         * Add register number to buffer
+0000149C  4EF9 000016A2            445              JMP     end1101
+000014A2                           446              
+000014A2  14FC 002E                447  opSUB       MOVE.B  #'.',(A2)+          * finish putting Add.x to buffer
+000014A6  4EB9 00001786            448              JSR     size2Buffer         * Determine Size and Add to Buffer
+000014AC  14FC 0020                449              MOVE.B  #' ',(A2)+
+000014B0  14FC 0020                450              MOVE.B  #' ',(A2)+
+000014B4  14FC 0020                451              MOVE.B  #' ',(A2)+
+000014B8  14FC 0020                452              MOVE.B  #' ',(A2)+
+000014BC  4EB9 000017CE            453              JSR     getDirBit           * get Direction Bit 0 = EA 1 =regs
+000014C2  BC3C 0000                454              CMP.B   #%0,D6              * is this EA first?
+000014C6  6600 001C                455              BNE     opSUB01             * no, jmp to reg mode first
+000014CA  4EB9 0000190A            456              JSR     getEA               * print off effective address
+000014D0  14FC 002C                457              MOVE.B  #',',(A2)+          * add comma
+000014D4  14FC 0044                458              MOVE.B  #'D',(A2)+          * add register BAM!
+000014D8  4EB9 000017BC            459              JSR     highRegBits         * Add register number to buffer
+000014DE  4EF9 000014F8            460              JMP     end1001             * jump to exit of sub: hex1_1101
+000014E4                           461              
+000014E4  14FC 0044                462  opSUB01     MOVE.B  #'D',(A2)+          * start register entry
+000014E8  4EB9 000017BC            463              JSR     highRegBits         * add register number
+000014EE  14FC 002C                464              MOVE.B  #',',(A2)+          * add comma
+000014F2  4EB9 0000190A            465              JSR     getEA               * finish with EA          
+000014F8                           466              
+000014F8  4E75                     467  end1001     RTS            
+000014FA                           468  
+000014FA  4EB9 00001886            469  hex1_1010   JSR     illegalCode             * Invalid Instruction
+00001500  4E75                     470              RTS
+00001502                           471  
+00001502                           472  
+00001502                           473  
+00001502                           474  ********************************************************************************************************************** 
+00001502                           475  * Case for: first four bits = 1011
+00001502                           476  * --(CMP)
+00001502                           477  ********************************************************************************************************************** 
+00001502  4EB9 0000177C            478  hex1_1011   JSR     getSize             * return size  in 6 & 7 into D6
+00001508  BC3C 0003                479              CMP.B   #%11,D6             * determine if a CMPA
+0000150C  6600 005A                480              BNE     opCMPEOR
+00001510  14FC 0043                481              MOVE.B  #'C',(A2)+          * Put SUBA into Buff
+00001514  14FC 004D                482              MOVE.B  #'M',(A2)+
+00001518  14FC 0050                483              MOVE.B  #'P',(A2)+
+0000151C  14FC 0041                484              MOVE.B  #'A',(A2)+
+00001520  14FC 002E                485              MOVE.B  #'.',(A2)+
+00001524  3C07                     486              MOVE.W  D7,D6               * fresh copy of instruction
+00001526  E08E                     487              LSR.L   #shift8bits,D6          * shift to right to isolate 8th bits
+00001528  0246 0001                488              ANDI.W  #$0001,D6           * Isolate last bit for size
+0000152C  BC3C 0001                489              CMP.B   #%1,D6              * compare for a 1 to determine
+00001530  6700 000C                490              BEQ     cmpaL               * jump to long, else word
+00001534  14FC 0057                491              MOVE.B  #'W',(A2)+          * add word size into buffer
+00001538  4EF9 00001542            492              JMP     opCMPA              * Skip to adding padding and destination
+0000153E  14FC 004C                493  cmpaL       MOVE.B  #'L',(A2)+          * add long size into buffer           
+00001542  14FC 0020                494  opCMPA      MOVE.B  #' ',(A2)+
+00001546  14FC 0020                495              MOVE.B  #' ',(A2)+
+0000154A  14FC 0020                496              MOVE.B  #' ',(A2)+
+0000154E                           497  
+0000154E  4EB9 0000190A            498              JSR     getEA               * get source operand
+00001554  14FC 002C                499              MOVE.B  #',',(A2)+
+00001558  14FC 0041                500              MOVE.B  #'A',(A2)+
+0000155C  4EB9 000017BC            501              JSR     highRegBits         * Get address register number
+00001562  4EF9 000015B4            502              JMP     end1011             * Skip to end of sub: hex1_1011
+00001568                           503              
+00001568  3C07                     504  opCMPEOR    MOVE.W  D7,D6               * fresh value
+0000156A  4EB9 000017CE            505              JSR     getDirBit           * determine the direction bit 1 = eor 0 = cmp
+00001570  BC3C 0000                506              CMP.B   #%0,D6              * yes, go into CMP     
+00001574                           507                     
+00001574  14FC 0043                508  opCMP       MOVE.B  #'C',(A2)+          * Populate CMP
+00001578  14FC 004D                509              MOVE.B  #'M',(A2)+
+0000157C  14FC 0050                510              MOVE.B  #'P',(A2)+
+00001580  14FC 002E                511              MOVE.B  #'.',(A2)+
+00001584  4EB9 00001786            512              JSR     size2Buffer         * Determine & add size to buffer
+0000158A  14FC 0020                513              MOVE.B  #' ',(A2)+
+0000158E  14FC 0020                514              MOVE.B  #' ',(A2)+
+00001592  14FC 0020                515              MOVE.B  #' ',(A2)+
+00001596  14FC 0020                516              MOVE.B  #' ',(A2)+
+0000159A  4EB9 0000190A            517              JSR     getEA               * Source Operand
+000015A0  14FC 002C                518              MOVE.B  #',',(A2)+
+000015A4  14FC 0044                519              MOVE.B  #'D',(A2)+  
+000015A8  4EB9 000017BC            520              JSR     highRegBits         * Add register number to buffer
+000015AE  4EF9 000015B4            521              JMP     end1011             * Skip to end of sub: hex1_1011
+000015B4                           522        
+000015B4                           523  
+000015B4  4E75                     524  end1011     RTS
+000015B6                           525  
+000015B6                           526  
+000015B6                           527  
+000015B6                           528  
+000015B6                           529  ********************************************************************************************************************** 
+000015B6                           530  * Case for: first four bits = 1100
+000015B6                           531  * MULU
+000015B6                           532  ********************************************************************************************************************** 
+000015B6  3C07                     533  hex1_1100   MOVE.W  D7,D6               * copy instruction for testing
+000015B8  EC8E                     534  opMULU      LSR.L   #6,D6               * shift 6 to prep for mulu testing
+000015BA  0246 0003                535              ANDI.W  #$3,D6              * mask last 3 bits
+000015BE  BC3C 0003                536              CMP.B   #$3,D6              * is this MULU or MULS?
+000015C2  6700 0002                537              BEQ     muluMode            * head to mulu  mode to determine immediate  
+000015C6  3C07                     538  muluMode    MOVE.W  D7,D6               * fresh copy
+000015C8  E68E                     539              LSR.L   #3,D6               * shift bits 3-5 into LSB
+000015CA  0246 0007                540              ANDI.W  #$7,D6              * mask for mode bits
+000015CE  BC3C 0007                541              CMP.B   #$7,D6              *
+000015D2  6700 0008                542              BEQ     movePTR             * increment pointer by word
+000015D6  4EF9 00001886            543              JMP     illegalCode     
+000015DC                           544  
+000015DC  5448                     545  movePTR     ADDQ.W  #2,A0               * increment pointer
+000015DE  4EF9 00001886            546              JMP     illegalCode
+000015E4                           547          
+000015E4                           548  
+000015E4  4E75                     549  end1100     RTS
 000015E6                           550  
-000015E6  5448                     551  movePTR     ADDQ.W  #2,A0               * increment pointer
-000015E8  4EF9 00001890            552              JMP     badInst
-000015EE                           553          
-000015EE                           554  
-000015EE  4E75                     555  end1100     RTS
-000015F0                           556  
-000015F0                           557  ********************************************************************************************************************** 
-000015F0                           558  * Case for: first four bits = 1101
-000015F0                           559  * --(ADD,ADDA)
-000015F0                           560  ********************************************************************************************************************** 
-000015F0  14FC 0041                561  hex1_1101   MOVE.B  #'A',(A2)+          * Put ADD into Buff
-000015F4  14FC 0044                562              MOVE.B  #'D',(A2)+
-000015F8  14FC 0044                563              MOVE.B  #'D',(A2)+
-000015FC  4EB9 00001786            564              JSR     getSize             * return size  in 6 & 7 into D6
-00001602  BC3C 0003                565              CMP.B   #%11,D6             * determine if a ADD or ADDA
-00001606  6600 004E                566              BNE     opADD               * not size 11, then skip to ADD
-0000160A  14FC 0041                567              MOVE.B  #'A',(A2)+          * yep, detected 11 then ADDA
-0000160E  14FC 002E                568              MOVE.B  #'.',(A2)+
-00001612  3C07                     569              MOVE.W  D7,D6               * fresh copy of instruction
-00001614  E08E                     570              LSR.L   #shift8bits,D6          * shift to right to isolate 8th bits
-00001616  0246 0001                571              ANDI.W  #$0001,D6           * Isolate last bit for size
-0000161A  BC3C 0001                572              CMP.B   #%1,D6              * compare for a 1 to determine
-0000161E  6700 000C                573              BEQ     addaL               * jump to long, else word
-00001622  14FC 0057                574              MOVE.B  #'W',(A2)+          * add word size into buffer
-00001626  4EF9 00001630            575              JMP     opADDA
-0000162C  14FC 004C                576  addaL       MOVE.B  #'L',(A2)+          * add long size into buffer           
-00001630  14FC 0020                577  opADDA      MOVE.B  #' ',(A2)+
-00001634  14FC 0020                578              MOVE.B  #' ',(A2)+
-00001638  14FC 0020                579              MOVE.B  #' ',(A2)+
-0000163C                           580              **** NOTE NEED TO TEST FOR EA to ADD $
-0000163C  4EB9 00001924            581              JSR     getEA               * get source operand
-00001642  14FC 002C                582              MOVE.B  #',',(A2)+
-00001646  14FC 0041                583              MOVE.B  #'A',(A2)+  
-0000164A  4EB9 000017C6            584              JSR     highRegBits         * Add register number to buffer
-00001650  4EF9 000016AC            585              JMP     end1101
-00001656                           586              
-00001656  14FC 002E                587  opADD       MOVE.B  #'.',(A2)+          * finish putting Add.x to buffer
-0000165A  4EB9 00001790            588              JSR     size2Buffer         * Determine Size and Add to Buffer
-00001660  14FC 0020                589              MOVE.B  #' ',(A2)+
-00001664  14FC 0020                590              MOVE.B  #' ',(A2)+
-00001668  14FC 0020                591              MOVE.B  #' ',(A2)+
-0000166C  14FC 0020                592              MOVE.B  #' ',(A2)+
-00001670  4EB9 000017D8            593              JSR     getDirBit           * get Direction Bit 0 = EA 1 =regs
-00001676  BC3C 0000                594              CMP.B   #%0,D6              * is this EA first?
-0000167A  6600 001C                595              BNE     opADD01             * no, jmp to reg mode first
-0000167E  4EB9 00001924            596              JSR     getEA               * print off effective address
-00001684  14FC 002C                597              MOVE.B  #',',(A2)+          * add comma
-00001688  14FC 0044                598              MOVE.B  #'D',(A2)+          * add register BAM!
-0000168C  4EB9 000017C6            599              JSR     highRegBits         * Add register number to buffer
-00001692  4EF9 000016AC            600              JMP     end1101             * jump to exit of sub: hex1_1101
-00001698                           601              
-00001698  14FC 0044                602  opADD01     MOVE.B  #'D',(A2)+          * start register entry
-0000169C  4EB9 000017C6            603              JSR     highRegBits         * add register number
-000016A2  14FC 002C                604              MOVE.B  #',',(A2)+          * add comma
-000016A6  4EB9 00001924            605              JSR     getEA               * finish with EA 
-000016AC                           606  
-000016AC  4E75                     607  end1101     RTS
-000016AE                           608  
-000016AE                           609  
-000016AE                           610  
-000016AE                           611  ********************************************************************************************************************** 
-000016AE                           612  * Beginning of 4xxx Op Codes table: tbl_0100 
-000016AE                           613  * Contains the functions per the second  4 bits of current instruction.
-000016AE                           614  ********************************************************************************************************************** 
-000016AE                           615  tbl_0100    *Jump table for all op codes that start with 4XXX
-000016AE  4EF9 000016F6            616              JMP     hex4_0000            
-000016B4  4EF9 000016FE            617              JMP     hex4_0001            
-000016BA                           618              ;JMP     hex4_0010
-000016BA                           619              ;JMP     hex4_0011
-000016BA                           620              ;JMP     hex4_0100
-000016BA  4EF9 0000170E            621              JMP     hex4_0101
-000016C0                           622              ;JMP     hex4_0110
-000016C0  4EF9 00001716            623              JMP     hex4_0111
-000016C6  4EF9 0000171E            624              JMP     hex4_1000
-000016CC  4EF9 00001738            625              JMP     hex4_1001
-000016D2  4EF9 00001740            626              JMP     hex4_1010
-000016D8  4EF9 00001748            627              JMP     hex4_1011
-000016DE  4EF9 00001750            628              JMP     hex4_1100
-000016E4  4EF9 00001758            629              JMP     hex4_1101
-000016EA  4EF9 00001768            630              JMP     hex4_1110
-000016F0  4EF9 00001760            631              JMP     hex4_1111
-000016F6                           632              
-000016F6  4EB9 00001890            633  hex4_0000   JSR     badInst
-000016FC  4E75                     634              RTS
-000016FE                           635              
-000016FE  4EB9 00001890            636  hex4_0001   JSR     badInst
-00001704  4E75                     637              RTS
-00001706                           638              
-00001706  4EB9 00001890            639  hex4_0011   JSR     badInst
-0000170C  4E75                     640              RTS
-0000170E                           641                            
-0000170E                           642              
-0000170E  4EB9 00001890            643  hex4_0101   JSR     badInst
-00001714  4E75                     644              RTS
-00001716                           645          
-00001716                           646              
-00001716  4EB9 00001890            647  hex4_0111   JSR     badInst
-0000171C  4E75                     648              RTS
-0000171E                           649              
-0000171E                           650              
-0000171E                           651  ********************************************************************************************************************** 
-0000171E                           652  * Case for: 0100 1000 (MOVEM)                                                          
-0000171E                           653  ********************************************************************************************************************** 
-0000171E  3C07                     654  hex4_1000   MOVE.W  D7,D6           * copy instruction
-00001720  E88E                     655              LSR.L   #shift4bits,D6      * shift by 4 bits
-00001722  0246 000F                656              ANDI.W  #$000F,D6       * isolate last byte
-00001726  BC3C 0004                657              CMP.B   #$4,D6          * Determine if SWAP
-0000172A  6600 0004                658              BNE     opMOVEM         * No - go to MOVEM
-0000172E                           659  
-0000172E  4E75                     660              RTS            
-00001730                           661  
-00001730  4EB9 00001890            662  opMOVEM     JSR     badInst
-00001736  4E75                     663              RTS   
-00001738                           664  
-00001738  4EB9 00001890            665  hex4_1001   JSR     badInst
-0000173E  4E75                     666              RTS   
-00001740  4EB9 00001890            667  hex4_1010   JSR     badInst
-00001746  4E75                     668              RTS   
-00001748  4EB9 00001890            669  hex4_1011   JSR     badInst
-0000174E  4E75                     670              RTS
-00001750  4EB9 00001890            671  hex4_1100   JSR     badInst
-00001756  4E75                     672              RTS
-00001758  4EB9 00001890            673  hex4_1101   JSR     badInst
-0000175E  4E75                     674              RTS
-00001760  4EB9 00001890            675  hex4_1111   JSR     badInst
-00001766  4E75                     676              RTS   
-00001768                           677  
-00001768                           678  
-00001768                           679  ********************************************************************************************************************** 
-00001768                           680  * Case for: 0100 1110 (NOP)                                                      
-00001768                           681  ********************************************************************************************************************** 
-00001768  4EB9 00001786            682  hex4_1110   JSR     getSize             * determine the size for (JSR,JMP)
-0000176E  BC3C 0002                683              CMP.B   #%10,D6             * test size bits is this JSR? (0100 1110 10..)
-00001772  6600 011C                684              BNE     badInst             * No set badFlag for illegal instruction
-00001776                           685               
-00001776  14FC 004E                686              MOVE.B  #'N',(A2)+          * yes - print NOP to goodBuff
-0000177A  14FC 004F                687              MOVE.B  #'O',(A2)+
-0000177E  14FC 0050                688              MOVE.B  #'P',(A2)+
-00001782  4E75                     689              RTS
-00001784                           690  
-00001784                           691              
-00001784  4E75                     692  hex2_1111   RTS    
-00001786                           693  
-00001786                           694  
-00001786                           695  ********************************************************************************************************************** 
-00001786                           696  * Beginning of functions: badInst, getSize, size2Buffer, 
-00001786                           697  ********************************************************************************************************************** 
-00001786  3C07                     698  getSize     MOVE.W  D7,D6               * copy current instruction to shift
-00001788  EC4E                     699              LSR.W   #6,D6               * move the size bits in 6-7 to LSB
-0000178A  0246 0003                700              ANDI.W  #$0003,D6           * remove other non-size bits and store result into D6
-0000178E  4E75                     701              RTS
-00001790                           702  
-00001790  4EB8 1786                703  size2Buffer JSR     getSize             * run sizing Commands
-00001794  BC3C 0000                704              CMP.B   #%00,D6             * is tihs a byte?
-00001798  6700 001C                705              BEQ     mainB               * yes, add B to buffer
-0000179C  BC3C 0001                706              CMP.B   #%01,D6             * is this a word?
-000017A0  6700 001E                707              BEQ     mainW               * yes, add teh W to buffer
-000017A4  BC3C 0002                708              CMP.B   #%10,D6             * is this a long?
-000017A8  6600 00E6                709              BNE     badInst             * No? then bad instruction
-000017AC                           710        
-000017AC  14FC 004C                711              MOVE.B  #'L',(A2)+          * add L to buffer
-000017B0  4EF9 000017C4            712              JMP     mainEnd             * end size2Buffer sub  
-000017B6                           713              
-000017B6  14FC 0042                714  mainB       MOVE.B  #'B',(A2)+          * add B to buffer
-000017BA  4EF9 000017C4            715              JMP     mainEnd             * end size2Buffer sub
-000017C0                           716              
-000017C0  14FC 0057                717  mainW       MOVE.B  #'W',(A2)+          * add W to buffer
-000017C4  4E75                     718  mainEnd     RTS                         * end size2Buffer sub                        
-000017C6                           719  
-000017C6  3C07                     720  highRegBits MOVE.W  D7,D6               * get fresh copy of instruction
-000017C8  E08E                     721              LSR.L   #shift8bits,D6          * shift by 8 (9total)
-000017CA  E28E                     722              LSR.L   #1,D6               * shift by 1
-000017CC  0206 0007                723              ANDI.B  #$7,D6              * isolate last 7 bits for register number
-000017D0  0606 0030                724              ADD.B   #$30,D6             * convert register number to ascii
-000017D4  14C6                     725              MOVE.B  D6,(A2)+            * put register numbert into buffer
-000017D6  4E75                     726              RTS
-000017D8                           727  
-000017D8  3C07                     728  getDirBit   MOVE.W  D7,D6               * get fresh copy of instruction
-000017DA  E08E                     729              LSR.L   #shift8bits,D6          * shift to right to isolate 8th bits
-000017DC  0206 0001                730              ANDI.B  #01,D6              * isolate last bit for testing & return in D6
-000017E0  4E75                     731              RTS  
-000017E2                           732              
-000017E2  BC3C 0000                733  getAddr     CMP.B   #%00,D6             * test if value is a byte - assumes D6 already loaded
-000017E6  6700 0254                734              BEQ     putbytebuffer         * yes? - load B worth of address into buffer
-000017EA  BC3C 0001                735              CMP.B   #%01,D6             * test if value is a word - assumes D6 already loaded
-000017EE  6700 025A                736              BEQ     word2Buffer         * yes? - load W worth of address into buffer
-000017F2  BC3C 0002                737              CMP.B   #%10,D6             * test if value is a long - assumes D6 already loaded
-000017F6  6700 026A                738              BEQ     long2Buffer         * yes? - load L worth of address into buffer
-000017FA  4E75                     739              RTS
-000017FC                           740  
-000017FC  4EB9 0000185A            741  getLong     JSR     cmdSh1              * Clear D6 and load value for shift
-00001802  183C 000C                742              MOVE.B  #shift12bits,D4         * Load shifter w/12
-00001806  4EB9 00001862            743              JSR     cmdSh2              * Shift
-0000180C  183C 0008                744              MOVE.B  #shift8bits,D4          * Load shifter w/8
-00001810  4EB9 00001862            745              JSR     cmdSh2              * Shift
-00001816  183C 0004                746              MOVE.B  #shift4bits,D4          * Load shifter w/4
-0000181A  4EB9 00001862            747              JSR     cmdSh2              * Shift
-00001820  183C 0000                748              MOVE.B  #0,D4
-00001824  4EB9 0000187C            749              JSR     cmdSh4              * Shift
-0000182A  183C 000C                750              MOVE.B  #shift12bits,D4         * Load shifter w/12
-0000182E  4EB9 0000187C            751              JSR     cmdSh4              * Shift
-00001834  183C 0008                752              MOVE.B  #shift8bits,D4          * Load shifter w/8
-00001838  4EB9 0000187C            753              JSR     cmdSh4              * Shift
-0000183E  183C 0004                754              MOVE.B  #shift4bits,D4          * Load shifter w/4
-00001842  4EB9 0000187C            755              JSR     cmdSh4              * Shift
-00001848  183C 0000                756              MOVE.B  #0,D4               * Load shifter
-0000184C  E8AE                     757              LSR.L   D4,D6               * Shift
-0000184E  0286 0000000F            758              ANDI.L  #$0000000F,D6       * Isolate last bit
-00001854  4EB9 0000190C            759              JSR     converToHex           * Place value in D6 into buffer
-0000185A                           760  
-0000185A  7C00                     761  cmdSh1      MOVEQ   #$0,D6              * Clear D6
-0000185C  2C08                     762              MOVE.L  A0,D6               * Load current address to print
-0000185E  4846                     763              SWAP    D6                  * Swap high and low word
-00001860  4E75                     764              RTS
-00001862                           765  
-00001862  E8AE                     766  cmdSh2      LSR.L   D4,D6               * Shift
-00001864  0286 0000000F            767              ANDI.L  #$0000000F,D6       * Isolate last bit
-0000186A  4EB9 0000190C            768              JSR     converToHex           * Place value in D6 into buffer
-00001870  4EB8 185A                769              JSR     cmdSh1              * Reset D6 for next shift
-00001874  4E75                     770              RTS
-00001876                           771  
-00001876  7C00                     772  cmdSh3      MOVEQ   #$0,D6              * Clear D6
-00001878  2C08                     773              MOVE.L  A0,D6               * Load current address to print
-0000187A  4E75                     774              RTS
-0000187C                           775              
-0000187C  E8AE                     776  cmdSh4      LSR.L   D4,D6               * Shift
-0000187E  0286 0000000F            777              ANDI.L  #$0000000F,D6       * Isolate last bit
-00001884  4EB9 0000190C            778              JSR     converToHex           * Place value in D6 into buffer
-0000188A  4EB8 1876                779              JSR     cmdSh3              * Reset D6 for next shift
-0000188E  4E75                     780              RTS
-00001890                           781              
-00001890  1A3C 0000                782  badInst     MOVE.B  #0,D5         
-00001894  244B                     783              MOVEA.L A3,A2               
-00001896  14FC 0044                784              MOVE.B  #'D',(A2)+          
-0000189A  14FC 0041                785              MOVE.B  #'A',(A2)+
-0000189E  14FC 0054                786              MOVE.B  #'T',(A2)+
-000018A2  14FC 0041                787              MOVE.B  #'A',(A2)+
-000018A6  14FC 0009                788              MOVE.B  #$09,(A2)+
-000018AA  14FC 0024                789              MOVE.B  #'$',(A2)+          
-000018AE  4EB9 000018B6            790              JSR     loadDataBuffer          
-000018B4  4E75                     791              RTS          
-000018B6                           792  
-000018B6  7C00                     793  loadDataBuffer      MOVEQ   #$0,D6              
-000018B8  3C07                     794                      MOVE.W  D7,D6               
-000018BA  183C 000C                795                      MOVE.B  #shift12bits,D4         
-000018BE  E8AE                     796                      LSR.L   D4,D6               
-000018C0  0246 000F                797                      ANDI.W  #$000F,D6           
-000018C4  4EB9 0000190C            798                      JSR     converToHex           
-000018CA  3C07                     799                      MOVE.W  D7,D6
-000018CC  183C 0008                800                      MOVE.B  #shift8bits,D4
-000018D0  E8AE                     801                      LSR.L   D4,D6
-000018D2  0246 000F                802                      ANDI.W  #$000F,D6
-000018D6  4EB9 0000190C            803                      JSR     converToHex           
-000018DC  3C07                     804                      MOVE.W  D7,D6
-000018DE  183C 0004                805                      MOVE.B  #shift4bits,D4
-000018E2  E8AE                     806                      LSR.L   D4,D6
-000018E4  0246 000F                807                      ANDI.W  #$000F,D6
-000018E8  4EB9 0000190C            808                      JSR     converToHex           
-000018EE  3C07                     809                      MOVE.W  D7,D6
-000018F0  0246 000F                810                      ANDI.W  #$000F,D6
-000018F4  4EB9 0000190C            811                      JSR     converToHex           
-000018FA  4E75                     812                      RTS
-000018FC                           813              
-000018FC  4280                     814  clrRegs     CLR.L   D0                 
-000018FE  4281                     815              CLR.L   D1
-00001900  4282                     816              CLR.L   D2
-00001902  4283                     817              CLR.L   D3
-00001904  4284                     818              CLR.L   D4
-00001906  4286                     819              CLR.L   D6
-00001908  4287                     820              CLR.L   D7
-0000190A  4E75                     821              RTS
-0000190C                           822  
-0000190C                           823  ; Convert hex to ascii
-0000190C  BC3C 000A                824  converToHex   CMP.B   #$A,D6              * Confirm hex character?
-00001910  6C00 000A                825              BGE     letter              * Is it a letter or number?
-00001914  0606 0030                826              ADDI.B  #$30,D6             * Convert decimal to ASCII
-00001918  6000 0006                827              BRA     hexToBuffer          
-0000191C                           828              
-0000191C  0606 0037                829  letter      ADDI.B  #$37,D6
-00001920  14C6                     830  hexToBuffer MOVE.B  D6,(A2)+
-00001922  4E75                     831              RTS
-00001924                           832              
-00001924                           833  getEA       
-00001924  4BF9 0000194E            834              LEA         ea_mode_table,A5 * load EA_mode jump table
-0000192A  4282                     835              CLR.L   D2
-0000192C  4283                     836              CLR.L   D3
-0000192E  4284                     837              CLR.L   D4           
-00001930  4286                     838              CLR.L   D6
-00001932  3C07                     839              MOVE.W  D7,D6                 * move word into D6 for manipulation
-00001934  0246 003F                840              ANDI.W  #$003F,D6             * leave only the mode bits
-00001938  123C 0003                841              MOVE.B      #3,D1                 * Store number of bits we wish to shift            
-0000193C  E26E                     842              LSR.W       D1,D6                 * Shift to the Right to isolate mode bits            
-0000193E                           843  
-0000193E  CCFC 0006                844              MULU      #6,D6            * Form Offset for passing to Jump Index table            
-00001942  4EB5 6000                845              JSR         00(A5,D6)          * Now we have the index, back to Index table        
-00001946                           846  
-00001946  4E75                     847              RTS                                * return from EA routine
-00001948                           848          
-00001948  4EF9 000040CC            849              JMP         END                    * Return
-0000194E                           850  
-0000194E                           851  ea_mode_table                             * table holds the different EA modes
-0000194E  4EF9 0000197E            852              JMP     EAcode000             * Direct Data Register
-00001954  4EF9 00001990            853              JMP     EAcode001             * Direct Address Register
-0000195A  4EF9 000019A2            854              JMP     EAcode010             * Indirect Address Register
-00001960  4EF9 000019BC            855              JMP     EAcode011             * Indirect Address Register with Post Increment
-00001966  4EF9 000019DA            856              JMP     EAcode100             * Indirect Address Register with Pre Decrement
-0000196C  4EF9 000019F8            857              JMP     EAcode101             * Indirect Address Register using Index
-00001972  4EF9 000019FC            858              JMP     EAcode110             * 
-00001978  4EF9 00001A00            859              JMP     EAcode111             * Absolute or Immediate EA
-0000197E                           860  
-0000197E                           861  EAcode000
-0000197E  3C07                     862              MOVE.W      D7,D6                   * move current working word into temp storage
-00001980  0246 0007                863              ANDI.W      #$7,D6                  * isolate register bits (last 3)
-00001984  14FC 0044                864              MOVE.B      #'D',(A2)+              * add "D" to buffer
-00001988  0606 0030                865              ADD.B       #$30,D6                 * convert data register # to hex digit
-0000198C  14C6                     866              MOVE.B      D6,(A2)+                * register # to buffer                  
-0000198E                           867              
-0000198E  4E75                     868          RTS                                     * Return
-00001990                           869   
-00001990                           870  EAcode001
-00001990  3C07                     871              MOVE.W      D7,D6                   * move current working word into temp storage
-00001992  0246 0007                872              ANDI.W      #$7,D6                  * isolate register bits (last 3)
-00001996  14FC 0041                873              MOVE.B      #'A',(A2)+              * add "A" to buffer
-0000199A  0606 0030                874              ADD.B       #$30,D6                 * convert data register # to hex digit
-0000199E  14C6                     875              MOVE.B      D6,(A2)+                * register # to buffer
-000019A0                           876                
-000019A0  4E75                     877              RTS                                 * Return
-000019A2                           878  
-000019A2                           879  EAcode010
-000019A2  3C07                     880              MOVE.W      D7,D6                   * move current working word into temp storage
-000019A4  0246 0007                881              ANDI.W      #$7,D6                  * isolate register bits (last 3)
-000019A8  14FC 0028                882              MOVE.B      #'(',(A2)+              * add "(" to buffer            
-000019AC  14FC 0041                883              MOVE.B      #'A',(A2)+              * add "A" to buffer
-000019B0  0606 0030                884              ADD.B       #$30,D6                 * convert data register # to hex digit
-000019B4  14C6                     885              MOVE.B      D6,(A2)+                * register # to buffer
-000019B6  14FC 0029                886              MOVE.B      #')',(A2)+              * add ")" to buffer
-000019BA                           887               
-000019BA  4E75                     888              RTS                                 * Return
-000019BC                           889   
-000019BC                           890  EAcode011
-000019BC                           891              
-000019BC  3C07                     892              MOVE.W      D7,D6                   * move current working word into temp storage
-000019BE  0246 0007                893              ANDI.W      #$7,D6                  * isolate register bits (last 3)
-000019C2  14FC 0028                894              MOVE.B      #'(',(A2)+              * add "(" to buffer            
-000019C6  14FC 0041                895              MOVE.B      #'A',(A2)+              * add "A" to buffer
-000019CA  0606 0030                896              ADD.B       #$30,D6                 * convert data register # to hex digit
-000019CE  14C6                     897              MOVE.B      D6,(A2)+                * register # to buffer
-000019D0  14FC 0029                898              MOVE.B      #')',(A2)+              * add ")" to buffer
-000019D4  14FC 002B                899              MOVE.B      #'+',(A2)+              * add "+" to buffer
-000019D8  4E75                     900              RTS
-000019DA                           901  
-000019DA  3C07                     902  EAcode100   MOVE.W      D7,D6                   * move current working word into temp storage
-000019DC  0246 0007                903              ANDI.W      #$7,D6                  * isolate register bits (last 3)
-000019E0  14FC 002D                904              MOVE.B      #'-',(A2)+              * add "-" to buffer
-000019E4  14FC 0028                905              MOVE.B      #'(',(A2)+              * add "(" to buffer            
-000019E8  14FC 0041                906              MOVE.B      #'A',(A2)+              * add "A" to buffer
-000019EC  0606 0030                907              ADD.B       #$30,D6                 * convert data register # to hex digit
-000019F0  14C6                     908              MOVE.B      D6,(A2)+                * register # to buffer
-000019F2  14FC 0029                909              MOVE.B      #')',(A2)+              * add ")" to buffer
-000019F6  4E75                     910              RTS                                     * Return
-000019F8                           911              
-000019F8                           912  EAcode101
-000019F8  4EF8 1890                913               JMP    badInst          * set bad instruction flag
-000019FC                           914  EAcode110
-000019FC  4EF8 1890                915              JMP       badInst             * set bad instruction flag
-00001A00                           916  
-00001A00  3C07                     917  EAcode111   MOVE.W D7, D6
-00001A02  0246 0007                918              ANDI.W #$07, D6
-00001A06  0C06 0000                919              CMPI.B   #$0,D6              
-00001A0A  6700 003E                920              BEQ      word2Buffer         
-00001A0E  0C06 0001                921              CMPI.B   #$1,D6              
-00001A12  6700 004E                922              BEQ      long2Buffer         
-00001A16  0C06 0002                923              CMPI.B   #$2,D6
-00001A1A  0C06 0002                924              CMPI.B   #$2,D6              
-00001A1E  6700 0004                925              BEQ      pctobuffer  
-00001A22  4E75                     926              RTS
-00001A24                           927  
-00001A24                           928   
-00001A24                           929  ; Add '(pc)' to buffer
-00001A24                           930  pctobuffer
-00001A24  4EB9 00001A4A            931              JSR         word2Buffer
-00001A2A  14FC 0028                932              MOVE.B      #'(',(A2)+                        
-00001A2E  14FC 0050                933              MOVE.B      #'P',(A2)+              
-00001A32  14FC 0043                934              MOVE.B      #'C',(A2)+              
-00001A36  14FC 0029                935              MOVE.B      #')',(A2)+                                     
-00001A3A  4E75                     936              RTS
-00001A3C                           937  
-00001A3C                           938  putbytebuffer   
-00001A3C  14FC 0024                939              MOVE.B  #'$',(A2)+
-00001A40  4284                     940              CLR.L   D4          
-00001A42  3410                     941              MOVE.W  (A0),D2     
-00001A44  4284                     942              CLR.L   D4          
-00001A46  183C 0002                943              MOVE.B  #2,D4       
-00001A4A                           944              
-00001A4A                           945  word2Buffer 
-00001A4A  14FC 0024                946              MOVE.B  #'$',(A2)+  
-00001A4E  4284                     947              CLR.L   D4          * pre-emptive clearout
-00001A50  14FC 0024                948              MOVE.B  #$24,(A2)+  * put dollar sign in buffer (before address)
-00001A54  3410                     949              MOVE.W  (A0),D2       * move current word into D2 for rolling purposes
-00001A56  4284                     950              CLR.L   D4          * pre-emptive clearout
-00001A58  183C 0004                951              MOVE.B  #4,D4       * load a counter
-00001A5C                           952              
-00001A5C  3C07                     953  rtnEA1      MOVE.W  D7,D6       * re-load current word for temp storage            
-00001A5E  5448                     954              ADDQ.W  #2,A0       * advancing memory pointer by word   
-00001A60  4E75                     955              RTS                 * return from subroutine
-00001A62                           956  
-00001A62                           957  long2Buffer
-00001A62  14FC 0024                958              MOVE.B  #'$',(A2)+
-00001A66  4284                     959              CLR.L   D4          * pre-emptive clearout
-00001A68  2410                     960              MOVE.L  (A0),D2       * move current word into D2 for rolling purposes
-00001A6A  4284                     961              CLR.L   D4          * pre-emptive clearout
-00001A6C  183C 0008                962              MOVE.B  #8,D4       * load a counter
-00001A70                           963  
-00001A70                           964  l2bLoop                 
-00001A70  B83C 0000                965              CMP.B   #$00,D4     * compare counter with 0
-00001A74  6700 0014                966              BEQ     rtnEA2      * if zero, return
-00001A78  E99A                     967              ROL.L   #4,D2       * roll the bits in D2 to the left
-00001A7A  3C02                     968              MOVE.W  D2,D6       * move rolled bits into temp storage
-00001A7C  0246 000F                969              ANDI.W  #$000F,D6   * and the bits to isolate ascii char   
-00001A80  4EB8 190C                970              JSR     converToHex   * load ascii char into buffer            
-00001A84  5304                     971              SUBQ.B  #$1,D4      * subtract from counter
-00001A86  4EF8 1A70                972              JMP     l2bLoop     * keep looping until counter hits zero
-00001A8A                           973              
-00001A8A  3C07                     974  rtnEA2      MOVE.W  D7,D6       * re-load current word for temp storage
-00001A8C  5848                     975              ADDQ.W  #4,A0       * advancing memory pointer by long
-00001A8E  4E75                     976              RTS                 * return from subroutine
-00001A90                           977  
-00001A90                           978  
-00001A90                           979                     
-00004000                           980               ORG   $4000 ; Make sure data starts at $4000
-00004000= 48 65 6C 6C 6F 2C ...    981  intro        DC.B    'Hello, please enter beginning and ending addresses',CR,LF
-00004034                           982  
-00004034= 0034                     983  intro_len   DC.W    intro_len-intro
-00004036                           984          
-00004036= 45 6E 74 65 72 20 ...    985  string1     DC.B    'Enter start address: $',0
-0000404E= 0018                     986  str_len1    DC.W    str_len1-string1  *Get the length of the string
-00004050                           987  
-00004050= 45 6E 74 65 72 20 ...    988  string2     DC.B    'Enter end address: $',0
-00004066= 0016                     989  str_len2    DC.W    str_len2-string2  *Get the length of the string
-00004068                           990  
-00004068= 50 72 65 73 73 20 ...    991  str_enter   DC.B    'Press enter to read more data',0
-00004086= FFE2                     992  str_en_len  DC.W    str_enter-str_en_len
-00004088                           993  
-00004088= 44 69 73 61 73 73 ...    994  str_more    DC.B    'Disassemble more code? 1 for yes, 0 for no. ',0
-000040B6= 002E                     995  strMore_len DC.W    strMore_len-str_more       
-000040B8                           996  
-000040B8= 43 6C 6F 73 69 6E ...    997  exit        DC.B    'Closing program',0
-000040C8= 0010                     998  exit_len    DC.W    exit_len-exit           
-000040CA                           999  
-000040CA= 01                      1000  message_buffer    DC.B   1
-000040CB                          1001                                   
-000040CB                          1002  *************************************************************************************************************************
-000040CB                          1003  * End of program:
-000040CB                          1004  *************************************************************************************************************************        
-000040CC  4E72 2700               1005  END         STOP    #$2700
-000040D0                          1006              END     $1000
+000015E6                           551  ********************************************************************************************************************** 
+000015E6                           552  * Case for: first four bits = 1101
+000015E6                           553  * --(ADD,ADDA)
+000015E6                           554  ********************************************************************************************************************** 
+000015E6  14FC 0041                555  hex1_1101   MOVE.B  #'A',(A2)+          * Put ADD into Buff
+000015EA  14FC 0044                556              MOVE.B  #'D',(A2)+
+000015EE  14FC 0044                557              MOVE.B  #'D',(A2)+
+000015F2  4EB9 0000177C            558              JSR     getSize             * return size  in 6 & 7 into D6
+000015F8  BC3C 0003                559              CMP.B   #%11,D6             * determine if a ADD or ADDA
+000015FC  6600 004E                560              BNE     opADD               * not size 11, then skip to ADD
+00001600  14FC 0041                561              MOVE.B  #'A',(A2)+          * yep, detected 11 then ADDA
+00001604  14FC 002E                562              MOVE.B  #'.',(A2)+
+00001608  3C07                     563              MOVE.W  D7,D6               * fresh copy of instruction
+0000160A  E08E                     564              LSR.L   #shift8bits,D6          * shift to right to isolate 8th bits
+0000160C  0246 0001                565              ANDI.W  #$0001,D6           * Isolate last bit for size
+00001610  BC3C 0001                566              CMP.B   #%1,D6              * compare for a 1 to determine
+00001614  6700 000C                567              BEQ     addaL               * jump to long, else word
+00001618  14FC 0057                568              MOVE.B  #'W',(A2)+          * add word size into buffer
+0000161C  4EF9 00001626            569              JMP     opADDA
+00001622  14FC 004C                570  addaL       MOVE.B  #'L',(A2)+          * add long size into buffer           
+00001626  14FC 0020                571  opADDA      MOVE.B  #' ',(A2)+
+0000162A  14FC 0020                572              MOVE.B  #' ',(A2)+
+0000162E  14FC 0020                573              MOVE.B  #' ',(A2)+
+00001632                           574              **** NOTE NEED TO TEST FOR EA to ADD $
+00001632  4EB9 0000190A            575              JSR     getEA               * get source operand
+00001638  14FC 002C                576              MOVE.B  #',',(A2)+
+0000163C  14FC 0041                577              MOVE.B  #'A',(A2)+  
+00001640  4EB9 000017BC            578              JSR     highRegBits         * Add register number to buffer
+00001646  4EF9 000016A2            579              JMP     end1101
+0000164C                           580              
+0000164C  14FC 002E                581  opADD       MOVE.B  #'.',(A2)+          * finish putting Add.x to buffer
+00001650  4EB9 00001786            582              JSR     size2Buffer         * Determine Size and Add to Buffer
+00001656  14FC 0020                583              MOVE.B  #' ',(A2)+
+0000165A  14FC 0020                584              MOVE.B  #' ',(A2)+
+0000165E  14FC 0020                585              MOVE.B  #' ',(A2)+
+00001662  14FC 0020                586              MOVE.B  #' ',(A2)+
+00001666  4EB9 000017CE            587              JSR     getDirBit           * get Direction Bit 0 = EA 1 =regs
+0000166C  BC3C 0000                588              CMP.B   #%0,D6              * is this EA first?
+00001670  6600 001C                589              BNE     opADD01             * no, jmp to reg mode first
+00001674  4EB9 0000190A            590              JSR     getEA               * print off effective address
+0000167A  14FC 002C                591              MOVE.B  #',',(A2)+          * add comma
+0000167E  14FC 0044                592              MOVE.B  #'D',(A2)+          * add register BAM!
+00001682  4EB9 000017BC            593              JSR     highRegBits         * Add register number to buffer
+00001688  4EF9 000016A2            594              JMP     end1101             * jump to exit of sub: hex1_1101
+0000168E                           595              
+0000168E  14FC 0044                596  opADD01     MOVE.B  #'D',(A2)+          * start register entry
+00001692  4EB9 000017BC            597              JSR     highRegBits         * add register number
+00001698  14FC 002C                598              MOVE.B  #',',(A2)+          * add comma
+0000169C  4EB9 0000190A            599              JSR     getEA               * finish with EA 
+000016A2                           600  
+000016A2  4E75                     601  end1101     RTS
+000016A4                           602  
+000016A4                           603  
+000016A4                           604  
+000016A4                           605  ********************************************************************************************************************** 
+000016A4                           606  * Beginning of 4xxx Op Codes table: tbl_0100 
+000016A4                           607  * Contains the functions per the second  4 bits of current instruction.
+000016A4                           608  ********************************************************************************************************************** 
+000016A4                           609  tbl_0100    *Jump table for all op codes that start with 4XXX
+000016A4  4EF9 000016EC            610              JMP     hex4_0000            
+000016AA  4EF9 000016F4            611              JMP     hex4_0001            
+000016B0                           612              ;JMP     hex4_0010
+000016B0                           613              ;JMP     hex4_0011
+000016B0                           614              ;JMP     hex4_0100
+000016B0  4EF9 00001704            615              JMP     hex4_0101
+000016B6                           616              ;JMP     hex4_0110
+000016B6  4EF9 0000170C            617              JMP     hex4_0111
+000016BC  4EF9 00001714            618              JMP     hex4_1000
+000016C2  4EF9 0000172E            619              JMP     hex4_1001
+000016C8  4EF9 00001736            620              JMP     hex4_1010
+000016CE  4EF9 0000173E            621              JMP     hex4_1011
+000016D4  4EF9 00001746            622              JMP     hex4_1100
+000016DA  4EF9 0000174E            623              JMP     hex4_1101
+000016E0  4EF9 0000175E            624              JMP     hex4_1110
+000016E6  4EF9 00001756            625              JMP     hex4_1111
+000016EC                           626              
+000016EC  4EB9 00001886            627  hex4_0000   JSR     illegalCode
+000016F2  4E75                     628              RTS
+000016F4                           629              
+000016F4  4EB9 00001886            630  hex4_0001   JSR     illegalCode
+000016FA  4E75                     631              RTS
+000016FC                           632              
+000016FC  4EB9 00001886            633  hex4_0011   JSR     illegalCode
+00001702  4E75                     634              RTS
+00001704                           635                            
+00001704                           636              
+00001704  4EB9 00001886            637  hex4_0101   JSR     illegalCode
+0000170A  4E75                     638              RTS
+0000170C                           639          
+0000170C                           640              
+0000170C  4EB9 00001886            641  hex4_0111   JSR     illegalCode
+00001712  4E75                     642              RTS
+00001714                           643              
+00001714                           644              
+00001714                           645  ********************************************************************************************************************** 
+00001714                           646  * Case for: 0100 1000 (MOVEM)                                                          
+00001714                           647  ********************************************************************************************************************** 
+00001714  3C07                     648  hex4_1000   MOVE.W  D7,D6           * copy instruction
+00001716  E88E                     649              LSR.L   #shift4bits,D6      * shift by 4 bits
+00001718  0246 000F                650              ANDI.W  #$000F,D6       * isolate last byte
+0000171C  BC3C 0004                651              CMP.B   #$4,D6          * Determine if SWAP
+00001720  6600 0004                652              BNE     opMOVEM         * No - go to MOVEM
+00001724                           653  
+00001724  4E75                     654              RTS            
+00001726                           655  
+00001726  4EB9 00001886            656  opMOVEM     JSR     illegalCode
+0000172C  4E75                     657              RTS   
+0000172E                           658  
+0000172E  4EB9 00001886            659  hex4_1001   JSR     illegalCode
+00001734  4E75                     660              RTS   
+00001736  4EB9 00001886            661  hex4_1010   JSR     illegalCode
+0000173C  4E75                     662              RTS   
+0000173E  4EB9 00001886            663  hex4_1011   JSR     illegalCode
+00001744  4E75                     664              RTS
+00001746  4EB9 00001886            665  hex4_1100   JSR     illegalCode
+0000174C  4E75                     666              RTS
+0000174E  4EB9 00001886            667  hex4_1101   JSR     illegalCode
+00001754  4E75                     668              RTS
+00001756  4EB9 00001886            669  hex4_1111   JSR     illegalCode
+0000175C  4E75                     670              RTS   
+0000175E                           671  
+0000175E                           672  
+0000175E                           673  ********************************************************************************************************************** 
+0000175E                           674  * Case for: 0100 1110 (NOP)                                                      
+0000175E                           675  ********************************************************************************************************************** 
+0000175E  4EB9 0000177C            676  hex4_1110   JSR     getSize             
+00001764  BC3C 0002                677              CMP.B   #%10,D6             
+00001768  6600 011C                678              BNE     illegalCode             
+0000176C                           679               
+0000176C  14FC 004E                680              MOVE.B  #'N',(A2)+          ; print nop
+00001770  14FC 004F                681              MOVE.B  #'O',(A2)+
+00001774  14FC 0050                682              MOVE.B  #'P',(A2)+
+00001778  4E75                     683              RTS
+0000177A                           684  
+0000177A                           685              
+0000177A  4E75                     686  hex2_1111   RTS    
+0000177C                           687  
+0000177C                           688  
+0000177C                           689  ********************************************************************************************************************** 
+0000177C                           690  * Beginning of functions: illegalCode, getSize, size2Buffer, 
+0000177C                           691  ********************************************************************************************************************** 
+0000177C  3C07                     692  getSize     MOVE.W  D7,D6               * copy current instruction to shift
+0000177E  EC4E                     693              LSR.W   #6,D6               * move the size bits in 6-7 to LSB
+00001780  0246 0003                694              ANDI.W  #$0003,D6           * remove other non-size bits and store result into D6
+00001784  4E75                     695              RTS
+00001786                           696  
+00001786  4EB8 177C                697  size2Buffer JSR     getSize             * run sizing Commands
+0000178A  BC3C 0000                698              CMP.B   #%00,D6             * is tihs a byte?
+0000178E  6700 001C                699              BEQ     mainB               * yes, add B to buffer
+00001792  BC3C 0001                700              CMP.B   #%01,D6             * is this a word?
+00001796  6700 001E                701              BEQ     mainW               * yes, add teh W to buffer
+0000179A  BC3C 0002                702              CMP.B   #%10,D6             * is this a long?
+0000179E  6600 00E6                703              BNE     illegalCode             * No? then bad instruction
+000017A2                           704        
+000017A2  14FC 004C                705              MOVE.B  #'L',(A2)+          * add L to buffer
+000017A6  4EF9 000017BA            706              JMP     mainEnd             * end size2Buffer sub  
+000017AC                           707              
+000017AC  14FC 0042                708  mainB       MOVE.B  #'B',(A2)+          * add B to buffer
+000017B0  4EF9 000017BA            709              JMP     mainEnd             * end size2Buffer sub
+000017B6                           710              
+000017B6  14FC 0057                711  mainW       MOVE.B  #'W',(A2)+          * add W to buffer
+000017BA  4E75                     712  mainEnd     RTS                         * end size2Buffer sub                        
+000017BC                           713  
+000017BC  3C07                     714  highRegBits MOVE.W  D7,D6               * get fresh copy of instruction
+000017BE  E08E                     715              LSR.L   #shift8bits,D6          * shift by 8 (9total)
+000017C0  E28E                     716              LSR.L   #1,D6               * shift by 1
+000017C2  0206 0007                717              ANDI.B  #$7,D6              * isolate last 7 bits for register number
+000017C6  0606 0030                718              ADD.B   #$30,D6             * convert register number to ascii
+000017CA  14C6                     719              MOVE.B  D6,(A2)+            * put register numbert into buffer
+000017CC  4E75                     720              RTS
+000017CE                           721  
+000017CE  3C07                     722  getDirBit   MOVE.W  D7,D6               * get fresh copy of instruction
+000017D0  E08E                     723              LSR.L   #shift8bits,D6          * shift to right to isolate 8th bits
+000017D2  0206 0001                724              ANDI.B  #01,D6              * isolate last bit for testing & return in D6
+000017D6  4E75                     725              RTS  
+000017D8                           726              
+000017D8  BC3C 0000                727  getAddr     CMP.B   #%00,D6             * test if value is a byte - assumes D6 already loaded
+000017DC  6700 0244                728              BEQ     putbytebuffer         * yes? - load B worth of address into buffer
+000017E0  BC3C 0001                729              CMP.B   #%01,D6             * test if value is a word - assumes D6 already loaded
+000017E4  6700 024A                730              BEQ     appendWordBuffer         * yes? - load W worth of address into buffer
+000017E8  BC3C 0002                731              CMP.B   #%10,D6             * test if value is a long - assumes D6 already loaded
+000017EC  6700 0254                732              BEQ     long2Buffer         * yes? - load L worth of address into buffer
+000017F0  4E75                     733              RTS
+000017F2                           734  
+000017F2  4EB9 00001850            735  getLong     JSR     cmdSh1              * Clear D6 and load value for shift
+000017F8  183C 000C                736              MOVE.B  #shift12bits,D4         * Load shifter w/12
+000017FC  4EB9 00001858            737              JSR     cmdSh2              * Shift
+00001802  183C 0008                738              MOVE.B  #shift8bits,D4          * Load shifter w/8
+00001806  4EB9 00001858            739              JSR     cmdSh2              * Shift
+0000180C  183C 0004                740              MOVE.B  #shift4bits,D4          * Load shifter w/4
+00001810  4EB9 00001858            741              JSR     cmdSh2              * Shift
+00001816  183C 0000                742              MOVE.B  #0,D4
+0000181A  4EB9 00001872            743              JSR     cmdSh4              * Shift
+00001820  183C 000C                744              MOVE.B  #shift12bits,D4         * Load shifter w/12
+00001824  4EB9 00001872            745              JSR     cmdSh4              * Shift
+0000182A  183C 0008                746              MOVE.B  #shift8bits,D4          * Load shifter w/8
+0000182E  4EB9 00001872            747              JSR     cmdSh4              * Shift
+00001834  183C 0004                748              MOVE.B  #shift4bits,D4          * Load shifter w/4
+00001838  4EB9 00001872            749              JSR     cmdSh4              * Shift
+0000183E  183C 0000                750              MOVE.B  #0,D4               * Load shifter
+00001842  E8AE                     751              LSR.L   D4,D6               * Shift
+00001844  0286 0000000F            752              ANDI.L  #$0000000F,D6       * Isolate last bit
+0000184A  4EB9 000018F2            753              JSR     converToHex           * Place value in D6 into buffer
+00001850                           754  
+00001850  7C00                     755  cmdSh1      MOVEQ   #$0,D6              * Clear D6
+00001852  2C08                     756              MOVE.L  A0,D6               * Load current address to print
+00001854  4846                     757              SWAP    D6                  * Swap high and low word
+00001856  4E75                     758              RTS
+00001858                           759  
+00001858  E8AE                     760  cmdSh2      LSR.L   D4,D6               * Shift
+0000185A  0286 0000000F            761              ANDI.L  #$0000000F,D6       * Isolate last bit
+00001860  4EB9 000018F2            762              JSR     converToHex           * Place value in D6 into buffer
+00001866  4EB8 1850                763              JSR     cmdSh1              * Reset D6 for next shift
+0000186A  4E75                     764              RTS
+0000186C                           765  
+0000186C  7C00                     766  cmdSh3      MOVEQ   #$0,D6              * Clear D6
+0000186E  2C08                     767              MOVE.L  A0,D6               * Load current address to print
+00001870  4E75                     768              RTS
+00001872                           769              
+00001872  E8AE                     770  cmdSh4      LSR.L   D4,D6               * Shift
+00001874  0286 0000000F            771              ANDI.L  #$0000000F,D6       * Isolate last bit
+0000187A  4EB9 000018F2            772              JSR     converToHex           * Place value in D6 into buffer
+00001880  4EB8 186C                773              JSR     cmdSh3              * Reset D6 for next shift
+00001884  4E75                     774              RTS
+00001886                           775              
+00001886  1A3C 0000                776  illegalCode     MOVE.B  #0,D5         
+0000188A  244B                     777              MOVEA.L A3,A2               
+0000188C  14FC 0044                778              MOVE.B  #'D',(A2)+          
+00001890  14FC 0041                779              MOVE.B  #'A',(A2)+
+00001894  14FC 0054                780              MOVE.B  #'T',(A2)+
+00001898  14FC 0041                781              MOVE.B  #'A',(A2)+
+0000189C  14FC 0009                782              MOVE.B  #$09,(A2)+
+000018A0  14FC 0024                783              MOVE.B  #'$',(A2)+          
+000018A4  4EB9 000018AC            784              JSR     loadDataBuffer          
+000018AA  4E75                     785              RTS          
+000018AC                           786  
+000018AC  7C00                     787  loadDataBuffer      MOVEQ   #$0,D6              
+000018AE  3C07                     788                      MOVE.W  D7,D6               
+000018B0  183C 000C                789                      MOVE.B  #shift12bits,D4         
+000018B4  E8AE                     790                      LSR.L   D4,D6               
+000018B6  0246 000F                791                      ANDI.W  #$000F,D6           
+000018BA  4EB9 000018F2            792                      JSR     converToHex           
+000018C0  3C07                     793                      MOVE.W  D7,D6
+000018C2  183C 0008                794                      MOVE.B  #shift8bits,D4
+000018C6  E8AE                     795                      LSR.L   D4,D6
+000018C8  0246 000F                796                      ANDI.W  #$000F,D6
+000018CC  4EB9 000018F2            797                      JSR     converToHex           
+000018D2  3C07                     798                      MOVE.W  D7,D6
+000018D4  183C 0004                799                      MOVE.B  #shift4bits,D4
+000018D8  E8AE                     800                      LSR.L   D4,D6
+000018DA  0246 000F                801                      ANDI.W  #$000F,D6
+000018DE  4EB9 000018F2            802                      JSR     converToHex           
+000018E4  3C07                     803                      MOVE.W  D7,D6
+000018E6  0246 000F                804                      ANDI.W  #$000F,D6
+000018EA  4EB9 000018F2            805                      JSR     converToHex           
+000018F0  4E75                     806                      RTS
+000018F2                           807              
+000018F2                           808  ; Convert hex to ascii
+000018F2  BC3C 000A                809  converToHex   CMP.B   #$A,D6              * Confirm hex character?
+000018F6  6C00 000A                810              BGE     letter              * Is it a letter or number?
+000018FA  0606 0030                811              ADDI.B  #$30,D6             * Convert decimal to ASCII
+000018FE  6000 0006                812              BRA     hexToBuffer          
+00001902                           813              
+00001902  0606 0037                814  letter      ADDI.B  #$37,D6
+00001906  14C6                     815  hexToBuffer MOVE.B  D6,(A2)+
+00001908  4E75                     816              RTS
+0000190A                           817              
+0000190A                           818  getEA       
+0000190A  4BF9 00001934            819              LEA         addresstable,A5 * load EA_mode jump table
+00001910  4282                     820              CLR.L   D2
+00001912  4283                     821              CLR.L   D3
+00001914  4284                     822              CLR.L   D4           
+00001916  4286                     823              CLR.L   D6
+00001918  3C07                     824              MOVE.W  D7,D6                 * move word into D6 for manipulation
+0000191A  0246 003F                825              ANDI.W  #$003F,D6             * leave only the mode bits
+0000191E  123C 0003                826              MOVE.B      #3,D1                 * Store number of bits we wish to shift            
+00001922  E26E                     827              LSR.W       D1,D6                 * Shift to the Right to isolate mode bits            
+00001924                           828  
+00001924  CCFC 0006                829              MULU      #6,D6            * Form Offset for passing to Jump Index table            
+00001928  4EB5 6000                830              JSR         00(A5,D6)          * Now we have the index, back to Index table        
+0000192C                           831  
+0000192C  4E75                     832              RTS                                * return from EA routine
+0000192E                           833          
+0000192E  4EF9 000040CC            834              JMP         END                    * Return
+00001934                           835  
+00001934                           836  addresstable                             
+00001934  4EF9 00001964            837              JMP     EAcode000             ; Data Register Direct (mode 0)
+0000193A  4EF9 00001976            838              JMP     EAcode001             ; Address Register Direct (mode 1)
+00001940  4EF9 00001988            839              JMP     EAcode010             ; Address Register Indirect (mode 2)
+00001946  4EF9 000019A2            840              JMP     EAcode011             ; Address Register Indirect with Post Increment (mode 3)
+0000194C  4EF9 000019C0            841              JMP     EAcode100             ; Address Register Indirect with Pre Decrement (mode 4)
+00001952  4EF9 000019DE            842              JMP     EAcode101             ; Absolute Word Address (mode 7, subclass 0)
+00001958  4EF9 000019E2            843              JMP     EAcode110             ; Absolute Long Address (mode 7, subclass 1)
+0000195E  4EF9 000019E6            844              JMP     EAcode111             * Immediate Data (mode 7 subclass 4)
+00001964                           845  
+00001964                           846  EAcode000
+00001964  3C07                     847              MOVE.W      D7,D6                   * move current working word into temp storage
+00001966  0246 0007                848              ANDI.W      #$7,D6                  * isolate register bits (last 3)
+0000196A  14FC 0044                849              MOVE.B      #'D',(A2)+              * add "D" to buffer
+0000196E  0606 0030                850              ADD.B       #$30,D6                 * convert data register # to hex digit
+00001972  14C6                     851              MOVE.B      D6,(A2)+                * register # to buffer                  
+00001974                           852              
+00001974  4E75                     853          RTS                                     * Return
+00001976                           854   
+00001976                           855  EAcode001
+00001976  3C07                     856              MOVE.W      D7,D6                   * move current working word into temp storage
+00001978  0246 0007                857              ANDI.W      #$7,D6                  * isolate register bits (last 3)
+0000197C  14FC 0041                858              MOVE.B      #'A',(A2)+              * add "A" to buffer
+00001980  0606 0030                859              ADD.B       #$30,D6                 * convert data register # to hex digit
+00001984  14C6                     860              MOVE.B      D6,(A2)+                * register # to buffer
+00001986                           861                
+00001986  4E75                     862              RTS                                 * Return
+00001988                           863  
+00001988                           864  EAcode010
+00001988  3C07                     865              MOVE.W      D7,D6                   * move current working word into temp storage
+0000198A  0246 0007                866              ANDI.W      #$7,D6                  * isolate register bits (last 3)
+0000198E  14FC 0028                867              MOVE.B      #'(',(A2)+              * add "(" to buffer            
+00001992  14FC 0041                868              MOVE.B      #'A',(A2)+              * add "A" to buffer
+00001996  0606 0030                869              ADD.B       #$30,D6                 * convert data register # to hex digit
+0000199A  14C6                     870              MOVE.B      D6,(A2)+                * register # to buffer
+0000199C  14FC 0029                871              MOVE.B      #')',(A2)+              * add ")" to buffer
+000019A0                           872               
+000019A0  4E75                     873              RTS                                 * Return
+000019A2                           874   
+000019A2                           875  EAcode011
+000019A2                           876              
+000019A2  3C07                     877              MOVE.W      D7,D6                   * move current working word into temp storage
+000019A4  0246 0007                878              ANDI.W      #$7,D6                  * isolate register bits (last 3)
+000019A8  14FC 0028                879              MOVE.B      #'(',(A2)+              * add "(" to buffer            
+000019AC  14FC 0041                880              MOVE.B      #'A',(A2)+              * add "A" to buffer
+000019B0  0606 0030                881              ADD.B       #$30,D6                 * convert data register # to hex digit
+000019B4  14C6                     882              MOVE.B      D6,(A2)+                * register # to buffer
+000019B6  14FC 0029                883              MOVE.B      #')',(A2)+              * add ")" to buffer
+000019BA  14FC 002B                884              MOVE.B      #'+',(A2)+              * add "+" to buffer
+000019BE  4E75                     885              RTS
+000019C0                           886  
+000019C0  3C07                     887  EAcode100   MOVE.W      D7,D6                   * move current working word into temp storage
+000019C2  0246 0007                888              ANDI.W      #$7,D6                  * isolate register bits (last 3)
+000019C6  14FC 002D                889              MOVE.B      #'-',(A2)+              * add "-" to buffer
+000019CA  14FC 0028                890              MOVE.B      #'(',(A2)+              * add "(" to buffer            
+000019CE  14FC 0041                891              MOVE.B      #'A',(A2)+              * add "A" to buffer
+000019D2  0606 0030                892              ADD.B       #$30,D6                 * convert data register # to hex digit
+000019D6  14C6                     893              MOVE.B      D6,(A2)+                * register # to buffer
+000019D8  14FC 0029                894              MOVE.B      #')',(A2)+              * add ")" to buffer
+000019DC  4E75                     895              RTS                                     * Return
+000019DE                           896              
+000019DE                           897  EAcode101
+000019DE  4EF8 1886                898              JMP    illegalCode          * set bad instruction flag
+000019E2                           899  EAcode110
+000019E2  4EF8 1886                900              JMP       illegalCode             * set bad instruction flag
+000019E6                           901  
+000019E6  3C07                     902  EAcode111   MOVE.W D7, D6
+000019E8  0246 0007                903              ANDI.W #$07, D6
+000019EC  0C06 0000                904              CMPI.B   #$0,D6              
+000019F0  6700 003E                905              BEQ      appendWordBuffer         
+000019F4  0C06 0001                906              CMPI.B   #$1,D6              
+000019F8  6700 0048                907              BEQ      long2Buffer         
+000019FC  0C06 0002                908              CMPI.B   #$2,D6
+00001A00  0C06 0002                909              CMPI.B   #$2,D6              
+00001A04  6700 0004                910              BEQ      pctobuffer  
+00001A08  4E75                     911              RTS
+00001A0A                           912  
+00001A0A                           913  ;;; Adding things to buffer 
+00001A0A                           914  ; Add '(pc)' to buffer
+00001A0A                           915  pctobuffer
+00001A0A  4EB9 00001A30            916              JSR         appendWordBuffer
+00001A10  14FC 0028                917              MOVE.B      #'(',(A2)+                        
+00001A14  14FC 0050                918              MOVE.B      #'P',(A2)+              
+00001A18  14FC 0043                919              MOVE.B      #'C',(A2)+              
+00001A1C  14FC 0029                920              MOVE.B      #')',(A2)+                                     
+00001A20  4E75                     921              RTS
+00001A22                           922  
+00001A22                           923  putbytebuffer   
+00001A22  14FC 0024                924              MOVE.B  #'$',(A2)+
+00001A26  4284                     925              CLR.L   D4          
+00001A28  3410                     926              MOVE.W  (A0),D2     
+00001A2A  4284                     927              CLR.L   D4          
+00001A2C  183C 0002                928              MOVE.B  #2,D4       
+00001A30                           929              
+00001A30                           930  appendWordBuffer 
+00001A30  14FC 0024                931              MOVE.B  #'$',(A2)+  
+00001A34  4284                     932              CLR.L   D4          * pre-emptive clearout
+00001A36  14FC 0024                933              MOVE.B  #$24,(A2)+  * put dollar sign in buffer (before address)
+00001A3A  3410                     934              MOVE.W  (A0),D2       * move current word into D2 for rolling purposes
+00001A3C  4284                     935              CLR.L   D4          * pre-emptive clearout
+00001A3E  183C 0004                936              MOVE.B  #4,D4       * load a counter
+00001A42                           937              
+00001A42                           938  long2Buffer
+00001A42  14FC 0024                939              MOVE.B  #'$',(A2)+
+00001A46  4284                     940              CLR.L   D4          * pre-emptive clearout
+00001A48  2410                     941              MOVE.L  (A0),D2       * move current word into D2 for rolling purposes
+00001A4A  4284                     942              CLR.L   D4          * pre-emptive clearout
+00001A4C  183C 0008                943              MOVE.B  #8,D4       * load a counter
+00001A50                           944  
+00001A50                           945                     
+00004000                           946               ORG   $4000 ; Make sure data starts at $4000
+00004000= 48 65 6C 6C 6F 2C ...    947  intro        DC.B    'Hello, please enter beginning and ending addresses',CR,LF
+00004034                           948  
+00004034= 0034                     949  intro_len   DC.W    intro_len-intro
+00004036                           950          
+00004036= 45 6E 74 65 72 20 ...    951  string1     DC.B    'Enter start address: $',0
+0000404E= 0018                     952  str_len1    DC.W    str_len1-string1  *Get the length of the string
+00004050                           953  
+00004050= 45 6E 74 65 72 20 ...    954  string2     DC.B    'Enter end address: $',0
+00004066= 0016                     955  str_len2    DC.W    str_len2-string2  *Get the length of the string
+00004068                           956  
+00004068= 50 72 65 73 73 20 ...    957  str_enter   DC.B    'Press enter to read more data',0
+00004086= FFE2                     958  str_en_len  DC.W    str_enter-str_en_len
+00004088                           959  
+00004088= 44 69 73 61 73 73 ...    960  str_more    DC.B    'Disassemble more code? 1 for yes, 0 for no. ',0
+000040B6= 002E                     961  strMore_len DC.W    strMore_len-str_more       
+000040B8                           962  
+000040B8= 43 6C 6F 73 69 6E ...    963  exit        DC.B    'Closing program',0
+000040C8= 0010                     964  exit_len    DC.W    exit_len-exit           
+000040CA                           965  
+000040CA= 01                       966  message_buffer    DC.B   1
+000040CB                           967                                   
+000040CB                           968  *************************************************************************************************************************
+000040CB                           969  * End of program:
+000040CB                           970  *************************************************************************************************************************        
+000040CC  4E72 2700                971  END         STOP    #$2700
+000040D0                           972              END     $1000
 
-No errors detected
+2 errors detected
 No warnings generated
 
 
 SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
-ADDAL               162C
-ASCIITOHEX          10F0
-BADINST             1890
+ADDAL               1622
+ADDRESSTABLE        1934
+APPENDWORDBUFFER    1A30
+ASCIITOHEX          1100
 BUFFPREP            118A
-CAP_TO_HEX          115E
+CAP_TO_HEX          116C
 CLEARALL            107A
-CLRREGS             18FC
-CMDSH1              185A
-CMDSH2              1862
-CMDSH3              1876
-CMDSH4              187C
-CMPAL               1548
-CONVERTOHEX         190C
+CLEARRIGSTERS       108C
+CMDSH1              1850
+CMDSH2              1858
+CMDSH3              186C
+CMDSH4              1872
+CMPAL               153E
+CONVERTOHEX         18F2
 CR                  D
-EACODE000           197E
-EACODE001           1990
-EACODE010           19A2
-EACODE011           19BC
-EACODE100           19DA
-EACODE101           19F8
-EACODE110           19FC
-EACODE111           1A00
-EA_MODE_TABLE       194E
+EACODE000           1964
+EACODE001           1976
+EACODE010           1988
+EACODE011           19A2
+EACODE100           19C0
+EACODE101           19DE
+EACODE110           19E2
+EACODE111           19E6
 END                 40CC
-END0000             12A6
-END0010             130C
-END0011             1372
-END0100             142A
-END1001             1502
-END1011             15BE
-END1100             15EE
-END1101             16AC
-ENDBUFF             11CE
-ENDINPUT            10EE
-ENDUTIL             108C
+END0000             129C
+END0010             1302
+END0011             1368
+END0100             1420
+END1001             14F8
+END1011             15B4
+END1100             15E4
+END1101             16A2
+ENDBUFF             11D8
+ENDINPUT            10FE
+ENDUTIL             109C
 EXIT                40B8
 EXIT_LEN            40C8
-FILL_ADDRESS        117C
-FINISH              1172
-GETADDR             17E2
-GETDIRBIT           17D8
-GETEA               1924
-GETLONG             17FC
-GETOP               11EE
-GETSIZE             1786
-HEX1_0000           124E
-HEX1_0001           12A8
-HEX1_0011           130E
-HEX1_0100           13C8
-HEX1_0101           142C
-HEX1_0110           1434
-HEX1_0111           143E
-HEX1_1001           1446
-HEX1_1010           1504
-HEX1_1011           150C
-HEX1_1100           15C0
-HEX1_1101           15F0
-HEX2_1111           1784
-HEX4_0000           16F6
-HEX4_0001           16FE
-HEX4_0011           1706
-HEX4_0101           170E
-HEX4_0111           1716
-HEX4_1000           171E
-HEX4_1001           1738
-HEX4_1010           1740
-HEX4_1011           1748
-HEX4_1100           1750
-HEX4_1101           1758
-HEX4_1110           1768
-HEX4_1111           1760
-HEXTOBUFFER         1920
-HIGHREGBITS         17C6
-INPUT               108E
+FINISH              1180
+GETADDR             17D8
+GETDIRBIT           17CE
+GETEA               190A
+GETLONG             17F2
+GETOPCODE           11F0
+GETSIZE             177C
+HEX1_0000           1244
+HEX1_0001           129E
+HEX1_0011           1304
+HEX1_0100           13BE
+HEX1_0101           1422
+HEX1_0110           142A
+HEX1_0111           1434
+HEX1_1001           143C
+HEX1_1010           14FA
+HEX1_1011           1502
+HEX1_1100           15B6
+HEX1_1101           15E6
+HEX2_1111           177A
+HEX4_0000           16EC
+HEX4_0001           16F4
+HEX4_0011           16FC
+HEX4_0101           1704
+HEX4_0111           170C
+HEX4_1000           1714
+HEX4_1001           172E
+HEX4_1010           1736
+HEX4_1011           173E
+HEX4_1100           1746
+HEX4_1101           174E
+HEX4_1110           175E
+HEX4_1111           1756
+HEXTOBUFFER         1906
+HIGHREGBITS         17BC
+ILLEGALCODE         1886
+INPUT               109E
 INTRO               4000
 INTRO_LEN           4034
 IN_START            1016
-L2BLOOP             1A70
-LETTER              191C
+JMP_TABLE           1208
+LETTER              1902
 LF                  A
-LOADDATABUFFER      18B6
-LONG2BUFFER         1A62
-LOOP2               1102
-LOWER_TO_HEX        1168
-MAINB               17B6
-MAINEND             17C4
-MAINW               17C0
+LOADDATABUFFER      18AC
+LONG2BUFFER         1A42
+LOOP2               1110
+LOWER_TO_HEX        1176
+MAINB               17AC
+MAINEND             17BA
+MAINW               17B6
 MESSAGE_BUFFER      40CA
-MOVEL               12E2
-MOVELEA             12F6
-MOVEPTR             15E6
-MOVESIZE            1396
-MOVESIZEL           13C2
-MOVESIZEW           13B8
-MOVEW               1348
-MOVEWEA             135C
-MSIZEEND            13C6
-MULUMODE            15D0
-NUM_TO_HEX          1154
-OPADD               1656
-OPADD01             1698
-OPADDA              1630
-OPCMP               157E
-OPCMPA              154C
-OPCMPEOR            1572
-OPDECODE            11D0
-OPLEA               13F6
-OPMOVEM             1730
-OPMULU              15C2
-OPORI               1266
-OPRETURN            11E8
-OPSUB               14AC
-OPSUB01             14EE
-OPSUBA              1486
-PCTOBUFFER          1A24
+MOVEL               12D8
+MOVELEA             12EC
+MOVEPTR             15DC
+MOVESIZE            138C
+MOVESIZEL           13B8
+MOVESIZEW           13AE
+MOVEW               133E
+MOVEWEA             1352
+MSIZEEND            13BC
+MULUMODE            15C6
+NUM_TO_HEX          1162
+OPADD               164C
+OPADD01             168E
+OPADDA              1626
+OPCMP               1574
+OPCMPA              1542
+OPCMPEOR            1568
+OPDECODE            11DA
+OPLEA               13EC
+OPMOVEM             1726
+OPMULU              15B8
+OPORI               125C
+OPRETURN            11EA
+OPSUB               14A2
+OPSUB01             14E4
+OPSUBA              147C
+PCTOBUFFER          1A0A
 PRINTCOUNT          14
 PRINT_EXIT          1066
-PUTBYTEBUFFER       1A3C
-RESUME              113C
-RTNEA1              1A5C
-RTNEA2              1A8A
+PUTBYTEBUFFER       1A22
+RESUME              114A
 SHIFT12BITS         C
 SHIFT4BITS          4
 SHIFT8BITS          8
 SHOW                1052
-SIZE2BUFFER         1790
+SIZE2BUFFER         1786
 STACK               A000
 START               1000
 STRING1             4036
@@ -1152,8 +1118,6 @@ STR_EN_LEN          4086
 STR_LEN1            404E
 STR_LEN2            4066
 STR_MORE            4088
-SUBAL               1482
-SWAPDESTREG         1374
-TBL_0100            16AE
-TBL_OP              1206
-WORD2BUFFER         1A4A
+SUBAL               1478
+SWAPDESTREG         136A
+TBL_0100            16A4
