@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 12/15/2021 4:20:01 PM
+Created On: 12/15/2021 4:24:45 PM
 
 00000000                             1  *-----------------------------------------------------------------
 00000000                             2  * Title      : 68K Disassembler
@@ -735,11 +735,11 @@ Created On: 12/15/2021 4:20:01 PM
 000017E0  4E75                     731              RTS  
 000017E2                           732              
 000017E2  BC3C 0000                733  getAddr     CMP.B   #%00,D6             * test if value is a byte - assumes D6 already loaded
-000017E6  6700 025C                734              BEQ     byte2Buffer         * yes? - load B worth of address into buffer
+000017E6  6700 0254                734              BEQ     putbytebuffer         * yes? - load B worth of address into buffer
 000017EA  BC3C 0001                735              CMP.B   #%01,D6             * test if value is a word - assumes D6 already loaded
-000017EE  6700 0282                736              BEQ     word2Buffer         * yes? - load W worth of address into buffer
+000017EE  6700 025A                736              BEQ     word2Buffer         * yes? - load W worth of address into buffer
 000017F2  BC3C 0002                737              CMP.B   #%10,D6             * test if value is a long - assumes D6 already loaded
-000017F6  6700 02AC                738              BEQ     long2Buffer         * yes? - load L worth of address into buffer
+000017F6  6700 026A                738              BEQ     long2Buffer         * yes? - load L worth of address into buffer
 000017FA  4E75                     739              RTS
 000017FC                           740  
 000017FC  4EB9 0000185A            741  getLong     JSR     cmdSh1              * Clear D6 and load value for shift
@@ -918,127 +918,96 @@ Created On: 12/15/2021 4:20:01 PM
 000019FC                           914  EAcode110
 000019FC  4EF8 1890                915              JMP       badInst             * set bad instruction flag
 00001A00                           916  
-00001A00                           917  EAcode111
-00001A00  4EB9 00001A24            918              JSR      regBits             * Get Register bits
-00001A06  0C06 0000                919              CMPI.B   #$0,D6              * compare to determine if it's a word
-00001A0A  6700 0066                920              BEQ      word2Buffer         * put word address in buffer
-00001A0E  0C06 0001                921              CMPI.B   #$1,D6              * compare to determine if it's a long
-00001A12  6700 0090                922              BEQ      long2Buffer         * put long address in buffer
+00001A00  3C07                     917  EAcode111   MOVE.W D7, D6
+00001A02  0246 0007                918              ANDI.W #$07, D6
+00001A06  0C06 0000                919              CMPI.B   #$0,D6              
+00001A0A  6700 003E                920              BEQ      word2Buffer         
+00001A0E  0C06 0001                921              CMPI.B   #$1,D6              
+00001A12  6700 004E                922              BEQ      long2Buffer         
 00001A16  0C06 0002                923              CMPI.B   #$2,D6
-00001A1A                           924  
-00001A1A  0C06 0002                925              CMPI.B   #$2,D6              * compare to determine if it's PC w/ Displacement
-00001A1E  6700 000C                926              BEQ      pctobuffer             
-00001A22                           927              ;CMPI.B   #$4,D6              * compare to determine if it's Immediate
-00001A22                           928              ;BEQ      imm2Buffer          * DON"T HAVE THIS CASE YET
-00001A22                           929             
-00001A22  4E75                     930              RTS
-00001A24                           931  
-00001A24  3C07                     932  regBits     MOVE.W  D7,D6     * change D2 to A0  (simulating address)
-00001A26  0246 0007                933              ANDI.W  #$07,D6
-00001A2A  4E75                     934              RTS
-00001A2C                           935   
-00001A2C                           936  ; Add '(pc)' to buffer
-00001A2C                           937  pctobuffer
-00001A2C  4EB9 00001A72            938              JSR         word2Buffer
-00001A32  14FC 0028                939              MOVE.B      #'(',(A2)+                        
-00001A36  14FC 0050                940              MOVE.B      #'P',(A2)+              
-00001A3A  14FC 0043                941              MOVE.B      #'C',(A2)+              
-00001A3E  14FC 0029                942              MOVE.B      #')',(A2)+                                     
-00001A42  4E75                     943              RTS
-00001A44                           944  
-00001A44                           945  byte2Buffer   
-00001A44  14FC 0024                946              MOVE.B  #'$',(A2)+
-00001A48  4284                     947              CLR.L   D4          * pre-emptive clearout
-00001A4A  3410                     948              MOVE.W  (A0),D2       * move current word into D2 for rolling purposes
-00001A4C  4284                     949              CLR.L   D4          * pre-emptive clearout
-00001A4E  183C 0002                950              MOVE.B  #2,D4       * load a counter
-00001A52                           951  
-00001A52                           952  b2bLoop                 
-00001A52  B83C 0000                953              CMP.B   #$00,D4     * compare counter with 0
-00001A56  6700 0014                954              BEQ     rtnEA0      * if zero, return
-00001A5A  E91A                     955              ROL.B   #4,D2       * roll the bits in D2 to the left
-00001A5C  3C02                     956              MOVE.W  D2,D6       * move rolled bits into temp storage
-00001A5E  0246 000F                957              ANDI.W  #$000F,D6   * and the bits to isolate ascii char   
-00001A62  4EB8 190C                958              JSR     converToHex   * load ascii char into buffer            
-00001A66  5304                     959              SUBQ.B  #$1,D4      * subtract from counter
-00001A68  4EF8 1A52                960              JMP     b2bLoop     * keep looping until counter hits zero
-00001A6C                           961              
-00001A6C  3C07                     962  rtnEA0      MOVE.W  D7,D6       * re-load current word for temp storage            
-00001A6E  5448                     963              ADDQ.W  #2,A0       * advancing memory pointer by word   
-00001A70  4E75                     964              RTS                 * return from subroutine
-00001A72                           965              
-00001A72                           966  word2Buffer 
-00001A72  14FC 0024                967              MOVE.B  #'$',(A2)+  
-00001A76  4284                     968              CLR.L   D4          * pre-emptive clearout
-00001A78  14FC 0024                969              MOVE.B  #$24,(A2)+  * put dollar sign in buffer (before address)
-00001A7C  3410                     970              MOVE.W  (A0),D2       * move current word into D2 for rolling purposes
-00001A7E  4284                     971              CLR.L   D4          * pre-emptive clearout
-00001A80  183C 0004                972              MOVE.B  #4,D4       * load a counter
-00001A84                           973  
-00001A84                           974  w2bLoop                 
-00001A84  B83C 0000                975              CMP.B   #$00,D4     * compare counter with 0
-00001A88  6700 0014                976              BEQ     rtnEA1      * if zero, return
-00001A8C  E95A                     977              ROL.W   #4,D2       * roll the bits in D2 to the left
-00001A8E  3C02                     978              MOVE.W  D2,D6       * move rolled bits into temp storage
-00001A90  0246 000F                979              ANDI.W  #$000F,D6   * and the bits to isolate ascii char   
-00001A94  4EB8 190C                980              JSR     converToHex   * load ascii char into buffer            
-00001A98  5304                     981              SUBQ.B  #$1,D4      * subtract from counter
-00001A9A  4EF8 1A84                982              JMP     w2bLoop     * keep looping until counter hits zero
-00001A9E                           983              
-00001A9E  3C07                     984  rtnEA1      MOVE.W  D7,D6       * re-load current word for temp storage            
-00001AA0  5448                     985              ADDQ.W  #2,A0       * advancing memory pointer by word   
-00001AA2  4E75                     986              RTS                 * return from subroutine
-00001AA4                           987  
-00001AA4                           988  long2Buffer
-00001AA4  14FC 0024                989              MOVE.B  #'$',(A2)+
-00001AA8  4284                     990              CLR.L   D4          * pre-emptive clearout
-00001AAA  2410                     991              MOVE.L  (A0),D2       * move current word into D2 for rolling purposes
-00001AAC  4284                     992              CLR.L   D4          * pre-emptive clearout
-00001AAE  183C 0008                993              MOVE.B  #8,D4       * load a counter
-00001AB2                           994  
-00001AB2                           995  l2bLoop                 
-00001AB2  B83C 0000                996              CMP.B   #$00,D4     * compare counter with 0
-00001AB6  6700 0014                997              BEQ     rtnEA2      * if zero, return
-00001ABA  E99A                     998              ROL.L   #4,D2       * roll the bits in D2 to the left
-00001ABC  3C02                     999              MOVE.W  D2,D6       * move rolled bits into temp storage
-00001ABE  0246 000F               1000              ANDI.W  #$000F,D6   * and the bits to isolate ascii char   
-00001AC2  4EB8 190C               1001              JSR     converToHex   * load ascii char into buffer            
-00001AC6  5304                    1002              SUBQ.B  #$1,D4      * subtract from counter
-00001AC8  4EF8 1AB2               1003              JMP     l2bLoop     * keep looping until counter hits zero
-00001ACC                          1004              
-00001ACC  3C07                    1005  rtnEA2      MOVE.W  D7,D6       * re-load current word for temp storage
-00001ACE  5848                    1006              ADDQ.W  #4,A0       * advancing memory pointer by long
-00001AD0  4E75                    1007              RTS                 * return from subroutine
-00001AD2                          1008  
-00001AD2                          1009  
-00001AD2                          1010                     
-00004000                          1011               ORG   $4000 ; Make sure data starts at $4000
-00004000= 48 65 6C 6C 6F 2C ...   1012  intro        DC.B    'Hello, please enter beginning and ending addresses',CR,LF
-00004034                          1013  
-00004034= 0034                    1014  intro_len   DC.W    intro_len-intro
-00004036                          1015          
-00004036= 45 6E 74 65 72 20 ...   1016  string1     DC.B    'Enter start address: $',0
-0000404E= 0018                    1017  str_len1    DC.W    str_len1-string1  *Get the length of the string
-00004050                          1018  
-00004050= 45 6E 74 65 72 20 ...   1019  string2     DC.B    'Enter end address: $',0
-00004066= 0016                    1020  str_len2    DC.W    str_len2-string2  *Get the length of the string
-00004068                          1021  
-00004068= 50 72 65 73 73 20 ...   1022  str_enter   DC.B    'Press enter to read more data',0
-00004086= FFE2                    1023  str_en_len  DC.W    str_enter-str_en_len
-00004088                          1024  
-00004088= 44 69 73 61 73 73 ...   1025  str_more    DC.B    'Disassemble more code? 1 for yes, 0 for no. ',0
-000040B6= 002E                    1026  strMore_len DC.W    strMore_len-str_more       
-000040B8                          1027  
-000040B8= 43 6C 6F 73 69 6E ...   1028  exit        DC.B    'Closing program',0
-000040C8= 0010                    1029  exit_len    DC.W    exit_len-exit           
-000040CA                          1030  
-000040CA= 01                      1031  message_buffer    DC.B   1
-000040CB                          1032                                   
-000040CB                          1033  *************************************************************************************************************************
-000040CB                          1034  * End of program:
-000040CB                          1035  *************************************************************************************************************************        
-000040CC  4E72 2700               1036  END         STOP    #$2700
-000040D0                          1037              END     $1000
+00001A1A  0C06 0002                924              CMPI.B   #$2,D6              
+00001A1E  6700 0004                925              BEQ      pctobuffer  
+00001A22  4E75                     926              RTS
+00001A24                           927  
+00001A24                           928   
+00001A24                           929  ; Add '(pc)' to buffer
+00001A24                           930  pctobuffer
+00001A24  4EB9 00001A4A            931              JSR         word2Buffer
+00001A2A  14FC 0028                932              MOVE.B      #'(',(A2)+                        
+00001A2E  14FC 0050                933              MOVE.B      #'P',(A2)+              
+00001A32  14FC 0043                934              MOVE.B      #'C',(A2)+              
+00001A36  14FC 0029                935              MOVE.B      #')',(A2)+                                     
+00001A3A  4E75                     936              RTS
+00001A3C                           937  
+00001A3C                           938  putbytebuffer   
+00001A3C  14FC 0024                939              MOVE.B  #'$',(A2)+
+00001A40  4284                     940              CLR.L   D4          
+00001A42  3410                     941              MOVE.W  (A0),D2     
+00001A44  4284                     942              CLR.L   D4          
+00001A46  183C 0002                943              MOVE.B  #2,D4       
+00001A4A                           944              
+00001A4A                           945  word2Buffer 
+00001A4A  14FC 0024                946              MOVE.B  #'$',(A2)+  
+00001A4E  4284                     947              CLR.L   D4          * pre-emptive clearout
+00001A50  14FC 0024                948              MOVE.B  #$24,(A2)+  * put dollar sign in buffer (before address)
+00001A54  3410                     949              MOVE.W  (A0),D2       * move current word into D2 for rolling purposes
+00001A56  4284                     950              CLR.L   D4          * pre-emptive clearout
+00001A58  183C 0004                951              MOVE.B  #4,D4       * load a counter
+00001A5C                           952              
+00001A5C  3C07                     953  rtnEA1      MOVE.W  D7,D6       * re-load current word for temp storage            
+00001A5E  5448                     954              ADDQ.W  #2,A0       * advancing memory pointer by word   
+00001A60  4E75                     955              RTS                 * return from subroutine
+00001A62                           956  
+00001A62                           957  long2Buffer
+00001A62  14FC 0024                958              MOVE.B  #'$',(A2)+
+00001A66  4284                     959              CLR.L   D4          * pre-emptive clearout
+00001A68  2410                     960              MOVE.L  (A0),D2       * move current word into D2 for rolling purposes
+00001A6A  4284                     961              CLR.L   D4          * pre-emptive clearout
+00001A6C  183C 0008                962              MOVE.B  #8,D4       * load a counter
+00001A70                           963  
+00001A70                           964  l2bLoop                 
+00001A70  B83C 0000                965              CMP.B   #$00,D4     * compare counter with 0
+00001A74  6700 0014                966              BEQ     rtnEA2      * if zero, return
+00001A78  E99A                     967              ROL.L   #4,D2       * roll the bits in D2 to the left
+00001A7A  3C02                     968              MOVE.W  D2,D6       * move rolled bits into temp storage
+00001A7C  0246 000F                969              ANDI.W  #$000F,D6   * and the bits to isolate ascii char   
+00001A80  4EB8 190C                970              JSR     converToHex   * load ascii char into buffer            
+00001A84  5304                     971              SUBQ.B  #$1,D4      * subtract from counter
+00001A86  4EF8 1A70                972              JMP     l2bLoop     * keep looping until counter hits zero
+00001A8A                           973              
+00001A8A  3C07                     974  rtnEA2      MOVE.W  D7,D6       * re-load current word for temp storage
+00001A8C  5848                     975              ADDQ.W  #4,A0       * advancing memory pointer by long
+00001A8E  4E75                     976              RTS                 * return from subroutine
+00001A90                           977  
+00001A90                           978  
+00001A90                           979                     
+00004000                           980               ORG   $4000 ; Make sure data starts at $4000
+00004000= 48 65 6C 6C 6F 2C ...    981  intro        DC.B    'Hello, please enter beginning and ending addresses',CR,LF
+00004034                           982  
+00004034= 0034                     983  intro_len   DC.W    intro_len-intro
+00004036                           984          
+00004036= 45 6E 74 65 72 20 ...    985  string1     DC.B    'Enter start address: $',0
+0000404E= 0018                     986  str_len1    DC.W    str_len1-string1  *Get the length of the string
+00004050                           987  
+00004050= 45 6E 74 65 72 20 ...    988  string2     DC.B    'Enter end address: $',0
+00004066= 0016                     989  str_len2    DC.W    str_len2-string2  *Get the length of the string
+00004068                           990  
+00004068= 50 72 65 73 73 20 ...    991  str_enter   DC.B    'Press enter to read more data',0
+00004086= FFE2                     992  str_en_len  DC.W    str_enter-str_en_len
+00004088                           993  
+00004088= 44 69 73 61 73 73 ...    994  str_more    DC.B    'Disassemble more code? 1 for yes, 0 for no. ',0
+000040B6= 002E                     995  strMore_len DC.W    strMore_len-str_more       
+000040B8                           996  
+000040B8= 43 6C 6F 73 69 6E ...    997  exit        DC.B    'Closing program',0
+000040C8= 0010                     998  exit_len    DC.W    exit_len-exit           
+000040CA                           999  
+000040CA= 01                      1000  message_buffer    DC.B   1
+000040CB                          1001                                   
+000040CB                          1002  *************************************************************************************************************************
+000040CB                          1003  * End of program:
+000040CB                          1004  *************************************************************************************************************************        
+000040CC  4E72 2700               1005  END         STOP    #$2700
+000040D0                          1006              END     $1000
 
 No errors detected
 No warnings generated
@@ -1049,10 +1018,8 @@ Symbol-name         Value
 -------------------------
 ADDAL               162C
 ASCIITOHEX          10F0
-B2BLOOP             1A52
 BADINST             1890
 BUFFPREP            118A
-BYTE2BUFFER         1A44
 CAP_TO_HEX          115E
 CLEARALL            107A
 CLRREGS             18FC
@@ -1126,11 +1093,11 @@ INPUT               108E
 INTRO               4000
 INTRO_LEN           4034
 IN_START            1016
-L2BLOOP             1AB2
+L2BLOOP             1A70
 LETTER              191C
 LF                  A
 LOADDATABUFFER      18B6
-LONG2BUFFER         1AA4
+LONG2BUFFER         1A62
 LOOP2               1102
 LOWER_TO_HEX        1168
 MAINB               17B6
@@ -1163,14 +1130,13 @@ OPRETURN            11E8
 OPSUB               14AC
 OPSUB01             14EE
 OPSUBA              1486
-PCTOBUFFER          1A2C
+PCTOBUFFER          1A24
 PRINTCOUNT          14
 PRINT_EXIT          1066
-REGBITS             1A24
+PUTBYTEBUFFER       1A3C
 RESUME              113C
-RTNEA0              1A6C
-RTNEA1              1A9E
-RTNEA2              1ACC
+RTNEA1              1A5C
+RTNEA2              1A8A
 SHIFT12BITS         C
 SHIFT4BITS          4
 SHIFT8BITS          8
@@ -1190,5 +1156,4 @@ SUBAL               1482
 SWAPDESTREG         1374
 TBL_0100            16AE
 TBL_OP              1206
-W2BLOOP             1A84
-WORD2BUFFER         1A72
+WORD2BUFFER         1A4A
