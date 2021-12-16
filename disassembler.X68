@@ -742,9 +742,9 @@ getDirBit   MOVE.W  D7,D6               * get fresh copy of instruction
 getAddr     CMP.B   #%00,D6             * test if value is a byte - assumes D6 already loaded
             BEQ     putbytebuffer         * yes? - load B worth of address into buffer
             CMP.B   #%01,D6             * test if value is a word - assumes D6 already loaded
-            BEQ     word2Buffer         * yes? - load W worth of address into buffer
+            BEQ     putWordBuffer         * yes? - load W worth of address into buffer
             CMP.B   #%10,D6             * test if value is a long - assumes D6 already loaded
-            BEQ     long2Buffer         * yes? - load L worth of address into buffer
+            BEQ     putLongBuffer         * yes? - load L worth of address into buffer
             RTS
 
 getLong     JSR     cmdSh1              * Clear D6 and load value for shift
@@ -918,9 +918,9 @@ EAcode110
 EAcode111   MOVE.W D7, D6
             ANDI.W #$07, D6
             CMPI.B   #$0,D6              
-            BEQ      word2Buffer         
+            BEQ      putWordBuffer         
             CMPI.B   #$1,D6              
-            BEQ      long2Buffer         
+            BEQ      putLongBuffer         
             CMPI.B   #$2,D6
             CMPI.B   #$2,D6              
             BEQ      pctobuffer  
@@ -929,7 +929,7 @@ EAcode111   MOVE.W D7, D6
  
 ; Add '(pc)' to buffer
 pctobuffer
-            JSR         word2Buffer
+            JSR         putWordBuffer
             MOVE.B      #'(',(A2)+                        
             MOVE.B      #'P',(A2)+              
             MOVE.B      #'C',(A2)+              
@@ -943,7 +943,7 @@ putbytebuffer
             CLR.L   D4          
             MOVE.B  #2,D4       
             
-word2Buffer 
+putWordBuffer 
             MOVE.B  #'$',(A2)+  
             CLR.L   D4          
             MOVE.B  #$24,(A2)+  
@@ -955,7 +955,7 @@ word2Buffer
             ADDQ.W  #2,A0         
             RTS                 
 
-long2Buffer
+putLongBuffer
             MOVE.B  #'$',(A2)+
             CLR.L   D4          
             MOVE.L  (A0),D2     
@@ -965,8 +965,6 @@ long2Buffer
             MOVE.W  D7,D6       
             ADDQ.W  #4,A0      
             RTS                 
-
-
                    
              ORG   $4000 ; Make sure data starts at $4000
 intro        DC.B    'Hello, please enter beginning and ending addresses',CR,LF

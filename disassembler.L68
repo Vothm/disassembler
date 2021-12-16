@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 12/15/2021 5:16:59 PM
+Created On: 12/15/2021 5:18:08 PM
 
 00000000                             1  *-----------------------------------------------------------------
 00000000                             2  * Title      : 68K Disassembler
@@ -746,9 +746,9 @@ Created On: 12/15/2021 5:16:59 PM
 000017EE  BC3C 0000                742  getAddr     CMP.B   #%00,D6             * test if value is a byte - assumes D6 already loaded
 000017F2  6700 0244                743              BEQ     putbytebuffer         * yes? - load B worth of address into buffer
 000017F6  BC3C 0001                744              CMP.B   #%01,D6             * test if value is a word - assumes D6 already loaded
-000017FA  6700 024A                745              BEQ     word2Buffer         * yes? - load W worth of address into buffer
+000017FA  6700 024A                745              BEQ     putWordBuffer         * yes? - load W worth of address into buffer
 000017FE  BC3C 0002                746              CMP.B   #%10,D6             * test if value is a long - assumes D6 already loaded
-00001802  6700 025A                747              BEQ     long2Buffer         * yes? - load L worth of address into buffer
+00001802  6700 025A                747              BEQ     putLongBuffer         * yes? - load L worth of address into buffer
 00001806  4E75                     748              RTS
 00001808                           749  
 00001808  4EB9 00001866            750  getLong     JSR     cmdSh1              * Clear D6 and load value for shift
@@ -922,9 +922,9 @@ Created On: 12/15/2021 5:16:59 PM
 000019FC  3C07                     918  EAcode111   MOVE.W D7, D6
 000019FE  0246 0007                919              ANDI.W #$07, D6
 00001A02  0C06 0000                920              CMPI.B   #$0,D6              
-00001A06  6700 003E                921              BEQ      word2Buffer         
+00001A06  6700 003E                921              BEQ      putWordBuffer         
 00001A0A  0C06 0001                922              CMPI.B   #$1,D6              
-00001A0E  6700 004E                923              BEQ      long2Buffer         
+00001A0E  6700 004E                923              BEQ      putLongBuffer         
 00001A12  0C06 0002                924              CMPI.B   #$2,D6
 00001A16  0C06 0002                925              CMPI.B   #$2,D6              
 00001A1A  6700 0004                926              BEQ      pctobuffer  
@@ -933,7 +933,7 @@ Created On: 12/15/2021 5:16:59 PM
 00001A20                           929   
 00001A20                           930  ; Add '(pc)' to buffer
 00001A20                           931  pctobuffer
-00001A20  4EB9 00001A46            932              JSR         word2Buffer
+00001A20  4EB9 00001A46            932              JSR         putWordBuffer
 00001A26  14FC 0028                933              MOVE.B      #'(',(A2)+                        
 00001A2A  14FC 0050                934              MOVE.B      #'P',(A2)+              
 00001A2E  14FC 0043                935              MOVE.B      #'C',(A2)+              
@@ -947,7 +947,7 @@ Created On: 12/15/2021 5:16:59 PM
 00001A40  4284                     943              CLR.L   D4          
 00001A42  183C 0002                944              MOVE.B  #2,D4       
 00001A46                           945              
-00001A46                           946  word2Buffer 
+00001A46                           946  putWordBuffer 
 00001A46  14FC 0024                947              MOVE.B  #'$',(A2)+  
 00001A4A  4284                     948              CLR.L   D4          
 00001A4C  14FC 0024                949              MOVE.B  #$24,(A2)+  
@@ -959,7 +959,7 @@ Created On: 12/15/2021 5:16:59 PM
 00001A5A  5448                     955              ADDQ.W  #2,A0         
 00001A5C  4E75                     956              RTS                 
 00001A5E                           957  
-00001A5E                           958  long2Buffer
+00001A5E                           958  putLongBuffer
 00001A5E  14FC 0024                959              MOVE.B  #'$',(A2)+
 00001A62  4284                     960              CLR.L   D4          
 00001A64  2410                     961              MOVE.L  (A0),D2     
@@ -1087,7 +1087,6 @@ IN_START            1016
 LETTER              1918
 LF                  A
 LOADDATABUFFER      18C2
-LONG2BUFFER         1A5E
 LOOP2               1110
 LOWER_TO_HEX        1176
 MAINB               17C2
@@ -1124,6 +1123,8 @@ PCTOBUFFER          1A20
 PRINTCOUNT          14
 PRINT_EXIT          1066
 PUTBYTEBUFFER       1A38
+PUTLONGBUFFER       1A5E
+PUTWORDBUFFER       1A46
 RESUME              114A
 SHIFT12BITS         C
 SHIFT4BITS          4
@@ -1144,4 +1145,3 @@ SUBAL               148E
 SWAPDESTREG         1380
 TBL_0100            16BA
 TBL_OP              1212
-WORD2BUFFER         1A46
