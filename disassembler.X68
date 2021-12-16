@@ -450,7 +450,6 @@ cmpaL       MOVE.B  #'L',(A2)+
 opCMPA      MOVE.B  #' ',(A2)+
             MOVE.B  #' ',(A2)+
             MOVE.B  #' ',(A2)+
-
             JSR     getEA               
             MOVE.B  #',',(A2)+
             MOVE.B  #'A',(A2)+
@@ -460,8 +459,7 @@ opCMPA      MOVE.B  #' ',(A2)+
 opCMPEOR    MOVE.W  D7,D6              
             JSR     getDirBit           
             CMP.B   #%0,D6             
-                   
-opCMP       MOVE.B  #'C',(A2)+          
+            MOVE.B  #'C',(A2)+          
             MOVE.B  #'M',(A2)+
             MOVE.B  #'P',(A2)+
             MOVE.B  #'.',(A2)+
@@ -482,8 +480,8 @@ opcode_1100   MOVE.W  D7,D6
 opMULU      LSR.L   #6,D6             
             ANDI.W  #$3,D6             
             CMP.B   #$3,D6             
-            BEQ     muluMode           
-muluMode    MOVE.W  D7,D6           
+            BEQ     isMULU           
+isMULU      MOVE.W  D7,D6           
             LSR.L   #3,D6              
             ANDI.W  #$7,D6             
             CMP.B   #$7,D6             
