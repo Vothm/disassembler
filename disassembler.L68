@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 12/15/2021 5:31:51 PM
+Created On: 12/15/2021 5:39:04 PM
 
 00000000                             1  *-----------------------------------------------------------------
 00000000                             2  * Title      : 68K Disassembler
@@ -114,7 +114,7 @@ Created On: 12/15/2021 5:31:51 PM
 00001108  4EB8 108C                110              JSR     clrRegs
 0000110C  3C3C 0000                111              MOVE    #0,D6      
 00001110                           112        
-00001110  1619                     113  loop2       MOVE.B  (A1)+,D3            
+00001110  1619                     113  cleanup     MOVE.B  (A1)+,D3            
 00001112  B63C 0030                114              CMP.B   #$30,D3             
 00001116  6D00 0068                115              BLT     finish      
 0000111A  B63C 003A                116              CMP.B   #$3A,D3             
@@ -136,7 +136,7 @@ Created On: 12/15/2021 5:31:51 PM
 00001154  0C11 0000                132              CMP.B   #$00,(A1)          
 00001158  6700 0026                133              BEQ     finish      
 0000115C  E984                     134              ASL.L   #4,D4                         
-0000115E  4EF8 1110                135              JMP     loop2               
+0000115E  4EF8 1110                135              JMP     cleanup               
 00001162                           136  
 00001162  0403 0030                137  num_to_hex  SUBI.B  #$30,D3             
 00001166  D803                     138              ADD.B   D3,D4               
@@ -715,19 +715,19 @@ Created On: 12/15/2021 5:31:51 PM
 0000179C                           711  
 0000179C  4EB8 1792                712  size2Buffer JSR     getSize             * run sizing Commands
 000017A0  BC3C 0000                713              CMP.B   #%00,D6             * is tihs a byte?
-000017A4  6700 001C                714              BEQ     mainB               * yes, add B to buffer
+000017A4  6700 001C                714              BEQ     addBToBuffer               * yes, add B to buffer
 000017A8  BC3C 0001                715              CMP.B   #%01,D6             * is this a word?
-000017AC  6700 001E                716              BEQ     mainW               * yes, add teh W to buffer
+000017AC  6700 001E                716              BEQ     addWToBuffer               * yes, add teh W to buffer
 000017B0  BC3C 0002                717              CMP.B   #%10,D6             * is this a long?
 000017B4  6600 00E6                718              BNE     illegalCode             * No? then bad instruction
 000017B8                           719        
 000017B8  14FC 004C                720              MOVE.B  #'L',(A2)+          * add L to buffer
 000017BC  4EF9 000017D0            721              JMP     mainEnd             * end size2Buffer sub  
 000017C2                           722              
-000017C2  14FC 0042                723  mainB       MOVE.B  #'B',(A2)+          * add B to buffer
-000017C6  4EF9 000017D0            724              JMP     mainEnd             * end size2Buffer sub
+000017C2  14FC 0042                723  addBToBuffer       MOVE.B  #'B',(A2)+          * add B to buffer
+000017C6  4EF9 000017D0            724                      JMP     mainEnd             * end size2Buffer sub
 000017CC                           725              
-000017CC  14FC 0057                726  mainW       MOVE.B  #'W',(A2)+          * add W to buffer
+000017CC  14FC 0057                726  addWToBuffer       MOVE.B  #'W',(A2)+          * add W to buffer
 000017D0  4E75                     727  mainEnd     RTS                         * end size2Buffer sub                        
 000017D2                           728  
 000017D2  3C07                     729  highRegBits MOVE.W  D7,D6               * get fresh copy of instruction
@@ -836,17 +836,17 @@ Created On: 12/15/2021 5:31:51 PM
 0000191E  4E75                     832              RTS
 00001920                           833              
 00001920                           834  getEA       
-00001920  4BF9 0000194A            835              LEA         ea_mode_table,A5 * load EA_mode jump table
+00001920  4BF9 0000194A            835              LEA         ea_mode_table,A5 
 00001926  4282                     836              CLR.L   D2
 00001928  4283                     837              CLR.L   D3
 0000192A  4284                     838              CLR.L   D4           
 0000192C  4286                     839              CLR.L   D6
-0000192E  3C07                     840              MOVE.W  D7,D6                 * move word into D6 for manipulation
-00001930  0246 003F                841              ANDI.W  #$003F,D6             * leave only the mode bits
-00001934  123C 0003                842              MOVE.B      #3,D1                 * Store number of bits we wish to shift            
-00001938  E26E                     843              LSR.W       D1,D6                 * Shift to the Right to isolate mode bits            
+0000192E  3C07                     840              MOVE.W  D7,D6                 
+00001930  0246 003F                841              ANDI.W  #$003F,D6            
+00001934  123C 0003                842              MOVE.B      #3,D1                       
+00001938  E26E                     843              LSR.W       D1,D6                       
 0000193A                           844  
-0000193A  CCFC 0006                845              MULU      #6,D6            * Form Offset for passing to Jump Index table            
+0000193A  CCFC 0006                845              MULU      #6,D6                     
 0000193E  4EB5 6000                846              JSR         00(A5,D6)               
 00001942                           847  
 00001942  4E75                     848              RTS                                
@@ -1002,9 +1002,12 @@ SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
 ADDAL               1638
+ADDBTOBUFFER        17C2
+ADDWTOBUFFER        17CC
 ASCIITOHEX          1100
 BUFFPREP            1198
 CAP_TO_HEX          116C
+CLEANUP             1110
 CLEARALL            107A
 CLRREGS             108C
 CMDSH1              1866
@@ -1081,11 +1084,8 @@ IN_START            1016
 LETTER              1918
 LF                  A
 LOADDATABUFFER      18C2
-LOOP2               1110
 LOWER_TO_HEX        1176
-MAINB               17C2
 MAINEND             17D0
-MAINW               17CC
 MESSAGE_BUFFER      40CA
 MOVEL               12EE
 MOVELEA             1302

@@ -110,7 +110,7 @@ asciiToHex
             JSR     clrRegs
             MOVE    #0,D6      
       
-loop2       MOVE.B  (A1)+,D3            
+cleanup     MOVE.B  (A1)+,D3            
             CMP.B   #$30,D3             
             BLT     finish      
             CMP.B   #$3A,D3             
@@ -132,7 +132,7 @@ resume      ADD     #1,D6
             CMP.B   #$00,(A1)          
             BEQ     finish      
             ASL.L   #4,D4                         
-            JMP     loop2               
+            JMP     cleanup               
 
 num_to_hex  SUBI.B  #$30,D3             
             ADD.B   D3,D4               
@@ -711,19 +711,19 @@ getSize     MOVE.W  D7,D6               * copy current instruction to shift
 
 size2Buffer JSR     getSize             * run sizing Commands
             CMP.B   #%00,D6             * is tihs a byte?
-            BEQ     mainB               * yes, add B to buffer
+            BEQ     addBToBuffer               * yes, add B to buffer
             CMP.B   #%01,D6             * is this a word?
-            BEQ     mainW               * yes, add teh W to buffer
+            BEQ     addWToBuffer               * yes, add teh W to buffer
             CMP.B   #%10,D6             * is this a long?
             BNE     illegalCode             * No? then bad instruction
       
             MOVE.B  #'L',(A2)+          * add L to buffer
             JMP     mainEnd             * end size2Buffer sub  
             
-mainB       MOVE.B  #'B',(A2)+          * add B to buffer
-            JMP     mainEnd             * end size2Buffer sub
+addBToBuffer       MOVE.B  #'B',(A2)+          * add B to buffer
+                    JMP     mainEnd             * end size2Buffer sub
             
-mainW       MOVE.B  #'W',(A2)+          * add W to buffer
+addWToBuffer       MOVE.B  #'W',(A2)+          * add W to buffer
 mainEnd     RTS                         * end size2Buffer sub                        
 
 highRegBits MOVE.W  D7,D6               * get fresh copy of instruction
