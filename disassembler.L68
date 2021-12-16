@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 12/15/2021 6:38:23 PM
+Created On: 12/15/2021 6:42:08 PM
 
 00000000                             1  *-----------------------------------------------------------------
 00000000                             2  * Title      : 68K Disassembler
@@ -207,25 +207,25 @@ Created On: 12/15/2021 6:38:23 PM
 00001210  4E75                     203              RTS
 00001212                           204  
 00001212                           205  jmp_table      
-00001212  4EF9 0000125A            206              JMP     hex1_0000            
-00001218  4EF9 000012B4            207              JMP     hex1_0001            
-0000121E                           208              ;JMP     hex1_0010
-0000121E  4EF9 0000131A            209              JMP     hex1_0011
-00001224  4EF9 000013D4            210              JMP     hex1_0100
-0000122A  4EF9 00001438            211              JMP     hex1_0101
-00001230  4EF9 00001440            212              JMP     hex1_0110
-00001236  4EF9 0000144A            213              JMP     hex1_0111
-0000123C                           214              ;JMP     hex1_1000
-0000123C  4EF9 00001452            215              JMP     hex1_1001
-00001242  4EF9 00001510            216              JMP     hex1_1010
-00001248  4EF9 00001518            217              JMP     hex1_1011
-0000124E  4EF9 000015CC            218              JMP     hex1_1100
-00001254  4EF9 000015FC            219              JMP     hex1_1101
-0000125A                           220              ;JMP     hex1_1110
-0000125A                           221              ;JMP     hex1_1111
+00001212  4EF9 0000125A            206              JMP     opcode_0000            
+00001218  4EF9 000012B4            207              JMP     opcode_0001            
+0000121E                           208              ;JMP     opcode_0010
+0000121E  4EF9 0000131A            209              JMP     opcode_0011
+00001224  4EF9 000013D4            210              JMP     opcode_0100
+0000122A  4EF9 00001438            211              JMP     opcode_0101
+00001230  4EF9 00001440            212              JMP     opcode_0110
+00001236  4EF9 0000144A            213              JMP     opcode_0111
+0000123C                           214              ;JMP     opcode_1000
+0000123C  4EF9 00001452            215              JMP     opcode_1001
+00001242  4EF9 00001510            216              JMP     opcode_1010
+00001248  4EF9 00001518            217              JMP     opcode_1011
+0000124E  4EF9 000015CC            218              JMP     opcode_1100
+00001254  4EF9 000015FC            219              JMP     opcode_1101
+0000125A                           220              ;JMP     opcode_1110
+0000125A                           221              ;JMP     opcode_1111
 0000125A                           222  
 0000125A                           223  ;0000 ORI
-0000125A  3C07                     224  hex1_0000   MOVE.W  D7,D6               
+0000125A  3C07                     224  opcode_0000   MOVE.W  D7,D6               
 0000125C  0246 0F00                225              ANDI.W  #$0F00,D6           
 00001260  183C 0008                226              MOVE.B  #shift8bits,D4          
 00001264  E8AE                     227              LSR.L   D4,D6               
@@ -237,7 +237,7 @@ Created On: 12/15/2021 6:38:23 PM
 00001276  14FC 0052                233              MOVE.B  #'R',(A2)+
 0000127A  14FC 0049                234              MOVE.B  #'I',(A2)+
 0000127E  14FC 002E                235              MOVE.B  #'.',(A2)+
-00001282  4EB9 0000179A            236              JSR     size2Buffer         
+00001282  4EB9 0000179A            236              JSR     putSizeBuffer         
 00001288  14FC 0020                237              MOVE.B  #' ',(A2)+
 0000128C  14FC 0020                238              MOVE.B  #' ',(A2)+
 00001290  14FC 0020                239              MOVE.B  #' ',(A2)+
@@ -251,7 +251,7 @@ Created On: 12/15/2021 6:38:23 PM
 000012B2  4E75                     247  end0000     RTS
 000012B4                           248              
 000012B4                           249  ;0001 MOVEA, MOVE
-000012B4  14FC 004D                250  hex1_0001   MOVE.B  #'M',(A2)+          
+000012B4  14FC 004D                250  opcode_0001   MOVE.B  #'M',(A2)+          
 000012B8  14FC 004F                251              MOVE.B  #'O',(A2)+
 000012BC  14FC 0056                252              MOVE.B  #'V',(A2)+
 000012C0  14FC 0045                253              MOVE.B  #'E',(A2)+
@@ -280,7 +280,7 @@ Created On: 12/15/2021 6:38:23 PM
 0000131A                           276   
 0000131A                           277   
 0000131A                           278  ; 0011 MOVE
-0000131A  14FC 004D                279  hex1_0011   MOVE.B  #'M',(A2)+         
+0000131A  14FC 004D                279  opcode_0011   MOVE.B  #'M',(A2)+         
 0000131E  14FC 004F                280              MOVE.B  #'O',(A2)+
 00001322  14FC 0056                281              MOVE.B  #'V',(A2)+
 00001326  14FC 0045                282              MOVE.B  #'E',(A2)+
@@ -338,7 +338,7 @@ Created On: 12/15/2021 6:38:23 PM
 000013D4                           334  
 000013D4                           335  
 000013D4                           336  ; 0100 NOP, MOVEM, LEA
-000013D4  3C07                     337  hex1_0100   MOVE.W  D7,D6               
+000013D4  3C07                     337  opcode_0100   MOVE.W  D7,D6               
 000013D6  0246 0100                338              ANDI.W  #$0100,D6           
 000013DA  BC7C 0100                339              CMP.W   #$0100,D6           
 000013DE  6700 0022                340              BEQ     opLEA               
@@ -367,21 +367,21 @@ Created On: 12/15/2021 6:38:23 PM
 00001434  14C6                     363              MOVE.B  D6,(A2)+            
 00001436  4E75                     364  end0100     RTS
 00001438                           365  
-00001438  4EB9 0000189A            366  hex1_0101   JSR     illegalCode         
+00001438  4EB9 0000189A            366  opcode_0101   JSR     illegalCode         
 0000143E  4E75                     367              RTS
 00001440                           368              
 00001440                           369              ***** MOVEM Command
-00001440  4EB9 0000189A            370  hex1_0110   JSR     illegalCode
+00001440  4EB9 0000189A            370  opcode_0110   JSR     illegalCode
 00001446  5448                     371              ADDQ.W  #2,A0
 00001448  4E75                     372              RTS
 0000144A                           373  
-0000144A  4EB9 0000189A            374  hex1_0111   JSR     illegalCode       
+0000144A  4EB9 0000189A            374  opcode_0111   JSR     illegalCode       
 00001450  4E75                     375              RTS
 00001452                           376             
 00001452                           377  
 00001452                           378  
 00001452                           379  ; 1001 sub
-00001452  14FC 0053                380  hex1_1001   MOVE.B  #'S',(A2)+         
+00001452  14FC 0053                380  opcode_1001   MOVE.B  #'S',(A2)+         
 00001456  14FC 0055                381              MOVE.B  #'U',(A2)+
 0000145A  14FC 0042                382              MOVE.B  #'B',(A2)+
 0000145E  4EB9 00001790            383              JSR     getSize            
@@ -408,7 +408,7 @@ Created On: 12/15/2021 6:38:23 PM
 000014B2  4EF9 000016B8            404              JMP     end1101
 000014B8                           405              
 000014B8  14FC 002E                406  opSUB       MOVE.B  #'.',(A2)+        
-000014BC  4EB9 0000179A            407              JSR     size2Buffer         
+000014BC  4EB9 0000179A            407              JSR     putSizeBuffer         
 000014C2  14FC 0020                408              MOVE.B  #' ',(A2)+
 000014C6  14FC 0020                409              MOVE.B  #' ',(A2)+
 000014CA  14FC 0020                410              MOVE.B  #' ',(A2)+
@@ -429,13 +429,13 @@ Created On: 12/15/2021 6:38:23 PM
 0000150E                           425              
 0000150E  4E75                     426  end1001     RTS            
 00001510                           427  
-00001510  4EB9 0000189A            428  hex1_1010   JSR     illegalCode          
+00001510  4EB9 0000189A            428  opcode_1010   JSR     illegalCode          
 00001516  4E75                     429              RTS
 00001518                           430  
 00001518                           431  
 00001518                           432  
 00001518                           433  ;1011 CMP
-00001518  4EB9 00001790            434  hex1_1011   JSR     getSize            
+00001518  4EB9 00001790            434  opcode_1011   JSR     getSize            
 0000151E  BC3C 0003                435              CMP.B   #%11,D6           
 00001522  6600 005A                436              BNE     opCMPEOR
 00001526  14FC 0043                437              MOVE.B  #'C',(A2)+          
@@ -469,7 +469,7 @@ Created On: 12/15/2021 6:38:23 PM
 0000158E  14FC 004D                465              MOVE.B  #'M',(A2)+
 00001592  14FC 0050                466              MOVE.B  #'P',(A2)+
 00001596  14FC 002E                467              MOVE.B  #'.',(A2)+
-0000159A  4EB9 0000179A            468              JSR     size2Buffer         
+0000159A  4EB9 0000179A            468              JSR     putSizeBuffer         
 000015A0  14FC 0020                469              MOVE.B  #' ',(A2)+
 000015A4  14FC 0020                470              MOVE.B  #' ',(A2)+
 000015A8  14FC 0020                471              MOVE.B  #' ',(A2)+
@@ -487,7 +487,7 @@ Created On: 12/15/2021 6:38:23 PM
 000015CC                           483  
 000015CC                           484  
 000015CC                           485  
-000015CC  3C07                     486  hex1_1100   MOVE.W  D7,D6              
+000015CC  3C07                     486  opcode_1100   MOVE.W  D7,D6              
 000015CE  EC8E                     487  opMULU      LSR.L   #6,D6             
 000015D0  0246 0003                488              ANDI.W  #$3,D6             
 000015D4  BC3C 0003                489              CMP.B   #$3,D6             
@@ -505,7 +505,7 @@ Created On: 12/15/2021 6:38:23 PM
 000015FA                           501  
 000015FA  4E75                     502  end1100     RTS
 000015FC                           503  
-000015FC  14FC 0041                504  hex1_1101   MOVE.B  #'A',(A2)+        
+000015FC  14FC 0041                504  opcode_1101   MOVE.B  #'A',(A2)+        
 00001600  14FC 0044                505              MOVE.B  #'D',(A2)+
 00001604  14FC 0044                506              MOVE.B  #'D',(A2)+
 00001608  4EB9 00001790            507              JSR     getSize            
@@ -532,7 +532,7 @@ Created On: 12/15/2021 6:38:23 PM
 0000165C  4EF9 000016B8            528              JMP     end1101
 00001662                           529              
 00001662  14FC 002E                530  opADD       MOVE.B  #'.',(A2)+        
-00001666  4EB9 0000179A            531              JSR     size2Buffer       
+00001666  4EB9 0000179A            531              JSR     putSizeBuffer       
 0000166C  14FC 0020                532              MOVE.B  #' ',(A2)+
 00001670  14FC 0020                533              MOVE.B  #' ',(A2)+
 00001674  14FC 0020                534              MOVE.B  #' ',(A2)+
@@ -555,43 +555,43 @@ Created On: 12/15/2021 6:38:23 PM
 000016BA                           551  
 000016BA                           552  
 000016BA                           553  tbl_0100    
-000016BA  4EF9 00001702            554              JMP     effectiveAdd_0000            
-000016C0  4EF9 0000170A            555              JMP     effectiveAdd_0001            
-000016C6                           556              ;JMP     effectiveAdd_0010
-000016C6                           557              ;JMP     effectiveAdd_0011
-000016C6                           558              ;JMP     effectiveAdd_0100
-000016C6  4EF9 0000171A            559              JMP     effectiveAdd_0101
-000016CC                           560              ;JMP     effectiveAdd_0110
-000016CC  4EF9 00001722            561              JMP     effectiveAdd_0111
-000016D2  4EF9 0000172A            562              JMP     effectiveAdd_1000
-000016D8  4EF9 00001744            563              JMP     effectiveAdd_1001
-000016DE  4EF9 0000174C            564              JMP     effectiveAdd_1010
-000016E4  4EF9 00001754            565              JMP     effectiveAdd_1011
-000016EA  4EF9 0000175C            566              JMP     effectiveAdd_1100
-000016F0  4EF9 00001764            567              JMP     effectiveAdd_1101
-000016F6  4EF9 00001774            568              JMP     effectiveAdd_1110
-000016FC  4EF9 0000176C            569              JMP     effectiveAdd_1111
+000016BA  4EF9 00001702            554              JMP     hex4_0000            
+000016C0  4EF9 0000170A            555              JMP     hex4_0001            
+000016C6                           556              ;JMP     hex4_0010
+000016C6                           557              ;JMP     hex4_0011
+000016C6                           558              ;JMP     hex4_0100
+000016C6  4EF9 0000171A            559              JMP     hex4_0101
+000016CC                           560              ;JMP     hex4_0110
+000016CC  4EF9 00001722            561              JMP     hex4_0111
+000016D2  4EF9 0000172A            562              JMP     hex4_1000
+000016D8  4EF9 00001744            563              JMP     hex4_1001
+000016DE  4EF9 0000174C            564              JMP     hex4_1010
+000016E4  4EF9 00001754            565              JMP     hex4_1011
+000016EA  4EF9 0000175C            566              JMP     hex4_1100
+000016F0  4EF9 00001764            567              JMP     hex4_1101
+000016F6  4EF9 00001774            568              JMP     hex4_1110
+000016FC  4EF9 0000176C            569              JMP     hex4_1111
 00001702                           570              
-00001702  4EB9 0000189A            571  effectiveAdd_0000   JSR     illegalCode
+00001702  4EB9 0000189A            571  hex4_0000   JSR     illegalCode
 00001708  4E75                     572              RTS
 0000170A                           573              
-0000170A  4EB9 0000189A            574  effectiveAdd_0001   JSR     illegalCode
+0000170A  4EB9 0000189A            574  hex4_0001   JSR     illegalCode
 00001710  4E75                     575              RTS
 00001712                           576              
-00001712  4EB9 0000189A            577  effectiveAdd_0011   JSR     illegalCode
+00001712  4EB9 0000189A            577  hex4_0011   JSR     illegalCode
 00001718  4E75                     578              RTS
 0000171A                           579                            
 0000171A                           580              
-0000171A  4EB9 0000189A            581  effectiveAdd_0101   JSR     illegalCode
+0000171A  4EB9 0000189A            581  hex4_0101   JSR     illegalCode
 00001720  4E75                     582              RTS
 00001722                           583          
 00001722                           584              
-00001722  4EB9 0000189A            585  effectiveAdd_0111   JSR     illegalCode
+00001722  4EB9 0000189A            585  hex4_0111   JSR     illegalCode
 00001728  4E75                     586              RTS
 0000172A                           587              
 0000172A                           588              
 0000172A                           589  ;0100 MOVEM
-0000172A  3C07                     590  effectiveAdd_1000   MOVE.W  D7,D6          
+0000172A  3C07                     590  hex4_1000   MOVE.W  D7,D6          
 0000172C  E88E                     591              LSR.L   #shift4bits,D6     
 0000172E  0246 000F                592              ANDI.W  #$000F,D6      
 00001732  BC3C 0004                593              CMP.B   #$4,D6         
@@ -602,22 +602,22 @@ Created On: 12/15/2021 6:38:23 PM
 0000173C  4EB9 0000189A            598  opMOVEM     JSR     illegalCode
 00001742  4E75                     599              RTS   
 00001744                           600  
-00001744  4EB9 0000189A            601  effectiveAdd_1001   JSR     illegalCode
+00001744  4EB9 0000189A            601  hex4_1001   JSR     illegalCode
 0000174A  4E75                     602              RTS   
-0000174C  4EB9 0000189A            603  effectiveAdd_1010   JSR     illegalCode
+0000174C  4EB9 0000189A            603  hex4_1010   JSR     illegalCode
 00001752  4E75                     604              RTS   
-00001754  4EB9 0000189A            605  effectiveAdd_1011   JSR     illegalCode
+00001754  4EB9 0000189A            605  hex4_1011   JSR     illegalCode
 0000175A  4E75                     606              RTS
-0000175C  4EB9 0000189A            607  effectiveAdd_1100   JSR     illegalCode
+0000175C  4EB9 0000189A            607  hex4_1100   JSR     illegalCode
 00001762  4E75                     608              RTS
-00001764  4EB9 0000189A            609  effectiveAdd_1101   JSR     illegalCode
+00001764  4EB9 0000189A            609  hex4_1101   JSR     illegalCode
 0000176A  4E75                     610              RTS
-0000176C  4EB9 0000189A            611  effectiveAdd_1111   JSR     illegalCode
+0000176C  4EB9 0000189A            611  hex4_1111   JSR     illegalCode
 00001772  4E75                     612              RTS   
 00001774                           613  
 00001774                           614  
 00001774                           615  ;0100 NOP
-00001774  4EB9 00001790            616  effectiveAdd_1110   JSR     getSize            
+00001774  4EB9 00001790            616  hex4_1110   JSR     getSize            
 0000177A  BC3C 0002                617              CMP.B   #%10,D6           
 0000177E  6600 011A                618              BNE     illegalCode         
 00001782                           619               
@@ -631,7 +631,7 @@ Created On: 12/15/2021 6:38:23 PM
 00001794  0246 0003                627              ANDI.W  #$0003,D6         
 00001798  4E75                     628              RTS
 0000179A                           629  
-0000179A  4EB8 1790                630  size2Buffer JSR     getSize            
+0000179A  4EB8 1790                630  putSizeBuffer JSR     getSize            
 0000179E  BC3C 0000                631              CMP.B   #%00,D6             
 000017A2  6700 001C                632              BEQ     addBToBuffer              
 000017A6  BC3C 0001                633              CMP.B   #%01,D6            
@@ -944,19 +944,6 @@ EACODE101           19F2
 EACODE110           19F6
 EACODE111           19FA
 EA_MODE_TABLE       1948
-EFFECTIVEADD_0000   1702
-EFFECTIVEADD_0001   170A
-EFFECTIVEADD_0011   1712
-EFFECTIVEADD_0101   171A
-EFFECTIVEADD_0111   1722
-EFFECTIVEADD_1000   172A
-EFFECTIVEADD_1001   1744
-EFFECTIVEADD_1010   174C
-EFFECTIVEADD_1011   1754
-EFFECTIVEADD_1100   175C
-EFFECTIVEADD_1101   1764
-EFFECTIVEADD_1110   1774
-EFFECTIVEADD_1111   176C
 END                 40CC
 END0000             12B2
 END0010             1318
@@ -979,18 +966,19 @@ GETEA               191E
 GETLONG             1806
 GETOP               11FA
 GETSIZE             1790
-HEX1_0000           125A
-HEX1_0001           12B4
-HEX1_0011           131A
-HEX1_0100           13D4
-HEX1_0101           1438
-HEX1_0110           1440
-HEX1_0111           144A
-HEX1_1001           1452
-HEX1_1010           1510
-HEX1_1011           1518
-HEX1_1100           15CC
-HEX1_1101           15FC
+HEX4_0000           1702
+HEX4_0001           170A
+HEX4_0011           1712
+HEX4_0101           171A
+HEX4_0111           1722
+HEX4_1000           172A
+HEX4_1001           1744
+HEX4_1010           174C
+HEX4_1011           1754
+HEX4_1100           175C
+HEX4_1101           1764
+HEX4_1110           1774
+HEX4_1111           176C
 HEXTOBUFFER         191A
 HIGHREGBITS         17D0
 ILLEGALCODE         189A
@@ -1022,6 +1010,18 @@ OPADDA              163C
 OPCMP               158A
 OPCMPA              1558
 OPCMPEOR            157E
+OPCODE_0000         125A
+OPCODE_0001         12B4
+OPCODE_0011         131A
+OPCODE_0100         13D4
+OPCODE_0101         1438
+OPCODE_0110         1440
+OPCODE_0111         144A
+OPCODE_1001         1452
+OPCODE_1010         1510
+OPCODE_1011         1518
+OPCODE_1100         15CC
+OPCODE_1101         15FC
 OPDECODE            11DE
 OPLEA               1402
 OPMOVEM             173C
@@ -1036,13 +1036,13 @@ PRINTCOUNT          14
 PROGRAM_DONE        1066
 PUTBYTEBUFFER       1A36
 PUTLONGBUFFER       1A5C
+PUTSIZEBUFFER       179A
 PUTWORDBUFFER       1A44
 RESUME              114A
 SHIFT12BITS         C
 SHIFT4BITS          4
 SHIFT8BITS          8
 SHOW                1052
-SIZE2BUFFER         179A
 STACK               A000
 START               1000
 STRING1             4036

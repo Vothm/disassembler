@@ -203,25 +203,25 @@ getOp       MOVE.W  D7,D6
             RTS
 
 jmp_table      
-            JMP     hex1_0000            
-            JMP     hex1_0001            
-            ;JMP     hex1_0010
-            JMP     hex1_0011
-            JMP     hex1_0100
-            JMP     hex1_0101
-            JMP     hex1_0110
-            JMP     hex1_0111
-            ;JMP     hex1_1000
-            JMP     hex1_1001
-            JMP     hex1_1010
-            JMP     hex1_1011
-            JMP     hex1_1100
-            JMP     hex1_1101
-            ;JMP     hex1_1110
-            ;JMP     hex1_1111
+            JMP     opcode_0000            
+            JMP     opcode_0001            
+            ;JMP     opcode_0010
+            JMP     opcode_0011
+            JMP     opcode_0100
+            JMP     opcode_0101
+            JMP     opcode_0110
+            JMP     opcode_0111
+            ;JMP     opcode_1000
+            JMP     opcode_1001
+            JMP     opcode_1010
+            JMP     opcode_1011
+            JMP     opcode_1100
+            JMP     opcode_1101
+            ;JMP     opcode_1110
+            ;JMP     opcode_1111
 
 ;0000 ORI
-hex1_0000   MOVE.W  D7,D6               
+opcode_0000   MOVE.W  D7,D6               
             ANDI.W  #$0F00,D6           
             MOVE.B  #shift8bits,D4          
             LSR.L   D4,D6               
@@ -233,7 +233,7 @@ opORI       MOVE.B  #'O',(A2)+
             MOVE.B  #'R',(A2)+
             MOVE.B  #'I',(A2)+
             MOVE.B  #'.',(A2)+
-            JSR     size2Buffer         
+            JSR     putSizeBuffer         
             MOVE.B  #' ',(A2)+
             MOVE.B  #' ',(A2)+
             MOVE.B  #' ',(A2)+
@@ -247,7 +247,7 @@ opORI       MOVE.B  #'O',(A2)+
 end0000     RTS
             
 ;0001 MOVEA, MOVE
-hex1_0001   MOVE.B  #'M',(A2)+          
+opcode_0001   MOVE.B  #'M',(A2)+          
             MOVE.B  #'O',(A2)+
             MOVE.B  #'V',(A2)+
             MOVE.B  #'E',(A2)+
@@ -276,7 +276,7 @@ end0010     RTS
  
  
 ; 0011 MOVE
-hex1_0011   MOVE.B  #'M',(A2)+         
+opcode_0011   MOVE.B  #'M',(A2)+         
             MOVE.B  #'O',(A2)+
             MOVE.B  #'V',(A2)+
             MOVE.B  #'E',(A2)+
@@ -334,7 +334,7 @@ mSizeEnd    RTS
 
 
 ; 0100 NOP, MOVEM, LEA
-hex1_0100   MOVE.W  D7,D6               
+opcode_0100   MOVE.W  D7,D6               
             ANDI.W  #$0100,D6           
             CMP.W   #$0100,D6           
             BEQ     opLEA               
@@ -363,21 +363,21 @@ opLEA       MOVE.B  #'L',(A2)+
             MOVE.B  D6,(A2)+            
 end0100     RTS
 
-hex1_0101   JSR     illegalCode         
+opcode_0101   JSR     illegalCode         
             RTS
             
             ***** MOVEM Command
-hex1_0110   JSR     illegalCode
+opcode_0110   JSR     illegalCode
             ADDQ.W  #2,A0
             RTS
 
-hex1_0111   JSR     illegalCode       
+opcode_0111   JSR     illegalCode       
             RTS
            
 
 
 ; 1001 sub
-hex1_1001   MOVE.B  #'S',(A2)+         
+opcode_1001   MOVE.B  #'S',(A2)+         
             MOVE.B  #'U',(A2)+
             MOVE.B  #'B',(A2)+
             JSR     getSize            
@@ -404,7 +404,7 @@ opSUBA      MOVE.B  #' ',(A2)+
             JMP     end1101
             
 opSUB       MOVE.B  #'.',(A2)+        
-            JSR     size2Buffer         
+            JSR     putSizeBuffer         
             MOVE.B  #' ',(A2)+
             MOVE.B  #' ',(A2)+
             MOVE.B  #' ',(A2)+
@@ -425,13 +425,13 @@ opSUB01     MOVE.B  #'D',(A2)+
             
 end1001     RTS            
 
-hex1_1010   JSR     illegalCode          
+opcode_1010   JSR     illegalCode          
             RTS
 
 
 
 ;1011 CMP
-hex1_1011   JSR     getSize            
+opcode_1011   JSR     getSize            
             CMP.B   #%11,D6           
             BNE     opCMPEOR
             MOVE.B  #'C',(A2)+          
@@ -465,7 +465,7 @@ opCMP       MOVE.B  #'C',(A2)+
             MOVE.B  #'M',(A2)+
             MOVE.B  #'P',(A2)+
             MOVE.B  #'.',(A2)+
-            JSR     size2Buffer         
+            JSR     putSizeBuffer         
             MOVE.B  #' ',(A2)+
             MOVE.B  #' ',(A2)+
             MOVE.B  #' ',(A2)+
@@ -476,14 +476,9 @@ opCMP       MOVE.B  #'C',(A2)+
             JSR     highRegBits        
             JMP     end1011             
       
-
 end1011     RTS
 
-
-
-
-
-hex1_1100   MOVE.W  D7,D6              
+opcode_1100   MOVE.W  D7,D6              
 opMULU      LSR.L   #6,D6             
             ANDI.W  #$3,D6             
             CMP.B   #$3,D6             
@@ -501,7 +496,7 @@ movePTR     ADDQ.W  #2,A0
 
 end1100     RTS
 
-hex1_1101   MOVE.B  #'A',(A2)+        
+opcode_1101   MOVE.B  #'A',(A2)+        
             MOVE.B  #'D',(A2)+
             MOVE.B  #'D',(A2)+
             JSR     getSize            
@@ -528,7 +523,7 @@ opADDA      MOVE.B  #' ',(A2)+
             JMP     end1101
             
 opADD       MOVE.B  #'.',(A2)+        
-            JSR     size2Buffer       
+            JSR     putSizeBuffer       
             MOVE.B  #' ',(A2)+
             MOVE.B  #' ',(A2)+
             MOVE.B  #' ',(A2)+
@@ -551,43 +546,43 @@ end1101     RTS
 
 
 tbl_0100    
-            JMP     effectiveAdd_0000            
-            JMP     effectiveAdd_0001            
-            ;JMP     effectiveAdd_0010
-            ;JMP     effectiveAdd_0011
-            ;JMP     effectiveAdd_0100
-            JMP     effectiveAdd_0101
-            ;JMP     effectiveAdd_0110
-            JMP     effectiveAdd_0111
-            JMP     effectiveAdd_1000
-            JMP     effectiveAdd_1001
-            JMP     effectiveAdd_1010
-            JMP     effectiveAdd_1011
-            JMP     effectiveAdd_1100
-            JMP     effectiveAdd_1101
-            JMP     effectiveAdd_1110
-            JMP     effectiveAdd_1111
+            JMP     hex4_0000            
+            JMP     hex4_0001            
+            ;JMP     hex4_0010
+            ;JMP     hex4_0011
+            ;JMP     hex4_0100
+            JMP     hex4_0101
+            ;JMP     hex4_0110
+            JMP     hex4_0111
+            JMP     hex4_1000
+            JMP     hex4_1001
+            JMP     hex4_1010
+            JMP     hex4_1011
+            JMP     hex4_1100
+            JMP     hex4_1101
+            JMP     hex4_1110
+            JMP     hex4_1111
             
-effectiveAdd_0000   JSR     illegalCode
+hex4_0000   JSR     illegalCode
             RTS
             
-effectiveAdd_0001   JSR     illegalCode
+hex4_0001   JSR     illegalCode
             RTS
             
-effectiveAdd_0011   JSR     illegalCode
+hex4_0011   JSR     illegalCode
             RTS
                           
             
-effectiveAdd_0101   JSR     illegalCode
+hex4_0101   JSR     illegalCode
             RTS
         
             
-effectiveAdd_0111   JSR     illegalCode
+hex4_0111   JSR     illegalCode
             RTS
             
             
 ;0100 MOVEM
-effectiveAdd_1000   MOVE.W  D7,D6          
+hex4_1000   MOVE.W  D7,D6          
             LSR.L   #shift4bits,D6     
             ANDI.W  #$000F,D6      
             CMP.B   #$4,D6         
@@ -598,22 +593,22 @@ effectiveAdd_1000   MOVE.W  D7,D6
 opMOVEM     JSR     illegalCode
             RTS   
 
-effectiveAdd_1001   JSR     illegalCode
+hex4_1001   JSR     illegalCode
             RTS   
-effectiveAdd_1010   JSR     illegalCode
+hex4_1010   JSR     illegalCode
             RTS   
-effectiveAdd_1011   JSR     illegalCode
+hex4_1011   JSR     illegalCode
             RTS
-effectiveAdd_1100   JSR     illegalCode
+hex4_1100   JSR     illegalCode
             RTS
-effectiveAdd_1101   JSR     illegalCode
+hex4_1101   JSR     illegalCode
             RTS
-effectiveAdd_1111   JSR     illegalCode
+hex4_1111   JSR     illegalCode
             RTS   
 
 
 ;0100 NOP
-effectiveAdd_1110   JSR     getSize            
+hex4_1110   JSR     getSize            
             CMP.B   #%10,D6           
             BNE     illegalCode         
              
@@ -627,7 +622,7 @@ getSize     MOVE.W  D7,D6
             ANDI.W  #$0003,D6         
             RTS
 
-size2Buffer JSR     getSize            
+putSizeBuffer JSR     getSize            
             CMP.B   #%00,D6             
             BEQ     addBToBuffer              
             CMP.B   #%01,D6            
