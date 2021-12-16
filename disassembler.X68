@@ -63,7 +63,16 @@ CLEARALL    CLR     D0
             CLR     D6
             CLR     D7
             RTS
-                        
+                      
+clrRegs     CLR.L   D0                 
+            CLR.L   D1
+            CLR.L   D2
+            CLR.L   D3
+            CLR.L   D4
+            CLR.L   D6
+            CLR.L   D7
+            RTS
+  
 EndUtil      RTS
 
 INPUT:
@@ -74,7 +83,7 @@ INPUT:
             ADDA.L  #str_len1,A1         
             MOVE.B  #2,D0      
             TRAP    #15
-            JSR     asciiTOhex           
+            JSR     asciiToHex           
             CMP.B   #$00,D5
             BEQ     endInput            
             MOVEA.L A0,A4         
@@ -85,7 +94,7 @@ INPUT:
             ADDA.L  #str_len2,A1
             MOVE.B  #2,D0
             TRAP    #15
-            JSR     asciiTOhex
+            JSR     asciiToHex
             CMP.B   #$00,D5
             BEQ          endInput           
             MOVEA.L A4,A3               
@@ -95,7 +104,7 @@ INPUT:
 endInput    RTS
 
 ; Take D3 (user input) and put the converted ascii to hex on A4
-asciiTOhex
+asciiToHex
             MOVEM.L D0-D4,-(SP)         
             MOVE.B  #1,D5        
             JSR     clrRegs
@@ -810,15 +819,7 @@ loadDataBuffer      MOVEQ   #$0,D6
                     ANDI.W  #$000F,D6
                     JSR     converToHex           
                     RTS
-            
-clrRegs     CLR.L   D0                 
-            CLR.L   D1
-            CLR.L   D2
-            CLR.L   D3
-            CLR.L   D4
-            CLR.L   D6
-            CLR.L   D7
-            RTS
+           
 
 ; Convert hex to ascii
 converToHex   CMP.B   #$A,D6              * Confirm hex character?
@@ -961,15 +962,6 @@ long2Buffer
             CLR.L   D4          * pre-emptive clearout
             MOVE.B  #8,D4       * load a counter
 
-l2bLoop                 
-            CMP.B   #$00,D4     * compare counter with 0
-            BEQ     rtnEA2      * if zero, return
-            ROL.L   #4,D2       * roll the bits in D2 to the left
-            MOVE.W  D2,D6       * move rolled bits into temp storage
-            ANDI.W  #$000F,D6   * and the bits to isolate ascii char   
-            JSR     converToHex   * load ascii char into buffer            
-            SUBQ.B  #$1,D4      * subtract from counter
-            JMP     l2bLoop     * keep looping until counter hits zero
             
 rtnEA2      MOVE.W  D7,D6       * re-load current word for temp storage
             ADDQ.W  #4,A0       * advancing memory pointer by long
