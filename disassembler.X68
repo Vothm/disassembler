@@ -751,7 +751,7 @@ getEA
 ea_mode_table                             
             JMP     EAcode000             ; Data Register Direct (mode 0)
             JMP     EAcode001             ; Address Register Direct (mode 1)
-            JMP     EAcode010             ; Address Register Diret (mode 2)
+            JMP     EAcode010             ; Address Register Indirect (mode 2)
             JMP     EAcode011             ; Address Register Indirect with Post Increment (mode 3)
             JMP     EAcode100             ; Address Register Indirect with Pre Decrement (mode 4)
             JMP     EAcode101             ; Absolute Word Address (mode 7 subclass 0)
@@ -892,6 +892,7 @@ END         STOP    #$2700
 *~Font size~10~
 *~Tab type~1~
 *~Tab size~4~
+
 
 *~Font name~Courier New~
 *~Font size~10~
