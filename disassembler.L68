@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 12/15/2021 7:07:07 PM
+Created On: 12/15/2021 9:08:55 PM
 
 00000000                             1  *-----------------------------------------------------------------
 00000000                             2  * Title      : 68K Disassembler
@@ -8,11 +8,11 @@ Created On: 12/15/2021 7:07:07 PM
 00000000                             4  * Description: CSS422 Final Project
 00000000                             5  *-----------------------------------------------------------------
 00000000                             6  
-00000000  =0000A000                  7  stack       EQU     $A000               * Stack Address
-00000000  =00000004                  8  shift4bits  EQU     4                   * Shift 4 bits
-00000000  =00000008                  9  shift8bits  EQU     8                   * Shift 8 bits 
-00000000  =0000000C                 10  shift12bits EQU     12                  * Shift 12 bits
-00000000  =00000014                 11  printCount  EQU     20                  * Amount of lines to display to console at once
+00000000  =0000A000                  7  stack       EQU     $A000               ; Stack Address
+00000000  =00000004                  8  shift4bits  EQU     4                   ; Shift 4 bits
+00000000  =00000008                  9  shift8bits  EQU     8                   ; Shift 8 bits 
+00000000  =0000000C                 10  shift12bits EQU     12                  ; Shift 12 bits
+00000000  =00000014                 11  printCount  EQU     20                  ; Amount of lines to display to console at once
 00000000  =0000000D                 12  CR          EQU     $0D                 
 00000000  =0000000A                 13  LF          EQU     $0A                 
 00000000                            14  
@@ -887,12 +887,9 @@ Created On: 12/15/2021 7:07:07 PM
 000040C8= 0010                     883  exit_len    DC.W    exit_len-exit           
 000040CA                           884  
 000040CA= 01                       885  message_buffer    DC.B   1
-000040CB                           886                                   
-000040CB                           887  *************************************************************************************************************************
-000040CB                           888  * End of program:
-000040CB                           889  *************************************************************************************************************************        
-000040CC  4E72 2700                890  END         STOP    #$2700
-000040D0                           891              END     $1000
+000040CB                           886        
+000040CC  4E72 2700                887  END         STOP    #$2700
+000040D0                           888              END     $1000
 
 No errors detected
 No warnings generated

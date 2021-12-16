@@ -4,11 +4,11 @@
 * Description: CSS422 Final Project
 *-----------------------------------------------------------------
 
-stack       EQU     $A000               * Stack Address
-shift4bits  EQU     4                   * Shift 4 bits
-shift8bits  EQU     8                   * Shift 8 bits 
-shift12bits EQU     12                  * Shift 12 bits
-printCount  EQU     20                  * Amount of lines to display to console at once
+stack       EQU     $A000               ; Stack Address
+shift4bits  EQU     4                   ; Shift 4 bits
+shift8bits  EQU     8                   ; Shift 8 bits 
+shift12bits EQU     12                  ; Shift 12 bits
+printCount  EQU     20                  ; Amount of lines to display to console at once
 CR          EQU     $0D                 
 LF          EQU     $0A                 
 
@@ -883,10 +883,7 @@ exit        DC.B    'Closing program',0
 exit_len    DC.W    exit_len-exit           
 
 message_buffer    DC.B   1
-                                 
-*************************************************************************************************************************
-* End of program:
-*************************************************************************************************************************        
+      
 END         STOP    #$2700
             END     $1000
 
@@ -895,6 +892,7 @@ END         STOP    #$2700
 *~Font size~10~
 *~Tab type~1~
 *~Tab size~4~
+
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
