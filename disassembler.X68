@@ -46,21 +46,6 @@ in_start    BSR     INPUT
             BSR     print_exit
             JMP     end
         
-
-****************************************************************************************************************
-* Purpose: looks at the address entered by the user by checking the following:
-*1. checks if addresses are odd*  if yes, subtracts 1 bit to make it even.
-*2. checks if starting address < $00FFFFFF*  if no, display error and prompt user for inputs
-*3. checks if ending address <= $00FFFFFF*  if no, display error and prompt user for inputs
-*4. checks if ending address > starting address*  if no, display error and prompt user for inputs
-*5. when all conditions pass, subroutine returns to main  
-* parameters:
-*-A0: starting address
-*-A4: ending address
-*-D2: copy of address
-*-D3: utility register
-****************************************************************************************************************
-
 ;Utility functions (Printing, clearning, checking addresses)
 
 print_intro MOVE.B  #13,D0
@@ -87,15 +72,17 @@ CLEARALL    CLR     D0
                
                         
 ca_End      RTS
+
+
 INPUT:
             MOVE.B  #task1,D0
             LEA     string1,A1
             MOVE.W  str_len1,D1         
             TRAP    #15
-            ADDA.L  #str_len1,A1         * add input immediately after string
+            ADDA.L  #str_len1,A1         
             MOVE.B  #task2,D0      
             TRAP    #15
-            JSR     asciiTOhex            * conv an A!! check for bad / good flag after checking user's address
+            JSR     asciiTOhex           
             CMP.B   #$00,D5
             BEQ     endInput
             
@@ -112,32 +99,16 @@ INPUT:
             BEQ          endInput
             
            
-           **********swap************
-            MOVEA.L A4,A3               *store starting into register
-            MOVEA.L A0,A4               *copy ending to A4
-            MOVEA.L A3,A0               *store starting in A0                    
+            MOVEA.L A4,A3               
+            MOVEA.L A0,A4               
+            MOVEA.L A3,A0                            
 endInput    RTS
 
-*********************************************************************************************************************
-* Ascii To Hex
-* 
-*   Register Usage:
-*       D3 - Placeholder for current ascii byte (based off of User's Inputted Address)   
-*     D4 - Translated Address
-*           A0 - At the end of the routine, store the converted address here
-* 
-*   TODO:          
-*       - Replace clear commands with a an official subroutine call (not critical)
-*       - Test for the length of the address given (critical)
-*
-*
-*
-****************************************************************************************************************
-
+; Take D3 (user input) and put the converted ascii to hex on A4
 asciiTOhex
 
-            MOVEM.L D0-D4,-(SP)         * save data registers to the stack
-            MOVE.B  #goodFlag,D5        * set flag to good (until proven otherwise)
+            MOVEM.L D0-D4,-(SP)         
+            MOVE.B  #goodFlag,D5        
             JSR     clrRegs
             MOVE    #0,D6      
       
@@ -157,8 +128,7 @@ loop2       MOVE.B  (A1)+,D3
             CMP.B   #$66,D3             
             BGT     finish      
       
-resume    
-            ADD     #1,D6               
+resume      ADD     #1,D6               
             CMP     #6,D6               
             BEQ     finish      
             CMP.B   #$00,(A1)          
@@ -166,14 +136,11 @@ resume
             ASL.L   #4,D4                         
             JMP     loop2               
 
-num_to_hex
-            SUBI.B  #$30,D3             
+num_to_hex  SUBI.B  #$30,D3             
             ADD.B   D3,D4               
             JMP     resume              
 
-cap_to_hex
-
-            SUBI.B  #$37,D3             
+cap_to_hex  SUBI.B  #$37,D3             
             ADD.B   D3,D4               
             JMP     resume              
 
@@ -187,35 +154,13 @@ finish      MOVE.L  D4,A0
             MOVEM.L (SP)+,D0-D4             
             RTS                         
         
-            
-***************************** End of asciiTOhex routine **************************************************************
-
-       
-
-
-
-**********************************************************************************************************************
-* Fills the buffer with the current address
-* Parameters:
-* A1: Trap Address
-* A2: Pointer of buffer
+; Fill the message buffer with address so that the format can be: address DATA hex
 FILL_ADDRESS: MOVEA.L  A2,A1              *load trap address with A2                     JSR      getLongtLong
               JSR getLong
               MOVE.B   #$09,(A2)+                                   
-             RTS
-          
-            
-
-* prepares buffer for filling in current address, OpCode, and EA
-* Parameters:
-* A0: Current address
-* A1: Trap Address
-* A2: Buffer Pointer
-* A4: Ending Address
-* D0: task number
-* D1: length of str_enter
-* D7: counter for number of lines printed
-**********************************************************************************************************************   
+              RTS
+         
+; Print stuff in the buffer
 buffPrep    MOVEA.L A6,A2         
             BSR     FILL_ADDRESS        * fill buffer with current address
             JSR     opDecode
@@ -245,21 +190,6 @@ buffPrep    MOVEA.L A6,A2
             
 endBuff     RTS         
           
-********************************************************************************************************************** 
-* Start of opDecode section - setup process for decoding instruction
-* Registers used: 
-*   A0/A5 = Memory pointer
-*   A2 = Good buffer pointer
-*   A5 = Index for jump tables      (Dynamically used)
-*   A6 = Holds previous buffer spot (Dynamically used)
-*   D2 = Size returned from getSize function(s)      (Dynamically used)
-*   D4 = Size of Shift              (Dynamically used)
-*   D5 = Pass/Fail Flag
-*   D6 = Copy of D7 to shift        (Dynamically used)
-*   D7 = Current Word Value
-*   (A1, D0, D1 = Trap Commands) 
-*   (A7 = SP)
-********************************************************************************************************************** 
 opDecode    MOVEM.L A4-A6/D0-D4/D6-D7,-(SP)      * Save registers
             JSR     clrRegs             * Clear registers for use
             MOVE.B  #goodFlag,D5        * Set good flag until fail
@@ -272,15 +202,10 @@ opDecode    MOVEM.L A4-A6/D0-D4/D6-D7,-(SP)      * Save registers
 ********************************************************************************************************************** 
 * Start of opReturn section - clean up process and return to IO
 ********************************************************************************************************************** 
-opReturn    MOVEM.L (SP)+,D6-D7/D0-D4/A4-A6   * Clean up, restore registers
-            RTS              * replace with IO Call
+opReturn    MOVEM.L (SP)+,D6-D7/D0-D4/A4-A6 
+            RTS              
             
-            
-            
-            
-********************************************************************************************************************** 
-* Start of getOp section - decode 1st 4 bits
-**********************************************************************************************************************                              
+                                    
 getOp       MOVE.W  D7,D6               * Move instruction to shift
             MOVE.B  #shift12bits,D4         * Load shifter register
             LSR.W   D4,D6               * Shift right 12 bits
@@ -956,7 +881,7 @@ ea_mode_table                             * table holds the different EA modes
 EAcode000
             MOVE.W      D7,D6                   * move current working word into temp storage
             ANDI.W      #$7,D6                  * isolate register bits (last 3)
-            MOVE.B      #$44,(A2)+              * add "D" to buffer
+            MOVE.B      #'D',(A2)+              * add "D" to buffer
             ADD.B       #$30,D6                 * convert data register # to hex digit
             MOVE.B      D6,(A2)+                * register # to buffer                  
             
@@ -966,35 +891,35 @@ EAcode000
 EAcode001
             MOVE.W      D7,D6                   * move current working word into temp storage
             ANDI.W      #$7,D6                  * isolate register bits (last 3)
-            MOVE.B      #$41,(A2)+              * add "A" to buffer
+            MOVE.B      #'A',(A2)+              * add "A" to buffer
             ADD.B       #$30,D6                 * convert data register # to hex digit
             MOVE.B      D6,(A2)+                * register # to buffer
               
-        RTS                                 * Return
+            RTS                                 * Return
 
 ****** Address Register Indirect (An) *********************************************************************************  
 EAcode010
             MOVE.W      D7,D6                   * move current working word into temp storage
             ANDI.W      #$7,D6                  * isolate register bits (last 3)
-            MOVE.B      #$28,(A2)+              * add "(" to buffer            
-            MOVE.B      #$41,(A2)+              * add "A" to buffer
+            MOVE.B      #'(',(A2)+              * add "(" to buffer            
+            MOVE.B      #'A',(A2)+              * add "A" to buffer
             ADD.B       #$30,D6                 * convert data register # to hex digit
             MOVE.B      D6,(A2)+                * register # to buffer
-            MOVE.B      #$29,(A2)+              * add ")" to buffer
+            MOVE.B      #')',(A2)+              * add ")" to buffer
              
-        RTS                                 * Return
+            RTS                                 * Return
 
 ********* Address Register Indirect w/ Post-Increment (An)+ ***********************************************************  
 EAcode011
             
             MOVE.W      D7,D6                   * move current working word into temp storage
             ANDI.W      #$7,D6                  * isolate register bits (last 3)
-            MOVE.B      #$28,(A2)+              * add "(" to buffer            
-            MOVE.B      #$41,(A2)+              * add "A" to buffer
+            MOVE.B      #'(',(A2)+              * add "(" to buffer            
+            MOVE.B      #'A',(A2)+              * add "A" to buffer
             ADD.B       #$30,D6                 * convert data register # to hex digit
             MOVE.B      D6,(A2)+                * register # to buffer
-            MOVE.B      #$29,(A2)+              * add ")" to buffer
-            MOVE.B      #$2B,(A2)+              * add "+" to buffer
+            MOVE.B      #')',(A2)+              * add ")" to buffer
+            MOVE.B      #'+',(A2)+              * add "+" to buffer
                  
         RTS                                 * Return
 
@@ -1003,14 +928,13 @@ EAcode100
            
             MOVE.W      D7,D6                   * move current working word into temp storage
             ANDI.W      #$7,D6                  * isolate register bits (last 3)
-            MOVE.B      #$2D,(A2)+              * add "-" to buffer
-            MOVE.B      #$28,(A2)+              * add "(" to buffer            
-            MOVE.B      #$41,(A2)+              * add "A" to buffer
+            MOVE.B      #'-',(A2)+              * add "-" to buffer
+            MOVE.B      #'(',(A2)+              * add "(" to buffer            
+            MOVE.B      #'A',(A2)+              * add "A" to buffer
             ADD.B       #$30,D6                 * convert data register # to hex digit
             MOVE.B      D6,(A2)+                * register # to buffer
-            MOVE.B      #$29,(A2)+              * add ")" to buffer
-            
-        RTS                                     * Return
+            MOVE.B      #')',(A2)+              * add ")" to buffer
+            RTS                                     * Return
 
 
 
@@ -1035,22 +959,17 @@ EAcode111
             CMPI.B   #$2,D6
 
             CMPI.B   #$2,D6              * compare to determine if it's PC w/ Displacement
-            BEQ      PCwDisp             
-            CMPI.B   #$4,D6              * compare to determine if it's Immediate
-            BEQ      imm2Buffer          * DON"T HAVE THIS CASE YET
+            BEQ      pctobuffer             
+            ;CMPI.B   #$4,D6              * compare to determine if it's Immediate
+            ;BEQ      imm2Buffer          * DON"T HAVE THIS CASE YET
            
             RTS
 
-*************************************************************************************************************************
-* EA SubRoutines   
-*************************************************************************************************************************  
-
-*** regBits ***
 regBits     MOVE.W  D7,D6     * change D2 to A0  (simulating address)
             ANDI.W  #$07,D6
             RTS
             
-**** imm2Buffer ***
+; immediatebuffer
 imm2Buffer
             MOVE.B      #'#',(A2)+
             JSR         moveSize
@@ -1062,13 +981,13 @@ imm2Buffer
             BEQ         long2Buffer
             RTS
             
-**** PCwDisp ***********************************************************************************************************
-PCwDisp
+; Add '(pc)' to buffer
+pctobuffer
             JSR         word2Buffer
-            MOVE.B      #$28,(A2)+              * add "(" to buffer            
-            MOVE.B      #$50,(A2)+              * add "P" to buffer
-            MOVE.B      #$43,(A2)+              * add "C" to buffer
-            MOVE.B      #$29,(A2)+              * add ")" to buffer                        
+            MOVE.B      #'(',(A2)+                        
+            MOVE.B      #'P',(A2)+              
+            MOVE.B      #'C',(A2)+              
+            MOVE.B      #')',(A2)+                                     
             RTS
             
 **** byte2Buffer *******************************************************************************************************
@@ -1138,10 +1057,9 @@ rtnEA2      MOVE.W  D7,D6       * re-load current word for temp storage
             ADDQ.W  #4,A0       * advancing memory pointer by long
             RTS                 * return from subroutine
 
-*********************************************************************************************************************
-* Beginning of data space:
-*********************************************************************************************************************     
-             ORG   $4000
+
+                   
+             ORG   $4000 ; Make sure data starts at $4000
 intro        DC.B    'Hello, please enter beginning and ending addresses',CR,LF
 
 intro_len   DC.W    intro_len-intro
@@ -1151,15 +1069,6 @@ str_len1    DC.W    str_len1-string1  *Get the length of the string
 
 string2     DC.B    'Enter ending address: $',0
 str_len2    DC.W    str_len2-string2  *Get the length of the string
-
-string3     DC.B    'Error: starting or ending address has equality error',0
-str_len3    DC.W    str_len3-string3
-
-err_start   DC.B    'Error: invalid hex values for starting address.',0
-err_len1    DC.W    err_start-err_len1
-
-err_end     DC.B    'Error: invalid hex values for ending address.',0
-err_len2    DC.W    err_end-err_len2
 
 str_enter   DC.B    'Press enter to read more data',0
 str_en_len  DC.W    str_enter-str_en_len
