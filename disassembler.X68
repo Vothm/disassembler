@@ -19,9 +19,8 @@ start:      BSR     show                ; Show beginning message
             LEA     stack,SP                ;Load stack pointer       
             LEA     message_buffer,A2       ;A2 is the message buffer
             MOVEA.L A2,A6               
-    
-in_start    BSR     INPUT
-            BSR     buffPrep
+            BSR     HANDLEINPUTS
+            BSR     FILLBUFFER
             MOVE.B  #1,D0
             LEA     str_more,A1
             MOVE.W  strMore_len,D1
@@ -72,7 +71,7 @@ CLEARREGISTERS     CLR.L   D0
   
 EndUtil      RTS
 
-INPUT:      ; Handle inputs
+HANDLEINPUTS:      ; Handle inputs
             MOVE.B  #1,D0
             LEA     string1,A1
             MOVE.W  str_len1,D1         
@@ -155,7 +154,7 @@ FILL_ADDRESS: MOVEA.L  A2,A1
               RTS
          
 ; Print stuff in the buffer
-buffPrep    MOVEA.L A6,A2         
+FILLBUFFER    MOVEA.L A6,A2         
             BSR FILL_ADDRESS
             JSR     opDecode
             MOVE.B  #00,(A2)            
@@ -167,7 +166,7 @@ buffPrep    MOVEA.L A6,A2
             
             ADDI    #1,D7              
             CMP     #printCount,D7
-            BNE     buffPrep
+            BNE     FILLBUFFER
             
             MOVE.B  #1,D0
             LEA     str_enter,A1
@@ -180,7 +179,7 @@ buffPrep    MOVEA.L A6,A2
             MOVE.B  #$50,(A1)
             
             CLR     D7                
-            JMP     buffPrep
+            JMP     FILLBUFFER
             
 endBuff     RTS         
           
@@ -189,12 +188,12 @@ opDecode    MOVEM.L A4-A6/D0-D4/D6-D7,-(SP)
             MOVE.B  #1,D5      
             MOVE.W  (A0)+,D7           
             MOVEA.L A2,A3                             
-            JSR     getOp              
+            JSR     getOpcode              
 
 opReturn    MOVEM.L (SP)+,D6-D7/D0-D4/A4-A6 
             RTS              
             
-getOp       MOVE.W  D7,D6              
+getOpcode   MOVE.W  D7,D6              
             MOVE.B  #shift12bits,D4        
             LSR.W   D4,D6               
             MULU    #6,D6                          
@@ -226,10 +225,10 @@ opcode_0000   MOVE.W  D7,D6
             MOVE.B  #shift8bits,D4          
             LSR.L   D4,D6               
             CMP.B   #$0,D6              ; Check if ORI
-            BEQ     opORI               ; Jump to opORI section
+            BEQ     isORI               ; Jump to opORI section
             BNE     illegalCode                        
 
-opORI       MOVE.B  #'O',(A2)+         
+isORI       MOVE.B  #'O',(A2)+         
             MOVE.B  #'R',(A2)+
             MOVE.B  #'I',(A2)+
             MOVE.B  #'.',(A2)+
@@ -331,8 +330,6 @@ moveSizeW   ORI.W   #$0040,D3
 moveSizeL   ORI.W   #$0080,D3          
 mSizeEnd    RTS 
 
-
-
 ; 0100 NOP, MOVEM, LEA
 opcode_0100   MOVE.W  D7,D6               
             ANDI.W  #$0100,D6           
@@ -374,8 +371,6 @@ opcode_0110   JSR     illegalCode
 opcode_0111   JSR     illegalCode       
             RTS
            
-
-
 ; 1001 sub
 opcode_1001   MOVE.B  #'S',(A2)+         
             MOVE.B  #'U',(A2)+
@@ -427,9 +422,6 @@ end1001     RTS
 
 opcode_1010   JSR     illegalCode          
             RTS
-
-
-
 ;1011 CMP
 opcode_1011   JSR     getSize            
             CMP.B   #%11,D6           
