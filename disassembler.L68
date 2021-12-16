@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 12/15/2021 6:56:49 PM
+Created On: 12/15/2021 7:07:07 PM
 
 00000000                             1  *-----------------------------------------------------------------
 00000000                             2  * Title      : 68K Disassembler
@@ -495,18 +495,18 @@ Created On: 12/15/2021 6:56:49 PM
 00001604  14FC 0044                491              MOVE.B  #'D',(A2)+
 00001608  4EB9 00001790            492              JSR     getSize            
 0000160E  BC3C 0003                493              CMP.B   #%11,D6            
-00001612  6600 004E                494              BNE     opADD             
+00001612  6600 004E                494              BNE     ISADD             
 00001616  14FC 0041                495              MOVE.B  #'A',(A2)+          
 0000161A  14FC 002E                496              MOVE.B  #'.',(A2)+
 0000161E  3C07                     497              MOVE.W  D7,D6               
 00001620  E08E                     498              LSR.L   #shift8bits,D6       
 00001622  0246 0001                499              ANDI.W  #$0001,D6          
 00001626  BC3C 0001                500              CMP.B   #%1,D6              
-0000162A  6700 000C                501              BEQ     addaL              
+0000162A  6700 000C                501              BEQ     ISADDAL              
 0000162E  14FC 0057                502              MOVE.B  #'W',(A2)+          
-00001632  4EF9 0000163C            503              JMP     opADDA
-00001638  14FC 004C                504  addaL       MOVE.B  #'L',(A2)+                
-0000163C  14FC 0020                505  opADDA      MOVE.B  #' ',(A2)+
+00001632  4EF9 0000163C            503              JMP     ISADDA
+00001638  14FC 004C                504  ISADDAL     MOVE.B  #'L',(A2)+                
+0000163C  14FC 0020                505  ISADDA      MOVE.B  #' ',(A2)+
 00001640  14FC 0020                506              MOVE.B  #' ',(A2)+
 00001644  14FC 0020                507              MOVE.B  #' ',(A2)+
 00001648                           508  
@@ -516,7 +516,7 @@ Created On: 12/15/2021 6:56:49 PM
 00001656  4EB9 000017D0            512              JSR     highRegBits       
 0000165C  4EF9 000016B8            513              JMP     end1101
 00001662                           514              
-00001662  14FC 002E                515  opADD       MOVE.B  #'.',(A2)+        
+00001662  14FC 002E                515  ISADD       MOVE.B  #'.',(A2)+        
 00001666  4EB9 0000179A            516              JSR     putSizeBuffer       
 0000166C  14FC 0020                517              MOVE.B  #' ',(A2)+
 00001670  14FC 0020                518              MOVE.B  #' ',(A2)+
@@ -570,331 +570,329 @@ Created On: 12/15/2021 6:56:49 PM
 0000171A  4EB9 0000189A            566  opcode1_0101   JSR     illegalCode
 00001720  4E75                     567              RTS
 00001722                           568          
-00001722                           569              
-00001722  4EB9 0000189A            570  opcode1_0111   JSR     illegalCode
-00001728  4E75                     571              RTS
+00001722  4EB9 0000189A            569  opcode1_0111   JSR     illegalCode
+00001728  4E75                     570              RTS
+0000172A                           571              
 0000172A                           572              
-0000172A                           573              
-0000172A                           574  ;0100 MOVEM
-0000172A  3C07                     575  opcode1_1000   MOVE.W  D7,D6          
-0000172C  E88E                     576              LSR.L   #shift4bits,D6     
-0000172E  0246 000F                577              ANDI.W  #$000F,D6      
-00001732  BC3C 0004                578              CMP.B   #$4,D6         
-00001736  6600 0004                579              BNE     opMOVEM  
-0000173A  4E75                     580              RTS            
-0000173C                           581  
-0000173C  4EB9 0000189A            582  opMOVEM     JSR     illegalCode
-00001742  4E75                     583              RTS   
-00001744                           584  
-00001744  4EB9 0000189A            585  opcode1_1001   JSR     illegalCode
-0000174A  4E75                     586              RTS   
-0000174C  4EB9 0000189A            587  opcode1_1010   JSR     illegalCode
-00001752  4E75                     588              RTS   
-00001754  4EB9 0000189A            589  opcode1_1011   JSR     illegalCode
-0000175A  4E75                     590              RTS
-0000175C  4EB9 0000189A            591  opcode1_1100   JSR     illegalCode
-00001762  4E75                     592              RTS
-00001764  4EB9 0000189A            593  opcode1_1101   JSR     illegalCode
-0000176A  4E75                     594              RTS
-0000176C  4EB9 0000189A            595  opcode1_1111   JSR     illegalCode
-00001772  4E75                     596              RTS   
+0000172A                           573  ;0100 MOVEM
+0000172A  3C07                     574  opcode1_1000   MOVE.W  D7,D6          
+0000172C  E88E                     575              LSR.L   #shift4bits,D6     
+0000172E  0246 000F                576              ANDI.W  #$000F,D6      
+00001732  BC3C 0004                577              CMP.B   #$4,D6         
+00001736  6600 0004                578              BNE     opMOVEM  
+0000173A  4E75                     579              RTS            
+0000173C                           580  
+0000173C  4EB9 0000189A            581  opMOVEM     JSR     illegalCode
+00001742  4E75                     582              RTS   
+00001744                           583  
+00001744  4EB9 0000189A            584  opcode1_1001   JSR     illegalCode
+0000174A  4E75                     585              RTS   
+0000174C  4EB9 0000189A            586  opcode1_1010   JSR     illegalCode
+00001752  4E75                     587              RTS   
+00001754  4EB9 0000189A            588  opcode1_1011   JSR     illegalCode
+0000175A  4E75                     589              RTS
+0000175C  4EB9 0000189A            590  opcode1_1100   JSR     illegalCode
+00001762  4E75                     591              RTS
+00001764  4EB9 0000189A            592  opcode1_1101   JSR     illegalCode
+0000176A  4E75                     593              RTS
+0000176C  4EB9 0000189A            594  opcode1_1111   JSR     illegalCode
+00001772  4E75                     595              RTS   
+00001774                           596  
 00001774                           597  
-00001774                           598  
-00001774                           599  ;0100 NOP
-00001774  4EB9 00001790            600  opcode1_1110   JSR     getSize            
-0000177A  BC3C 0002                601              CMP.B   #%10,D6           
-0000177E  6600 011A                602              BNE     illegalCode         
-00001782                           603               
-00001782  14FC 004E                604              MOVE.B  #'N',(A2)+        
-00001786  14FC 004F                605              MOVE.B  #'O',(A2)+
-0000178A  14FC 0050                606              MOVE.B  #'P',(A2)+
-0000178E  4E75                     607              RTS
-00001790                           608  
-00001790  3C07                     609  getSize     MOVE.W  D7,D6            
-00001792  EC4E                     610              LSR.W   #6,D6              
-00001794  0246 0003                611              ANDI.W  #$0003,D6         
-00001798  4E75                     612              RTS
-0000179A                           613  
-0000179A  4EB8 1790                614  putSizeBuffer JSR     getSize            
-0000179E  BC3C 0000                615              CMP.B   #%00,D6             
-000017A2  6700 001C                616              BEQ     addBToBuffer              
-000017A6  BC3C 0001                617              CMP.B   #%01,D6            
-000017AA  6700 001E                618              BEQ     addWToBuffer             
-000017AE  BC3C 0002                619              CMP.B   #%10,D6             
-000017B2  6600 00E6                620              BNE     illegalCode           
-000017B6                           621        
-000017B6  14FC 004C                622              MOVE.B  #'L',(A2)+          
-000017BA  4EF9 000017CE            623              JMP     mainEnd             
-000017C0                           624              
-000017C0  14FC 0042                625  addBToBuffer       MOVE.B  #'B',(A2)+        
-000017C4  4EF9 000017CE            626                      JMP     mainEnd             
-000017CA                           627              
-000017CA  14FC 0057                628  addWToBuffer       MOVE.B  #'W',(A2)+      
-000017CE  4E75                     629  mainEnd     RTS                                            
-000017D0                           630  
-000017D0  3C07                     631  highRegBits MOVE.W  D7,D6               
-000017D2  E08E                     632              LSR.L   #shift8bits,D6        
-000017D4  E28E                     633              LSR.L   #1,D6              
-000017D6  0206 0007                634              ANDI.B  #$7,D6            
-000017DA  0606 0030                635              ADD.B   #$30,D6           
-000017DE  14C6                     636              MOVE.B  D6,(A2)+          
-000017E0  4E75                     637              RTS
-000017E2                           638  
-000017E2  3C07                     639  getDirBit   MOVE.W  D7,D6              
-000017E4  E08E                     640              LSR.L   #shift8bits,D6        
-000017E6  0206 0001                641              ANDI.B  #01,D6              
-000017EA  4E75                     642              RTS  
-000017EC                           643              
-000017EC  BC3C 0000                644  getAddr     CMP.B   #%00,D6            
-000017F0  6700 0244                645              BEQ     putbytebuffer        
-000017F4  BC3C 0001                646              CMP.B   #%01,D6            
-000017F8  6700 024A                647              BEQ     putWordBuffer        
-000017FC  BC3C 0002                648              CMP.B   #%10,D6            
-00001800  6700 025A                649              BEQ     putLongBuffer         
-00001804  4E75                     650              RTS
-00001806                           651  
-00001806  4EB9 00001864            652  getLong     JSR     cmdSh1            
-0000180C  183C 000C                653              MOVE.B  #shift12bits,D4      
-00001810  4EB9 0000186C            654              JSR     cmdSh2            
-00001816  183C 0008                655              MOVE.B  #shift8bits,D4       
-0000181A  4EB9 0000186C            656              JSR     cmdSh2             
-00001820  183C 0004                657              MOVE.B  #shift4bits,D4         
-00001824  4EB9 0000186C            658              JSR     cmdSh2             
-0000182A  183C 0000                659              MOVE.B  #0,D4
-0000182E  4EB9 00001886            660              JSR     cmdSh4             
-00001834  183C 000C                661              MOVE.B  #shift12bits,D4        
-00001838  4EB9 00001886            662              JSR     cmdSh4              
-0000183E  183C 0008                663              MOVE.B  #shift8bits,D4         
-00001842  4EB9 00001886            664              JSR     cmdSh4           
-00001848  183C 0004                665              MOVE.B  #shift4bits,D4        
-0000184C  4EB9 00001886            666              JSR     cmdSh4             
-00001852  183C 0000                667              MOVE.B  #0,D4              
-00001856  E8AE                     668              LSR.L   D4,D6               
-00001858  0286 0000000F            669              ANDI.L  #$0000000F,D6      
-0000185E  4EB9 00001906            670              JSR     converToHex           
-00001864                           671  
-00001864  7C00                     672  cmdSh1      MOVEQ   #$0,D6             
-00001866  2C08                     673              MOVE.L  A0,D6              
-00001868  4846                     674              SWAP    D6                 
-0000186A  4E75                     675              RTS
-0000186C                           676  
-0000186C  E8AE                     677  cmdSh2      LSR.L   D4,D6               
-0000186E  0286 0000000F            678              ANDI.L  #$0000000F,D6      
-00001874  4EB9 00001906            679              JSR     converToHex          
-0000187A  4EB8 1864                680              JSR     cmdSh1             
-0000187E  4E75                     681              RTS
-00001880                           682  
-00001880  7C00                     683  cmdSh3      MOVEQ   #$0,D6              
-00001882  2C08                     684              MOVE.L  A0,D6               
-00001884  4E75                     685              RTS
-00001886                           686              
-00001886  E8AE                     687  cmdSh4      LSR.L   D4,D6              
-00001888  0286 0000000F            688              ANDI.L  #$0000000F,D6       
-0000188E  4EB9 00001906            689              JSR     converToHex         
-00001894  4EB8 1880                690              JSR     cmdSh3             
-00001898  4E75                     691              RTS
-0000189A                           692              
-0000189A  1A3C 0000                693  illegalCode     MOVE.B  #0,D5         
-0000189E  244B                     694              MOVEA.L A3,A2               
-000018A0  14FC 0044                695              MOVE.B  #'D',(A2)+          
-000018A4  14FC 0041                696              MOVE.B  #'A',(A2)+
-000018A8  14FC 0054                697              MOVE.B  #'T',(A2)+
-000018AC  14FC 0041                698              MOVE.B  #'A',(A2)+
-000018B0  14FC 0009                699              MOVE.B  #$09,(A2)+
-000018B4  14FC 0024                700              MOVE.B  #'$',(A2)+          
-000018B8  4EB9 000018C0            701              JSR     loadDataBuffer          
-000018BE  4E75                     702              RTS          
-000018C0                           703  
-000018C0  7C00                     704  loadDataBuffer      MOVEQ   #$0,D6              
-000018C2  3C07                     705                      MOVE.W  D7,D6               
-000018C4  183C 000C                706                      MOVE.B  #shift12bits,D4         
-000018C8  E8AE                     707                      LSR.L   D4,D6               
-000018CA  0246 000F                708                      ANDI.W  #$000F,D6           
-000018CE  4EB9 00001906            709                      JSR     converToHex           
-000018D4  3C07                     710                      MOVE.W  D7,D6
-000018D6  183C 0008                711                      MOVE.B  #shift8bits,D4
-000018DA  E8AE                     712                      LSR.L   D4,D6
-000018DC  0246 000F                713                      ANDI.W  #$000F,D6
-000018E0  4EB9 00001906            714                      JSR     converToHex           
-000018E6  3C07                     715                      MOVE.W  D7,D6
-000018E8  183C 0004                716                      MOVE.B  #shift4bits,D4
-000018EC  E8AE                     717                      LSR.L   D4,D6
-000018EE  0246 000F                718                      ANDI.W  #$000F,D6
-000018F2  4EB9 00001906            719                      JSR     converToHex           
-000018F8  3C07                     720                      MOVE.W  D7,D6
-000018FA  0246 000F                721                      ANDI.W  #$000F,D6
-000018FE  4EB9 00001906            722                      JSR     converToHex           
-00001904  4E75                     723                      RTS
-00001906                           724             
-00001906                           725  
-00001906                           726  ; Convert hex to ascii
-00001906  BC3C 000A                727  converToHex   CMP.B   #$A,D6             
-0000190A  6C00 000A                728              BGE     letter              
-0000190E  0606 0030                729              ADDI.B  #$30,D6             
-00001912  6000 0006                730              BRA hexToBuffer
-00001916                           731              
-00001916  0606 0037                732  letter      ADDI.B  #$37,D6
-0000191A  14C6                     733  hexToBuffer MOVE.B D6, (A2)+
-0000191C  4E75                     734              RTS
-0000191E                           735              
-0000191E                           736  getEA       
-0000191E  4BF9 00001948            737              LEA         ea_mode_table,A5 
-00001924  4282                     738              CLR.L   D2
-00001926  4283                     739              CLR.L   D3
-00001928  4284                     740              CLR.L   D4           
-0000192A  4286                     741              CLR.L   D6
-0000192C  3C07                     742              MOVE.W  D7,D6                 
-0000192E  0246 003F                743              ANDI.W  #$003F,D6            
-00001932  123C 0003                744              MOVE.B      #3,D1                       
-00001936  E26E                     745              LSR.W       D1,D6                       
-00001938                           746  
-00001938  CCFC 0006                747              MULU      #6,D6                     
-0000193C  4EB5 6000                748              JSR         00(A5,D6)               
-00001940                           749  
-00001940  4E75                     750              RTS                                
-00001942  4EF9 000040CC            751              JMP         END                    
-00001948                           752  
-00001948                           753  ea_mode_table                             
-00001948  4EF9 00001978            754              JMP     EAcode000             ; Data Register Direct (mode 0)
-0000194E  4EF9 0000198A            755              JMP     EAcode001             ; Address Register Direct (mode 1)
-00001954  4EF9 0000199C            756              JMP     EAcode010             ; Address Register Diret (mode 2)
-0000195A  4EF9 000019B6            757              JMP     EAcode011             ; Address Register Indirect with Post Increment (mode 3)
-00001960  4EF9 000019D4            758              JMP     EAcode100             ; Address Register Indirect with Pre Decrement (mode 4)
-00001966  4EF9 000019F2            759              JMP     EAcode101             ; Absolute Word Address (mode 7 subclass 0)
-0000196C  4EF9 000019F6            760              JMP     EAcode110             ; Absolute Long Address (mode 7 subclass 1)
-00001972  4EF9 000019FA            761              JMP     EAcode111             ; Immediate Data (mode 7 subclass 4)
-00001978                           762  
-00001978                           763  EAcode000
-00001978  3C07                     764              MOVE.W      D7,D6                 
-0000197A  0246 0007                765              ANDI.W      #$7,D6                 
-0000197E  14FC 0044                766              MOVE.B      #'D',(A2)+              
-00001982  0606 0030                767              ADD.B       #$30,D6                 
-00001986  14C6                     768              MOVE.B      D6,(A2)+                            
-00001988  4E75                     769              RTS
-0000198A                           770   
-0000198A                           771  EAcode001
-0000198A  3C07                     772              MOVE.W      D7,D6                   
-0000198C  0246 0007                773              ANDI.W      #$7,D6                  
-00001990  14FC 0041                774              MOVE.B      #'A',(A2)+              
-00001994  0606 0030                775              ADD.B       #$30,D6                
-00001998  14C6                     776              MOVE.B      D6,(A2)+                
-0000199A  4E75                     777              RTS
-0000199C                           778  
-0000199C                           779  EAcode010
-0000199C  3C07                     780              MOVE.W      D7,D6                   
-0000199E  0246 0007                781              ANDI.W      #$7,D6                  
-000019A2  14FC 0028                782              MOVE.B      #'(',(A2)+                       
-000019A6  14FC 0041                783              MOVE.B      #'A',(A2)+              
-000019AA  0606 0030                784              ADD.B       #$30,D6                 
-000019AE  14C6                     785              MOVE.B      D6,(A2)+                
-000019B0  14FC 0029                786              MOVE.B      #')',(A2)+              
-000019B4  4E75                     787              RTS
-000019B6                           788   
-000019B6                           789  EAcode011
-000019B6                           790              
-000019B6  3C07                     791              MOVE.W      D7,D6                   
-000019B8  0246 0007                792              ANDI.W      #$7,D6                  
-000019BC  14FC 0028                793              MOVE.B      #'(',(A2)+                      
-000019C0  14FC 0041                794              MOVE.B      #'A',(A2)+             
-000019C4  0606 0030                795              ADD.B       #$30,D6                 
-000019C8  14C6                     796              MOVE.B      D6,(A2)+                
-000019CA  14FC 0029                797              MOVE.B      #')',(A2)+              
-000019CE  14FC 002B                798              MOVE.B      #'+',(A2)+              
-000019D2  4E75                     799              RTS
-000019D4                           800  
-000019D4  3C07                     801  EAcode100   MOVE.W      D7,D6                   
-000019D6  0246 0007                802              ANDI.W      #$7,D6                  
-000019DA  14FC 002D                803              MOVE.B      #'-',(A2)+              
-000019DE  14FC 0028                804              MOVE.B      #'(',(A2)+                          
-000019E2  14FC 0041                805              MOVE.B      #'A',(A2)+              
-000019E6  0606 0030                806              ADD.B       #$30,D6                 
-000019EA  14C6                     807              MOVE.B      D6,(A2)+                
-000019EC  14FC 0029                808              MOVE.B      #')',(A2)+              
-000019F0  4E75                     809              RTS                                     
-000019F2                           810              
-000019F2                           811  EAcode101
-000019F2  4EF8 189A                812               JMP    illegalCode          * set bad instruction flag
-000019F6                           813  EAcode110
-000019F6  4EF8 189A                814              JMP       illegalCode             * set bad instruction flag
-000019FA                           815  
-000019FA  3C07                     816  EAcode111   MOVE.W D7, D6
-000019FC  0246 0007                817              ANDI.W #$07, D6
-00001A00  0C06 0000                818              CMPI.B   #$0,D6              
-00001A04  6700 003E                819              BEQ      putWordBuffer         
-00001A08  0C06 0001                820              CMPI.B   #$1,D6              
-00001A0C  6700 004E                821              BEQ      putLongBuffer         
-00001A10  0C06 0002                822              CMPI.B   #$2,D6
-00001A14  0C06 0002                823              CMPI.B   #$2,D6              
-00001A18  6700 0004                824              BEQ      pctobuffer  
-00001A1C  4E75                     825              RTS
-00001A1E                           826  
-00001A1E                           827   
-00001A1E                           828  ; Add '(pc)' to buffer
-00001A1E                           829  pctobuffer
-00001A1E  4EB9 00001A44            830              JSR         putWordBuffer
-00001A24  14FC 0028                831              MOVE.B      #'(',(A2)+                        
-00001A28  14FC 0050                832              MOVE.B      #'P',(A2)+              
-00001A2C  14FC 0043                833              MOVE.B      #'C',(A2)+              
-00001A30  14FC 0029                834              MOVE.B      #')',(A2)+                                     
-00001A34  4E75                     835              RTS
-00001A36                           836  
-00001A36                           837  putbytebuffer   
-00001A36  14FC 0024                838              MOVE.B  #'$',(A2)+
-00001A3A  4284                     839              CLR.L   D4          
-00001A3C  3410                     840              MOVE.W  (A0),D2     
-00001A3E  4284                     841              CLR.L   D4          
-00001A40  183C 0002                842              MOVE.B  #2,D4       
-00001A44                           843              
-00001A44                           844  putWordBuffer 
-00001A44  14FC 0024                845              MOVE.B  #'$',(A2)+  
-00001A48  4284                     846              CLR.L   D4          
-00001A4A  14FC 0024                847              MOVE.B  #$24,(A2)+  
-00001A4E  3410                     848              MOVE.W  (A0),D2       
-00001A50  4284                     849              CLR.L   D4          
-00001A52  183C 0004                850              MOVE.B  #4,D4       
-00001A56                           851             
-00001A56  3C07                     852              MOVE.W  D7,D6                
-00001A58  5448                     853              ADDQ.W  #2,A0         
-00001A5A  4E75                     854              RTS                 
-00001A5C                           855  
-00001A5C                           856  putLongBuffer
-00001A5C  14FC 0024                857              MOVE.B  #'$',(A2)+
-00001A60  4284                     858              CLR.L   D4          
-00001A62  2410                     859              MOVE.L  (A0),D2     
-00001A64  4284                     860              CLR.L   D4          
-00001A66  183C 0008                861              MOVE.B  #8,D4      
-00001A6A                           862              
-00001A6A  3C07                     863              MOVE.W  D7,D6       
-00001A6C  5848                     864              ADDQ.W  #4,A0      
-00001A6E  4E75                     865              RTS                 
-00001A70                           866                     
-00004000                           867               ORG   $4000 ; Make sure data starts at $4000
-00004000= 48 65 6C 6C 6F 2C ...    868  intro        DC.B    'Hello, please enter beginning and ending addresses',CR,LF
-00004034                           869  
-00004034= 0034                     870  intro_len   DC.W    intro_len-intro
-00004036                           871          
-00004036= 45 6E 74 65 72 20 ...    872  string1     DC.B    'Enter start address: $',0
-0000404E= 0018                     873  str_len1    DC.W    str_len1-string1  *Get the length of the string
-00004050                           874  
-00004050= 45 6E 74 65 72 20 ...    875  string2     DC.B    'Enter end address: $',0
-00004066= 0016                     876  str_len2    DC.W    str_len2-string2  *Get the length of the string
-00004068                           877  
-00004068= 50 72 65 73 73 20 ...    878  str_enter   DC.B    'Press enter to read more data',0
-00004086= FFE2                     879  str_en_len  DC.W    str_enter-str_en_len
-00004088                           880  
-00004088= 44 69 73 61 73 73 ...    881  str_more    DC.B    'Disassemble more code? 1 for yes, 0 for no. ',0
-000040B6= 002E                     882  strMore_len DC.W    strMore_len-str_more       
-000040B8                           883  
-000040B8= 43 6C 6F 73 69 6E ...    884  exit        DC.B    'Closing program',0
-000040C8= 0010                     885  exit_len    DC.W    exit_len-exit           
-000040CA                           886  
-000040CA= 01                       887  message_buffer    DC.B   1
-000040CB                           888                                   
-000040CB                           889  *************************************************************************************************************************
-000040CB                           890  * End of program:
-000040CB                           891  *************************************************************************************************************************        
-000040CC  4E72 2700                892  END         STOP    #$2700
-000040D0                           893              END     $1000
+00001774                           598  ;0100 NOP
+00001774  4EB9 00001790            599  opcode1_1110   JSR     getSize            
+0000177A  BC3C 0002                600              CMP.B   #%10,D6           
+0000177E  6600 011A                601              BNE     illegalCode         
+00001782                           602               
+00001782  14FC 004E                603              MOVE.B  #'N',(A2)+        
+00001786  14FC 004F                604              MOVE.B  #'O',(A2)+
+0000178A  14FC 0050                605              MOVE.B  #'P',(A2)+
+0000178E  4E75                     606              RTS
+00001790                           607  
+00001790  3C07                     608  getSize     MOVE.W  D7,D6            
+00001792  EC4E                     609              LSR.W   #6,D6              
+00001794  0246 0003                610              ANDI.W  #$0003,D6         
+00001798  4E75                     611              RTS
+0000179A                           612  
+0000179A  4EB8 1790                613  putSizeBuffer JSR     getSize            
+0000179E  BC3C 0000                614              CMP.B   #%00,D6             
+000017A2  6700 001C                615              BEQ     addBToBuffer              
+000017A6  BC3C 0001                616              CMP.B   #%01,D6            
+000017AA  6700 001E                617              BEQ     addWToBuffer             
+000017AE  BC3C 0002                618              CMP.B   #%10,D6             
+000017B2  6600 00E6                619              BNE     illegalCode           
+000017B6                           620        
+000017B6  14FC 004C                621              MOVE.B  #'L',(A2)+          
+000017BA  4EF9 000017CE            622              JMP     mainEnd             
+000017C0                           623              
+000017C0  14FC 0042                624  addBToBuffer       MOVE.B  #'B',(A2)+        
+000017C4  4EF9 000017CE            625                      JMP     mainEnd             
+000017CA                           626              
+000017CA  14FC 0057                627  addWToBuffer       MOVE.B  #'W',(A2)+      
+000017CE  4E75                     628  mainEnd     RTS                                            
+000017D0                           629  
+000017D0  3C07                     630  highRegBits MOVE.W  D7,D6               
+000017D2  E08E                     631              LSR.L   #shift8bits,D6        
+000017D4  E28E                     632              LSR.L   #1,D6              
+000017D6  0206 0007                633              ANDI.B  #$7,D6            
+000017DA  0606 0030                634              ADD.B   #$30,D6           
+000017DE  14C6                     635              MOVE.B  D6,(A2)+          
+000017E0  4E75                     636              RTS
+000017E2                           637  
+000017E2  3C07                     638  getDirBit   MOVE.W  D7,D6              
+000017E4  E08E                     639              LSR.L   #shift8bits,D6        
+000017E6  0206 0001                640              ANDI.B  #01,D6              
+000017EA  4E75                     641              RTS  
+000017EC                           642              
+000017EC  BC3C 0000                643  getAddr     CMP.B   #%00,D6            
+000017F0  6700 0244                644              BEQ     putbytebuffer        
+000017F4  BC3C 0001                645              CMP.B   #%01,D6            
+000017F8  6700 024A                646              BEQ     putWordBuffer        
+000017FC  BC3C 0002                647              CMP.B   #%10,D6            
+00001800  6700 025A                648              BEQ     putLongBuffer         
+00001804  4E75                     649              RTS
+00001806                           650  
+00001806  4EB9 00001864            651  getLong     JSR     shift1            
+0000180C  183C 000C                652              MOVE.B  #shift12bits,D4      
+00001810  4EB9 0000186C            653              JSR     shift2            
+00001816  183C 0008                654              MOVE.B  #shift8bits,D4       
+0000181A  4EB9 0000186C            655              JSR     shift2             
+00001820  183C 0004                656              MOVE.B  #shift4bits,D4         
+00001824  4EB9 0000186C            657              JSR     shift2             
+0000182A  183C 0000                658              MOVE.B  #0,D4
+0000182E  4EB9 00001886            659              JSR     shift4             
+00001834  183C 000C                660              MOVE.B  #shift12bits,D4        
+00001838  4EB9 00001886            661              JSR     shift4              
+0000183E  183C 0008                662              MOVE.B  #shift8bits,D4         
+00001842  4EB9 00001886            663              JSR     shift4           
+00001848  183C 0004                664              MOVE.B  #shift4bits,D4        
+0000184C  4EB9 00001886            665              JSR     shift4             
+00001852  183C 0000                666              MOVE.B  #0,D4              
+00001856  E8AE                     667              LSR.L   D4,D6               
+00001858  0286 0000000F            668              ANDI.L  #$0000000F,D6      
+0000185E  4EB9 00001906            669              JSR     convertToHex           
+00001864                           670  
+00001864  7C00                     671  shift1      MOVEQ   #$0,D6             
+00001866  2C08                     672              MOVE.L  A0,D6              
+00001868  4846                     673              SWAP    D6                 
+0000186A  4E75                     674              RTS
+0000186C                           675  
+0000186C  E8AE                     676  shift2      LSR.L   D4,D6               
+0000186E  0286 0000000F            677              ANDI.L  #$0000000F,D6      
+00001874  4EB9 00001906            678              JSR     convertToHex          
+0000187A  4EB8 1864                679              JSR     shift1             
+0000187E  4E75                     680              RTS
+00001880                           681  
+00001880  7C00                     682  shift3      MOVEQ   #$0,D6              
+00001882  2C08                     683              MOVE.L  A0,D6               
+00001884  4E75                     684              RTS
+00001886                           685              
+00001886  E8AE                     686  shift4      LSR.L   D4,D6              
+00001888  0286 0000000F            687              ANDI.L  #$0000000F,D6       
+0000188E  4EB9 00001906            688              JSR     convertToHex         
+00001894  4EB8 1880                689              JSR     shift3             
+00001898  4E75                     690              RTS
+0000189A                           691              
+0000189A  1A3C 0000                692  illegalCode     MOVE.B  #0,D5         
+0000189E  244B                     693              MOVEA.L A3,A2               
+000018A0  14FC 0044                694              MOVE.B  #'D',(A2)+          
+000018A4  14FC 0041                695              MOVE.B  #'A',(A2)+
+000018A8  14FC 0054                696              MOVE.B  #'T',(A2)+
+000018AC  14FC 0041                697              MOVE.B  #'A',(A2)+
+000018B0  14FC 0009                698              MOVE.B  #$09,(A2)+
+000018B4  14FC 0024                699              MOVE.B  #'$',(A2)+          
+000018B8  4EB9 000018C0            700              JSR     loadDataBuffer          
+000018BE  4E75                     701              RTS          
+000018C0                           702  
+000018C0  7C00                     703  loadDataBuffer      MOVEQ   #$0,D6              
+000018C2  3C07                     704                      MOVE.W  D7,D6               
+000018C4  183C 000C                705                      MOVE.B  #shift12bits,D4         
+000018C8  E8AE                     706                      LSR.L   D4,D6               
+000018CA  0246 000F                707                      ANDI.W  #$000F,D6           
+000018CE  4EB9 00001906            708                      JSR     convertToHex           
+000018D4  3C07                     709                      MOVE.W  D7,D6
+000018D6  183C 0008                710                      MOVE.B  #shift8bits,D4
+000018DA  E8AE                     711                      LSR.L   D4,D6
+000018DC  0246 000F                712                      ANDI.W  #$000F,D6
+000018E0  4EB9 00001906            713                      JSR     convertToHex           
+000018E6  3C07                     714                      MOVE.W  D7,D6
+000018E8  183C 0004                715                      MOVE.B  #shift4bits,D4
+000018EC  E8AE                     716                      LSR.L   D4,D6
+000018EE  0246 000F                717                      ANDI.W  #$000F,D6
+000018F2  4EB9 00001906            718                      JSR     convertToHex           
+000018F8  3C07                     719                      MOVE.W  D7,D6
+000018FA  0246 000F                720                      ANDI.W  #$000F,D6
+000018FE  4EB9 00001906            721                      JSR     convertToHex           
+00001904  4E75                     722                      RTS
+00001906                           723             
+00001906                           724    ; Convert hex to ascii
+00001906  BC3C 000A                725  convertToHex   CMP.B   #$A,D6             
+0000190A  6C00 000A                726              BGE     letter              
+0000190E  0606 0030                727              ADDI.B  #$30,D6             
+00001912  6000 0006                728              BRA hexToBuffer
+00001916                           729              
+00001916  0606 0037                730  letter      ADDI.B  #$37,D6
+0000191A  14C6                     731  hexToBuffer MOVE.B D6, (A2)+
+0000191C  4E75                     732              RTS
+0000191E                           733              
+0000191E                           734  getEA       
+0000191E  4BF9 00001948            735              LEA         ea_mode_table,A5 
+00001924  4282                     736              CLR.L   D2
+00001926  4283                     737              CLR.L   D3
+00001928  4284                     738              CLR.L   D4           
+0000192A  4286                     739              CLR.L   D6
+0000192C  3C07                     740              MOVE.W  D7,D6                 
+0000192E  0246 003F                741              ANDI.W  #$003F,D6            
+00001932  123C 0003                742              MOVE.B      #3,D1                       
+00001936  E26E                     743              LSR.W       D1,D6                       
+00001938                           744  
+00001938  CCFC 0006                745              MULU      #6,D6                     
+0000193C  4EB5 6000                746              JSR         00(A5,D6)               
+00001940                           747  
+00001940  4E75                     748              RTS                                
+00001942  4EF9 000040CC            749              JMP         END                    
+00001948                           750  
+00001948                           751  ea_mode_table                             
+00001948  4EF9 00001978            752              JMP     EAcode000             ; Data Register Direct (mode 0)
+0000194E  4EF9 0000198A            753              JMP     EAcode001             ; Address Register Direct (mode 1)
+00001954  4EF9 0000199C            754              JMP     EAcode010             ; Address Register Diret (mode 2)
+0000195A  4EF9 000019B6            755              JMP     EAcode011             ; Address Register Indirect with Post Increment (mode 3)
+00001960  4EF9 000019D4            756              JMP     EAcode100             ; Address Register Indirect with Pre Decrement (mode 4)
+00001966  4EF9 000019F2            757              JMP     EAcode101             ; Absolute Word Address (mode 7 subclass 0)
+0000196C  4EF9 000019F6            758              JMP     EAcode110             ; Absolute Long Address (mode 7 subclass 1)
+00001972  4EF9 000019FA            759              JMP     EAcode111             ; Immediate Data (mode 7 subclass 4)
+00001978                           760  
+00001978                           761  EAcode000
+00001978  3C07                     762              MOVE.W      D7,D6                 
+0000197A  0246 0007                763              ANDI.W      #$7,D6                 
+0000197E  14FC 0044                764              MOVE.B      #'D',(A2)+              
+00001982  0606 0030                765              ADD.B       #$30,D6                 
+00001986  14C6                     766              MOVE.B      D6,(A2)+                            
+00001988  4E75                     767              RTS
+0000198A                           768   
+0000198A                           769  EAcode001
+0000198A  3C07                     770              MOVE.W      D7,D6                   
+0000198C  0246 0007                771              ANDI.W      #$7,D6                  
+00001990  14FC 0041                772              MOVE.B      #'A',(A2)+              
+00001994  0606 0030                773              ADD.B       #$30,D6                
+00001998  14C6                     774              MOVE.B      D6,(A2)+                
+0000199A  4E75                     775              RTS
+0000199C                           776  
+0000199C                           777  EAcode010
+0000199C  3C07                     778              MOVE.W      D7,D6                   
+0000199E  0246 0007                779              ANDI.W      #$7,D6                  
+000019A2  14FC 0028                780              MOVE.B      #'(',(A2)+                       
+000019A6  14FC 0041                781              MOVE.B      #'A',(A2)+              
+000019AA  0606 0030                782              ADD.B       #$30,D6                 
+000019AE  14C6                     783              MOVE.B      D6,(A2)+                
+000019B0  14FC 0029                784              MOVE.B      #')',(A2)+              
+000019B4  4E75                     785              RTS
+000019B6                           786   
+000019B6                           787  EAcode011
+000019B6                           788              
+000019B6  3C07                     789              MOVE.W      D7,D6                   
+000019B8  0246 0007                790              ANDI.W      #$7,D6                  
+000019BC  14FC 0028                791              MOVE.B      #'(',(A2)+                      
+000019C0  14FC 0041                792              MOVE.B      #'A',(A2)+             
+000019C4  0606 0030                793              ADD.B       #$30,D6                 
+000019C8  14C6                     794              MOVE.B      D6,(A2)+                
+000019CA  14FC 0029                795              MOVE.B      #')',(A2)+              
+000019CE  14FC 002B                796              MOVE.B      #'+',(A2)+              
+000019D2  4E75                     797              RTS
+000019D4                           798  
+000019D4  3C07                     799  EAcode100   MOVE.W      D7,D6                   
+000019D6  0246 0007                800              ANDI.W      #$7,D6                  
+000019DA  14FC 002D                801              MOVE.B      #'-',(A2)+              
+000019DE  14FC 0028                802              MOVE.B      #'(',(A2)+                          
+000019E2  14FC 0041                803              MOVE.B      #'A',(A2)+              
+000019E6  0606 0030                804              ADD.B       #$30,D6                 
+000019EA  14C6                     805              MOVE.B      D6,(A2)+                
+000019EC  14FC 0029                806              MOVE.B      #')',(A2)+              
+000019F0  4E75                     807              RTS                                     
+000019F2                           808              
+000019F2                           809  EAcode101
+000019F2  4EF8 189A                810               JMP    illegalCode          * set bad instruction flag
+000019F6                           811  EAcode110
+000019F6  4EF8 189A                812              JMP       illegalCode             * set bad instruction flag
+000019FA                           813  
+000019FA  3C07                     814  EAcode111   MOVE.W D7, D6
+000019FC  0246 0007                815              ANDI.W #$07, D6
+00001A00  0C06 0000                816              CMPI.B   #$0,D6              
+00001A04  6700 003E                817              BEQ      putWordBuffer         
+00001A08  0C06 0001                818              CMPI.B   #$1,D6              
+00001A0C  6700 004E                819              BEQ      putLongBuffer         
+00001A10  0C06 0002                820              CMPI.B   #$2,D6
+00001A14  0C06 0002                821              CMPI.B   #$2,D6              
+00001A18  6700 0004                822              BEQ      pctobuffer  
+00001A1C  4E75                     823              RTS
+00001A1E                           824  
+00001A1E                           825   
+00001A1E                           826  ; Add '(pc)' to buffer
+00001A1E                           827  pctobuffer
+00001A1E  4EB9 00001A44            828              JSR         putWordBuffer
+00001A24  14FC 0028                829              MOVE.B      #'(',(A2)+                        
+00001A28  14FC 0050                830              MOVE.B      #'P',(A2)+              
+00001A2C  14FC 0043                831              MOVE.B      #'C',(A2)+              
+00001A30  14FC 0029                832              MOVE.B      #')',(A2)+                                     
+00001A34  4E75                     833              RTS
+00001A36                           834  
+00001A36                           835  putbytebuffer   
+00001A36  14FC 0024                836              MOVE.B  #'$',(A2)+
+00001A3A  4284                     837              CLR.L   D4          
+00001A3C  3410                     838              MOVE.W  (A0),D2     
+00001A3E  4284                     839              CLR.L   D4          
+00001A40  183C 0002                840              MOVE.B  #2,D4       
+00001A44                           841              
+00001A44                           842  putWordBuffer 
+00001A44  14FC 0024                843              MOVE.B  #'$',(A2)+  
+00001A48  4284                     844              CLR.L   D4          
+00001A4A  14FC 0024                845              MOVE.B  #$24,(A2)+  
+00001A4E  3410                     846              MOVE.W  (A0),D2       
+00001A50  4284                     847              CLR.L   D4          
+00001A52  183C 0004                848              MOVE.B  #4,D4       
+00001A56                           849             
+00001A56  3C07                     850              MOVE.W  D7,D6                
+00001A58  5448                     851              ADDQ.W  #2,A0         
+00001A5A  4E75                     852              RTS                 
+00001A5C                           853  
+00001A5C                           854  putLongBuffer
+00001A5C  14FC 0024                855              MOVE.B  #'$',(A2)+
+00001A60  4284                     856              CLR.L   D4          
+00001A62  2410                     857              MOVE.L  (A0),D2     
+00001A64  4284                     858              CLR.L   D4          
+00001A66  183C 0008                859              MOVE.B  #8,D4      
+00001A6A                           860              
+00001A6A  3C07                     861              MOVE.W  D7,D6       
+00001A6C  5848                     862              ADDQ.W  #4,A0      
+00001A6E  4E75                     863              RTS                 
+00001A70                           864                     
+00004000                           865               ORG   $4000 ; Make sure data starts at $4000
+00004000= 48 65 6C 6C 6F 2C ...    866  intro        DC.B    'Hello, please enter beginning and ending addresses',CR,LF
+00004034                           867  
+00004034= 0034                     868  intro_len   DC.W    intro_len-intro
+00004036                           869          
+00004036= 45 6E 74 65 72 20 ...    870  string1     DC.B    'Enter start address: $',0
+0000404E= 0018                     871  str_len1    DC.W    str_len1-string1  *Get the length of the string
+00004050                           872  
+00004050= 45 6E 74 65 72 20 ...    873  string2     DC.B    'Enter end address: $',0
+00004066= 0016                     874  str_len2    DC.W    str_len2-string2  *Get the length of the string
+00004068                           875  
+00004068= 50 72 65 73 73 20 ...    876  str_enter   DC.B    'Press enter to read more data',0
+00004086= FFE2                     877  str_en_len  DC.W    str_enter-str_en_len
+00004088                           878  
+00004088= 44 69 73 61 73 73 ...    879  str_more    DC.B    'Disassemble more code? 1 for yes, 0 for no. ',0
+000040B6= 002E                     880  strMore_len DC.W    strMore_len-str_more       
+000040B8                           881  
+000040B8= 43 6C 6F 73 69 6E ...    882  exit        DC.B    'Closing program',0
+000040C8= 0010                     883  exit_len    DC.W    exit_len-exit           
+000040CA                           884  
+000040CA= 01                       885  message_buffer    DC.B   1
+000040CB                           886                                   
+000040CB                           887  *************************************************************************************************************************
+000040CB                           888  * End of program:
+000040CB                           889  *************************************************************************************************************************        
+000040CC  4E72 2700                890  END         STOP    #$2700
+000040D0                           891              END     $1000
 
 No errors detected
 No warnings generated
@@ -903,7 +901,6 @@ No warnings generated
 SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
-ADDAL               1638
 ADDBTOBUFFER        17C0
 ADDWTOBUFFER        17CA
 ASCIITOHEX          1100
@@ -911,12 +908,8 @@ CAP_TO_HEX          116C
 CLEANUP             1110
 CLEARALL            107A
 CLEARREGISTERS      108C
-CMDSH1              1864
-CMDSH2              186C
-CMDSH3              1880
-CMDSH4              1886
 CMPAL               1554
-CONVERTOHEX         1906
+CONVERTTOHEX        1906
 CR                  D
 EACODE000           1978
 EACODE001           198A
@@ -956,6 +949,9 @@ HIGHREGBITS         17D0
 ILLEGALCODE         189A
 INTRO               4000
 INTRO_LEN           4034
+ISADD               1662
+ISADDA              163C
+ISADDAL             1638
 ISMULU              15DC
 ISORI               1272
 JMP_TABLE           1212
@@ -976,9 +972,7 @@ MOVEW               1354
 MOVEWEA             1368
 MSIZEEND            13D2
 NUM_TO_HEX          1162
-OPADD               1662
 OPADD01             16A4
-OPADDA              163C
 OPCMPA              1558
 OPCMPEOR            157E
 OPCODE1_0000        1702
@@ -1022,7 +1016,11 @@ PUTLONGBUFFER       1A5C
 PUTSIZEBUFFER       179A
 PUTWORDBUFFER       1A44
 RESUME              114A
+SHIFT1              1864
 SHIFT12BITS         C
+SHIFT2              186C
+SHIFT3              1880
+SHIFT4              1886
 SHIFT4BITS          4
 SHIFT8BITS          8
 SHOW                1052

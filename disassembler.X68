@@ -491,18 +491,18 @@ opcode_1101   MOVE.B  #'A',(A2)+
             MOVE.B  #'D',(A2)+
             JSR     getSize            
             CMP.B   #%11,D6            
-            BNE     opADD             
+            BNE     ISADD             
             MOVE.B  #'A',(A2)+          
             MOVE.B  #'.',(A2)+
             MOVE.W  D7,D6               
             LSR.L   #shift8bits,D6       
             ANDI.W  #$0001,D6          
             CMP.B   #%1,D6              
-            BEQ     addaL              
+            BEQ     ISADDAL              
             MOVE.B  #'W',(A2)+          
-            JMP     opADDA
-addaL       MOVE.B  #'L',(A2)+                
-opADDA      MOVE.B  #' ',(A2)+
+            JMP     ISADDA
+ISADDAL     MOVE.B  #'L',(A2)+                
+ISADDA      MOVE.B  #' ',(A2)+
             MOVE.B  #' ',(A2)+
             MOVE.B  #' ',(A2)+
 
@@ -512,7 +512,7 @@ opADDA      MOVE.B  #' ',(A2)+
             JSR     highRegBits       
             JMP     end1101
             
-opADD       MOVE.B  #'.',(A2)+        
+ISADD       MOVE.B  #'.',(A2)+        
             JSR     putSizeBuffer       
             MOVE.B  #' ',(A2)+
             MOVE.B  #' ',(A2)+
@@ -566,7 +566,6 @@ opcode1_0011   JSR     illegalCode
 opcode1_0101   JSR     illegalCode
             RTS
         
-            
 opcode1_0111   JSR     illegalCode
             RTS
             
@@ -649,45 +648,45 @@ getAddr     CMP.B   #%00,D6
             BEQ     putLongBuffer         
             RTS
 
-getLong     JSR     cmdSh1            
+getLong     JSR     shift1            
             MOVE.B  #shift12bits,D4      
-            JSR     cmdSh2            
+            JSR     shift2            
             MOVE.B  #shift8bits,D4       
-            JSR     cmdSh2             
+            JSR     shift2             
             MOVE.B  #shift4bits,D4         
-            JSR     cmdSh2             
+            JSR     shift2             
             MOVE.B  #0,D4
-            JSR     cmdSh4             
+            JSR     shift4             
             MOVE.B  #shift12bits,D4        
-            JSR     cmdSh4              
+            JSR     shift4              
             MOVE.B  #shift8bits,D4         
-            JSR     cmdSh4           
+            JSR     shift4           
             MOVE.B  #shift4bits,D4        
-            JSR     cmdSh4             
+            JSR     shift4             
             MOVE.B  #0,D4              
             LSR.L   D4,D6               
             ANDI.L  #$0000000F,D6      
-            JSR     converToHex           
+            JSR     convertToHex           
 
-cmdSh1      MOVEQ   #$0,D6             
+shift1      MOVEQ   #$0,D6             
             MOVE.L  A0,D6              
             SWAP    D6                 
             RTS
 
-cmdSh2      LSR.L   D4,D6               
+shift2      LSR.L   D4,D6               
             ANDI.L  #$0000000F,D6      
-            JSR     converToHex          
-            JSR     cmdSh1             
+            JSR     convertToHex          
+            JSR     shift1             
             RTS
 
-cmdSh3      MOVEQ   #$0,D6              
+shift3      MOVEQ   #$0,D6              
             MOVE.L  A0,D6               
             RTS
             
-cmdSh4      LSR.L   D4,D6              
+shift4      LSR.L   D4,D6              
             ANDI.L  #$0000000F,D6       
-            JSR     converToHex         
-            JSR     cmdSh3             
+            JSR     convertToHex         
+            JSR     shift3             
             RTS
             
 illegalCode     MOVE.B  #0,D5         
@@ -706,25 +705,24 @@ loadDataBuffer      MOVEQ   #$0,D6
                     MOVE.B  #shift12bits,D4         
                     LSR.L   D4,D6               
                     ANDI.W  #$000F,D6           
-                    JSR     converToHex           
+                    JSR     convertToHex           
                     MOVE.W  D7,D6
                     MOVE.B  #shift8bits,D4
                     LSR.L   D4,D6
                     ANDI.W  #$000F,D6
-                    JSR     converToHex           
+                    JSR     convertToHex           
                     MOVE.W  D7,D6
                     MOVE.B  #shift4bits,D4
                     LSR.L   D4,D6
                     ANDI.W  #$000F,D6
-                    JSR     converToHex           
+                    JSR     convertToHex           
                     MOVE.W  D7,D6
                     ANDI.W  #$000F,D6
-                    JSR     converToHex           
+                    JSR     convertToHex           
                     RTS
            
-
-; Convert hex to ascii
-converToHex   CMP.B   #$A,D6             
+  ; Convert hex to ascii
+convertToHex   CMP.B   #$A,D6             
             BGE     letter              
             ADDI.B  #$30,D6             
             BRA hexToBuffer
