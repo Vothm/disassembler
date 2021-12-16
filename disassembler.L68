@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 12/15/2021 5:05:06 PM
+Created On: 12/15/2021 5:15:49 PM
 
 00000000                             1  *-----------------------------------------------------------------
 00000000                             2  * Title      : 68K Disassembler
@@ -250,7 +250,7 @@ Created On: 12/15/2021 5:05:06 PM
 00001264  E8AE                     246              LSR.L   D4,D6               * Shift to LSB
 00001266  BC3C 0000                247              CMP.B   #$0,D6              * Is this ORI?
 0000126A  6700 0006                248              BEQ     opORI               * Jump to opORI section
-0000126E  6600 062C                249              BNE     badInst             * No - bad instruction                  
+0000126E  6600 062C                249              BNE     illegalCode             * No - bad instruction                  
 00001272                           250  
 00001272  14FC 004F                251  opORI       MOVE.B  #'O',(A2)+          * Populate ORI into buffer
 00001276  14FC 0052                252              MOVE.B  #'R',(A2)+
@@ -379,7 +379,7 @@ Created On: 12/15/2021 5:05:06 PM
 000013B4  BC3C 0002                375              CMP.B   #$2,D6              * is this a L?
 000013B8  6700 0014                376              BEQ     moveSizeL           * yes - Or L size to D3 bits 6-7
 000013BC  BC3C 0003                377              CMP.B   #$3,D6              * is this a W?
-000013C0  6600 04DA                378              BNE     badInst             * No- then badInst        
+000013C0  6600 04DA                378              BNE     illegalCode             * No- then illegalCode        
 000013C4  0043 0040                379  moveSizeW   ORI.W   #$0040,D3           * add size 01 in bits 6-7 (4) into D3
 000013C8  4EF9 000013D2            380              JMP     mSizeEnd            * skip to end once done
 000013CE  0043 0080                381  moveSizeL   ORI.W   #$0080,D3           * add size 10 in bits 6-7 (4) into D3
@@ -420,15 +420,15 @@ Created On: 12/15/2021 5:05:06 PM
 00001434  14C6                     416              MOVE.B  D6,(A2)+            * register # to buffer
 00001436  4E75                     417  end0100     RTS
 00001438                           418  
-00001438  4EB9 0000189C            419  hex1_0101   JSR     badInst             * Invalid Instruction
+00001438  4EB9 0000189C            419  hex1_0101   JSR     illegalCode             * Invalid Instruction
 0000143E  4E75                     420              RTS
 00001440                           421              
 00001440                           422              ***** MOVEM Command
-00001440  4EB9 0000189C            423  hex1_0110   JSR     badInst
+00001440  4EB9 0000189C            423  hex1_0110   JSR     illegalCode
 00001446  5448                     424              ADDQ.W  #2,A0
 00001448  4E75                     425              RTS
 0000144A                           426  
-0000144A  4EB9 0000189C            427  hex1_0111   JSR     badInst             * Invalid Instruction
+0000144A  4EB9 0000189C            427  hex1_0111   JSR     illegalCode             * Invalid Instruction
 00001450  4E75                     428              RTS
 00001452                           429             
 00001452                           430  
@@ -485,7 +485,7 @@ Created On: 12/15/2021 5:05:06 PM
 0000150E                           481              
 0000150E  4E75                     482  end1001     RTS            
 00001510                           483  
-00001510  4EB9 0000189C            484  hex1_1010   JSR     badInst             * Invalid Instruction
+00001510  4EB9 0000189C            484  hex1_1010   JSR     illegalCode             * Invalid Instruction
 00001516  4E75                     485              RTS
 00001518                           486  
 00001518                           487  
@@ -559,10 +559,10 @@ Created On: 12/15/2021 5:05:06 PM
 000015E0  0246 0007                555              ANDI.W  #$7,D6              * mask for mode bits
 000015E4  BC3C 0007                556              CMP.B   #$7,D6              *
 000015E8  6700 0008                557              BEQ     movePTR             * increment pointer by word
-000015EC  4EF9 0000189C            558              JMP     badInst     
+000015EC  4EF9 0000189C            558              JMP     illegalCode     
 000015F2                           559  
 000015F2  5448                     560  movePTR     ADDQ.W  #2,A0               * increment pointer
-000015F4  4EF9 0000189C            561              JMP     badInst
+000015F4  4EF9 0000189C            561              JMP     illegalCode
 000015FA                           562          
 000015FA                           563  
 000015FA  4E75                     564  end1100     RTS
@@ -643,21 +643,21 @@ Created On: 12/15/2021 5:05:06 PM
 000016F6  4EF9 00001774            639              JMP     hex4_1110
 000016FC  4EF9 0000176C            640              JMP     hex4_1111
 00001702                           641              
-00001702  4EB9 0000189C            642  hex4_0000   JSR     badInst
+00001702  4EB9 0000189C            642  hex4_0000   JSR     illegalCode
 00001708  4E75                     643              RTS
 0000170A                           644              
-0000170A  4EB9 0000189C            645  hex4_0001   JSR     badInst
+0000170A  4EB9 0000189C            645  hex4_0001   JSR     illegalCode
 00001710  4E75                     646              RTS
 00001712                           647              
-00001712  4EB9 0000189C            648  hex4_0011   JSR     badInst
+00001712  4EB9 0000189C            648  hex4_0011   JSR     illegalCode
 00001718  4E75                     649              RTS
 0000171A                           650                            
 0000171A                           651              
-0000171A  4EB9 0000189C            652  hex4_0101   JSR     badInst
+0000171A  4EB9 0000189C            652  hex4_0101   JSR     illegalCode
 00001720  4E75                     653              RTS
 00001722                           654          
 00001722                           655              
-00001722  4EB9 0000189C            656  hex4_0111   JSR     badInst
+00001722  4EB9 0000189C            656  hex4_0111   JSR     illegalCode
 00001728  4E75                     657              RTS
 0000172A                           658              
 0000172A                           659              
@@ -672,20 +672,20 @@ Created On: 12/15/2021 5:05:06 PM
 0000173A                           668  
 0000173A  4E75                     669              RTS            
 0000173C                           670  
-0000173C  4EB9 0000189C            671  opMOVEM     JSR     badInst
+0000173C  4EB9 0000189C            671  opMOVEM     JSR     illegalCode
 00001742  4E75                     672              RTS   
 00001744                           673  
-00001744  4EB9 0000189C            674  hex4_1001   JSR     badInst
+00001744  4EB9 0000189C            674  hex4_1001   JSR     illegalCode
 0000174A  4E75                     675              RTS   
-0000174C  4EB9 0000189C            676  hex4_1010   JSR     badInst
+0000174C  4EB9 0000189C            676  hex4_1010   JSR     illegalCode
 00001752  4E75                     677              RTS   
-00001754  4EB9 0000189C            678  hex4_1011   JSR     badInst
+00001754  4EB9 0000189C            678  hex4_1011   JSR     illegalCode
 0000175A  4E75                     679              RTS
-0000175C  4EB9 0000189C            680  hex4_1100   JSR     badInst
+0000175C  4EB9 0000189C            680  hex4_1100   JSR     illegalCode
 00001762  4E75                     681              RTS
-00001764  4EB9 0000189C            682  hex4_1101   JSR     badInst
+00001764  4EB9 0000189C            682  hex4_1101   JSR     illegalCode
 0000176A  4E75                     683              RTS
-0000176C  4EB9 0000189C            684  hex4_1111   JSR     badInst
+0000176C  4EB9 0000189C            684  hex4_1111   JSR     illegalCode
 00001772  4E75                     685              RTS   
 00001774                           686  
 00001774                           687  
@@ -694,7 +694,7 @@ Created On: 12/15/2021 5:05:06 PM
 00001774                           690  ********************************************************************************************************************** 
 00001774  4EB9 00001792            691  hex4_1110   JSR     getSize             * determine the size for (JSR,JMP)
 0000177A  BC3C 0002                692              CMP.B   #%10,D6             * test size bits is this JSR? (0100 1110 10..)
-0000177E  6600 011C                693              BNE     badInst             * No set badFlag for illegal instruction
+0000177E  6600 011C                693              BNE     illegalCode             * No set badFlag for illegal instruction
 00001782                           694               
 00001782  14FC 004E                695              MOVE.B  #'N',(A2)+          * yes - print NOP to goodBuff
 00001786  14FC 004F                696              MOVE.B  #'O',(A2)+
@@ -706,7 +706,7 @@ Created On: 12/15/2021 5:05:06 PM
 00001792                           702  
 00001792                           703  
 00001792                           704  ********************************************************************************************************************** 
-00001792                           705  * Beginning of functions: badInst, getSize, size2Buffer, 
+00001792                           705  * Beginning of functions: illegalCode, getSize, size2Buffer, 
 00001792                           706  ********************************************************************************************************************** 
 00001792  3C07                     707  getSize     MOVE.W  D7,D6               * copy current instruction to shift
 00001794  EC4E                     708              LSR.W   #6,D6               * move the size bits in 6-7 to LSB
@@ -719,7 +719,7 @@ Created On: 12/15/2021 5:05:06 PM
 000017A8  BC3C 0001                715              CMP.B   #%01,D6             * is this a word?
 000017AC  6700 001E                716              BEQ     mainW               * yes, add teh W to buffer
 000017B0  BC3C 0002                717              CMP.B   #%10,D6             * is this a long?
-000017B4  6600 00E6                718              BNE     badInst             * No? then bad instruction
+000017B4  6600 00E6                718              BNE     illegalCode             * No? then bad instruction
 000017B8                           719        
 000017B8  14FC 004C                720              MOVE.B  #'L',(A2)+          * add L to buffer
 000017BC  4EF9 000017D0            721              JMP     mainEnd             * end size2Buffer sub  
@@ -792,7 +792,7 @@ Created On: 12/15/2021 5:05:06 PM
 00001896  4EB8 1882                788              JSR     cmdSh3              * Reset D6 for next shift
 0000189A  4E75                     789              RTS
 0000189C                           790              
-0000189C  1A3C 0000                791  badInst     MOVE.B  #0,D5         
+0000189C  1A3C 0000                791  illegalCode     MOVE.B  #0,D5         
 000018A0  244B                     792              MOVEA.L A3,A2               
 000018A2  14FC 0044                793              MOVE.B  #'D',(A2)+          
 000018A6  14FC 0041                794              MOVE.B  #'A',(A2)+
@@ -826,13 +826,13 @@ Created On: 12/15/2021 5:05:06 PM
 00001908                           822             
 00001908                           823  
 00001908                           824  ; Convert hex to ascii
-00001908  BC3C 000A                825  converToHex   CMP.B   #$A,D6              * Confirm hex character?
-0000190C  6C00 000A                826              BGE     letter              * Is it a letter or number?
-00001910  0606 0030                827              ADDI.B  #$30,D6             * Convert decimal to ASCII
-00001914  6000 0006                828              BRA     hexToBuffer          
+00001908  BC3C 000A                825  converToHex   CMP.B   #$A,D6             
+0000190C  6C00 000A                826              BGE     letter              
+00001910  0606 0030                827              ADDI.B  #$30,D6             
+00001914  6000 0006                828              BRA hexToBuffer
 00001918                           829              
 00001918  0606 0037                830  letter      ADDI.B  #$37,D6
-0000191C  14C6                     831  hexToBuffer MOVE.B  D6,(A2)+
+0000191C  14C6                     831  hexToBuffer MOVE.B D6, (A2)+
 0000191E  4E75                     832              RTS
 00001920                           833              
 00001920                           834  getEA       
@@ -915,9 +915,9 @@ Created On: 12/15/2021 5:05:06 PM
 000019F2  4E75                     911              RTS                                     * Return
 000019F4                           912              
 000019F4                           913  EAcode101
-000019F4  4EF8 189C                914               JMP    badInst          * set bad instruction flag
+000019F4  4EF8 189C                914               JMP    illegalCode          * set bad instruction flag
 000019F8                           915  EAcode110
-000019F8  4EF8 189C                916              JMP       badInst             * set bad instruction flag
+000019F8  4EF8 189C                916              JMP       illegalCode             * set bad instruction flag
 000019FC                           917  
 000019FC  3C07                     918  EAcode111   MOVE.W D7, D6
 000019FE  0246 0007                919              ANDI.W #$07, D6
@@ -949,57 +949,56 @@ Created On: 12/15/2021 5:05:06 PM
 00001A46                           945              
 00001A46                           946  word2Buffer 
 00001A46  14FC 0024                947              MOVE.B  #'$',(A2)+  
-00001A4A  4284                     948              CLR.L   D4          * pre-emptive clearout
-00001A4C  14FC 0024                949              MOVE.B  #$24,(A2)+  * put dollar sign in buffer (before address)
-00001A50  3410                     950              MOVE.W  (A0),D2       * move current word into D2 for rolling purposes
-00001A52  4284                     951              CLR.L   D4          * pre-emptive clearout
-00001A54  183C 0004                952              MOVE.B  #4,D4       * load a counter
+00001A4A  4284                     948              CLR.L   D4          
+00001A4C  14FC 0024                949              MOVE.B  #$24,(A2)+  
+00001A50  3410                     950              MOVE.W  (A0),D2       
+00001A52  4284                     951              CLR.L   D4          
+00001A54  183C 0004                952              MOVE.B  #4,D4       
 00001A58                           953              
-00001A58  3C07                     954  rtnEA1      MOVE.W  D7,D6       * re-load current word for temp storage            
-00001A5A  5448                     955              ADDQ.W  #2,A0       * advancing memory pointer by word   
-00001A5C  4E75                     956              RTS                 * return from subroutine
+00001A58  3C07                     954  rtnEA1      MOVE.W  D7,D6                
+00001A5A  5448                     955              ADDQ.W  #2,A0         
+00001A5C  4E75                     956              RTS                 
 00001A5E                           957  
 00001A5E                           958  long2Buffer
 00001A5E  14FC 0024                959              MOVE.B  #'$',(A2)+
-00001A62  4284                     960              CLR.L   D4          * pre-emptive clearout
-00001A64  2410                     961              MOVE.L  (A0),D2       * move current word into D2 for rolling purposes
-00001A66  4284                     962              CLR.L   D4          * pre-emptive clearout
-00001A68  183C 0008                963              MOVE.B  #8,D4       * load a counter
-00001A6C                           964  
-00001A6C                           965              
-00001A6C  3C07                     966  rtnEA2      MOVE.W  D7,D6       * re-load current word for temp storage
-00001A6E  5848                     967              ADDQ.W  #4,A0       * advancing memory pointer by long
-00001A70  4E75                     968              RTS                 * return from subroutine
+00001A62  4284                     960              CLR.L   D4          
+00001A64  2410                     961              MOVE.L  (A0),D2     
+00001A66  4284                     962              CLR.L   D4          
+00001A68  183C 0008                963              MOVE.B  #8,D4      
+00001A6C                           964              
+00001A6C  3C07                     965  rtnEA2      MOVE.W  D7,D6       
+00001A6E  5848                     966              ADDQ.W  #4,A0      
+00001A70  4E75                     967              RTS                 
+00001A72                           968  
 00001A72                           969  
-00001A72                           970  
-00001A72                           971                     
-00004000                           972               ORG   $4000 ; Make sure data starts at $4000
-00004000= 48 65 6C 6C 6F 2C ...    973  intro        DC.B    'Hello, please enter beginning and ending addresses',CR,LF
-00004034                           974  
-00004034= 0034                     975  intro_len   DC.W    intro_len-intro
-00004036                           976          
-00004036= 45 6E 74 65 72 20 ...    977  string1     DC.B    'Enter start address: $',0
-0000404E= 0018                     978  str_len1    DC.W    str_len1-string1  *Get the length of the string
-00004050                           979  
-00004050= 45 6E 74 65 72 20 ...    980  string2     DC.B    'Enter end address: $',0
-00004066= 0016                     981  str_len2    DC.W    str_len2-string2  *Get the length of the string
-00004068                           982  
-00004068= 50 72 65 73 73 20 ...    983  str_enter   DC.B    'Press enter to read more data',0
-00004086= FFE2                     984  str_en_len  DC.W    str_enter-str_en_len
-00004088                           985  
-00004088= 44 69 73 61 73 73 ...    986  str_more    DC.B    'Disassemble more code? 1 for yes, 0 for no. ',0
-000040B6= 002E                     987  strMore_len DC.W    strMore_len-str_more       
-000040B8                           988  
-000040B8= 43 6C 6F 73 69 6E ...    989  exit        DC.B    'Closing program',0
-000040C8= 0010                     990  exit_len    DC.W    exit_len-exit           
-000040CA                           991  
-000040CA= 01                       992  message_buffer    DC.B   1
-000040CB                           993                                   
-000040CB                           994  *************************************************************************************************************************
-000040CB                           995  * End of program:
-000040CB                           996  *************************************************************************************************************************        
-000040CC  4E72 2700                997  END         STOP    #$2700
-000040D0                           998              END     $1000
+00001A72                           970                     
+00004000                           971               ORG   $4000 ; Make sure data starts at $4000
+00004000= 48 65 6C 6C 6F 2C ...    972  intro        DC.B    'Hello, please enter beginning and ending addresses',CR,LF
+00004034                           973  
+00004034= 0034                     974  intro_len   DC.W    intro_len-intro
+00004036                           975          
+00004036= 45 6E 74 65 72 20 ...    976  string1     DC.B    'Enter start address: $',0
+0000404E= 0018                     977  str_len1    DC.W    str_len1-string1  *Get the length of the string
+00004050                           978  
+00004050= 45 6E 74 65 72 20 ...    979  string2     DC.B    'Enter end address: $',0
+00004066= 0016                     980  str_len2    DC.W    str_len2-string2  *Get the length of the string
+00004068                           981  
+00004068= 50 72 65 73 73 20 ...    982  str_enter   DC.B    'Press enter to read more data',0
+00004086= FFE2                     983  str_en_len  DC.W    str_enter-str_en_len
+00004088                           984  
+00004088= 44 69 73 61 73 73 ...    985  str_more    DC.B    'Disassemble more code? 1 for yes, 0 for no. ',0
+000040B6= 002E                     986  strMore_len DC.W    strMore_len-str_more       
+000040B8                           987  
+000040B8= 43 6C 6F 73 69 6E ...    988  exit        DC.B    'Closing program',0
+000040C8= 0010                     989  exit_len    DC.W    exit_len-exit           
+000040CA                           990  
+000040CA= 01                       991  message_buffer    DC.B   1
+000040CB                           992                                   
+000040CB                           993  *************************************************************************************************************************
+000040CB                           994  * End of program:
+000040CB                           995  *************************************************************************************************************************        
+000040CC  4E72 2700                996  END         STOP    #$2700
+000040D0                           997              END     $1000
 
 No errors detected
 No warnings generated
@@ -1010,7 +1009,6 @@ Symbol-name         Value
 -------------------------
 ADDAL               1638
 ASCIITOHEX          1100
-BADINST             189C
 BUFFPREP            1198
 CAP_TO_HEX          116C
 CLEARALL            107A
@@ -1081,6 +1079,7 @@ HEX4_1110           1774
 HEX4_1111           176C
 HEXTOBUFFER         191C
 HIGHREGBITS         17D2
+ILLEGALCODE         189C
 INPUT               109E
 INTRO               4000
 INTRO_LEN           4034
