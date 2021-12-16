@@ -551,43 +551,43 @@ end1101     RTS
 
 
 tbl_0100    
-            JMP     hex4_0000            
-            JMP     hex4_0001            
-            ;JMP     hex4_0010
-            ;JMP     hex4_0011
-            ;JMP     hex4_0100
-            JMP     hex4_0101
-            ;JMP     hex4_0110
-            JMP     hex4_0111
-            JMP     hex4_1000
-            JMP     hex4_1001
-            JMP     hex4_1010
-            JMP     hex4_1011
-            JMP     hex4_1100
-            JMP     hex4_1101
-            JMP     hex4_1110
-            JMP     hex4_1111
+            JMP     effectiveAdd_0000            
+            JMP     effectiveAdd_0001            
+            ;JMP     effectiveAdd_0010
+            ;JMP     effectiveAdd_0011
+            ;JMP     effectiveAdd_0100
+            JMP     effectiveAdd_0101
+            ;JMP     effectiveAdd_0110
+            JMP     effectiveAdd_0111
+            JMP     effectiveAdd_1000
+            JMP     effectiveAdd_1001
+            JMP     effectiveAdd_1010
+            JMP     effectiveAdd_1011
+            JMP     effectiveAdd_1100
+            JMP     effectiveAdd_1101
+            JMP     effectiveAdd_1110
+            JMP     effectiveAdd_1111
             
-hex4_0000   JSR     illegalCode
+effectiveAdd_0000   JSR     illegalCode
             RTS
             
-hex4_0001   JSR     illegalCode
+effectiveAdd_0001   JSR     illegalCode
             RTS
             
-hex4_0011   JSR     illegalCode
+effectiveAdd_0011   JSR     illegalCode
             RTS
                           
             
-hex4_0101   JSR     illegalCode
+effectiveAdd_0101   JSR     illegalCode
             RTS
         
             
-hex4_0111   JSR     illegalCode
+effectiveAdd_0111   JSR     illegalCode
             RTS
             
             
 ;0100 MOVEM
-hex4_1000   MOVE.W  D7,D6          
+effectiveAdd_1000   MOVE.W  D7,D6          
             LSR.L   #shift4bits,D6     
             ANDI.W  #$000F,D6      
             CMP.B   #$4,D6         
@@ -598,22 +598,22 @@ hex4_1000   MOVE.W  D7,D6
 opMOVEM     JSR     illegalCode
             RTS   
 
-hex4_1001   JSR     illegalCode
+effectiveAdd_1001   JSR     illegalCode
             RTS   
-hex4_1010   JSR     illegalCode
+effectiveAdd_1010   JSR     illegalCode
             RTS   
-hex4_1011   JSR     illegalCode
+effectiveAdd_1011   JSR     illegalCode
             RTS
-hex4_1100   JSR     illegalCode
+effectiveAdd_1100   JSR     illegalCode
             RTS
-hex4_1101   JSR     illegalCode
+effectiveAdd_1101   JSR     illegalCode
             RTS
-hex4_1111   JSR     illegalCode
+effectiveAdd_1111   JSR     illegalCode
             RTS   
 
 
 ;0100 NOP
-hex4_1110   JSR     getSize            
+effectiveAdd_1110   JSR     getSize            
             CMP.B   #%10,D6           
             BNE     illegalCode         
              
@@ -621,10 +621,6 @@ hex4_1110   JSR     getSize
             MOVE.B  #'O',(A2)+
             MOVE.B  #'P',(A2)+
             RTS
-
-            
-hex2_1111   RTS    
-
 
 getSize     MOVE.W  D7,D6            
             LSR.W   #6,D6              
