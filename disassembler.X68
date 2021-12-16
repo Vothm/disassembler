@@ -723,7 +723,7 @@ getDirBit   MOVE.W  D7,D6               * get fresh copy of instruction
             RTS  
             
 getAddr     CMP.B   #%00,D6             * test if value is a byte - assumes D6 already loaded
-            BEQ     putbytebuffer         * yes? - load B worth of address into buffer
+            BEQ     byte2Buffer         * yes? - load B worth of address into buffer
             CMP.B   #%01,D6             * test if value is a word - assumes D6 already loaded
             BEQ     appendWordBuffer         * yes? - load W worth of address into buffer
             CMP.B   #%10,D6             * test if value is a long - assumes D6 already loaded
@@ -748,7 +748,7 @@ getLong     JSR     cmdSh1              * Clear D6 and load value for shift
             MOVE.B  #0,D4               * Load shifter
             LSR.L   D4,D6               * Shift
             ANDI.L  #$0000000F,D6       * Isolate last bit
-            JSR     converToHex           * Place value in D6 into buffer
+            JSR     Hex2ASCII           * Place value in D6 into buffer
 
 cmdSh1      MOVEQ   #$0,D6              * Clear D6
             MOVE.L  A0,D6               * Load current address to print
@@ -757,7 +757,7 @@ cmdSh1      MOVEQ   #$0,D6              * Clear D6
 
 cmdSh2      LSR.L   D4,D6               * Shift
             ANDI.L  #$0000000F,D6       * Isolate last bit
-            JSR     converToHex           * Place value in D6 into buffer
+            JSR     Hex2ASCII           * Place value in D6 into buffer
             JSR     cmdSh1              * Reset D6 for next shift
             RTS
 
@@ -767,50 +767,55 @@ cmdSh3      MOVEQ   #$0,D6              * Clear D6
             
 cmdSh4      LSR.L   D4,D6               * Shift
             ANDI.L  #$0000000F,D6       * Isolate last bit
-            JSR     converToHex           * Place value in D6 into buffer
+            JSR     Hex2ASCII           * Place value in D6 into buffer
             JSR     cmdSh3              * Reset D6 for next shift
             RTS
             
+<<<<<<< HEAD
 illegalCode     MOVE.B  #0,D5         
             MOVEA.L A3,A2               
             MOVE.B  #'D',(A2)+          
+=======
+badInst    MOVE.B  #0,D5         * set bad flag
+            MOVEA.L A3,A2               * reset the buffer pointer 
+            MOVE.B  #'D',(A2)+          * add bad syntax to goodBuff
+>>>>>>> parent of 6e83393 (Update disassembler.X68)
             MOVE.B  #'A',(A2)+
             MOVE.B  #'T',(A2)+
             MOVE.B  #'A',(A2)+
             MOVE.B  #$09,(A2)+
-            MOVE.B  #'$',(A2)+          
-            JSR     loadDataBuffer          
+            MOVE.B  #'$',(A2)+          * add in shift/pad
+            JSR     loadDataBuffer          * add the bad word to the buffer
             RTS          
 
-loadDataBuffer      MOVEQ   #$0,D6              
-                    MOVE.W  D7,D6               
-                    MOVE.B  #shift12bits,D4         
-                    LSR.L   D4,D6               
-                    ANDI.W  #$000F,D6           
-                    JSR     converToHex           
+loadDataBuffer      MOVEQ   #$0,D6              * clear out D6 to use for copying word
+                    MOVE.W  D7,D6               * copy word instruction to D6
+                    MOVE.B  #shift12bits,D4         * load shifter
+                    LSR.L   D4,D6               * Shift D6
+                    ANDI.W  #$000F,D6           * isolate last 4 bits
+                    JSR     Hex2ASCII           * add 1st character to buffer
                     MOVE.W  D7,D6
                     MOVE.B  #shift8bits,D4
                     LSR.L   D4,D6
                     ANDI.W  #$000F,D6
-                    JSR     converToHex           
+                    JSR     Hex2ASCII           * add 2nd character to buffer
                     MOVE.W  D7,D6
                     MOVE.B  #shift4bits,D4
                     LSR.L   D4,D6
                     ANDI.W  #$000F,D6
-                    JSR     converToHex           
+                    JSR     Hex2ASCII           * add 3rd character to buffer
                     MOVE.W  D7,D6
                     ANDI.W  #$000F,D6
-                    JSR     converToHex           
+                    JSR     Hex2ASCII           * add 4th character to buffer   
                     RTS
             
 ; Convert hex to ascii
-converToHex   CMP.B   #$A,D6              * Confirm hex character?
+Hex2ASCII   CMP.B   #$A,D6              * Confirm hex character?
             BGE     letter              * Is it a letter or number?
             ADDI.B  #$30,D6             * Convert decimal to ASCII
-            BRA     hexToBuffer          
-            
+            BRA     write2Buff          * save to good buffer
 letter      ADDI.B  #$37,D6
-hexToBuffer MOVE.B  D6,(A2)+
+write2Buff  MOVE.B  D6,(A2)+
             RTS
             
 getEA       
@@ -897,18 +902,38 @@ EAcode101
 EAcode110
             JMP       illegalCode             * set bad instruction flag
 
+<<<<<<< HEAD
 EAcode111   MOVE.W D7, D6
             ANDI.W #$07, D6
             CMPI.B   #$0,D6              
             BEQ      appendWordBuffer         
             CMPI.B   #$1,D6              
             BEQ      long2Buffer         
+=======
+EAcode111
+            JSR      regBits             * Get Register bits
+            CMPI.B   #$0,D6              * compare to determine if it's a word
+            BEQ      word2Buffer         * put word address in buffer
+            CMPI.B   #$1,D6              * compare to determine if it's a long
+            BEQ      long2Buffer         * put long address in buffer
+>>>>>>> parent of 6e83393 (Update disassembler.X68)
             CMPI.B   #$2,D6
-            CMPI.B   #$2,D6              
-            BEQ      pctobuffer  
+
+            CMPI.B   #$2,D6              * compare to determine if it's PC w/ Displacement
+            BEQ      pctobuffer             
+            ;CMPI.B   #$4,D6              * compare to determine if it's Immediate
+            ;BEQ      imm2Buffer          * DON"T HAVE THIS CASE YET
+           
             RTS
 
+<<<<<<< HEAD
 ;;; Adding things to buffer 
+=======
+regBits     MOVE.W  D7,D6     * change D2 to A0  (simulating address)
+            ANDI.W  #$07,D6
+            RTS
+ 
+>>>>>>> parent of 6e83393 (Update disassembler.X68)
 ; Add '(pc)' to buffer
 pctobuffer
             JSR         appendWordBuffer
@@ -918,12 +943,26 @@ pctobuffer
             MOVE.B      #')',(A2)+                                     
             RTS
 
-putbytebuffer   
+byte2Buffer   
             MOVE.B  #'$',(A2)+
-            CLR.L   D4          
-            MOVE.W  (A0),D2     
-            CLR.L   D4          
-            MOVE.B  #2,D4       
+            CLR.L   D4          * pre-emptive clearout
+            MOVE.W  (A0),D2       * move current word into D2 for rolling purposes
+            CLR.L   D4          * pre-emptive clearout
+            MOVE.B  #2,D4       * load a counter
+
+b2bLoop                 
+            CMP.B   #$00,D4     * compare counter with 0
+            BEQ     rtnEA0      * if zero, return
+            ROL.B   #4,D2       * roll the bits in D2 to the left
+            MOVE.W  D2,D6       * move rolled bits into temp storage
+            ANDI.W  #$000F,D6   * and the bits to isolate ascii char   
+            JSR     Hex2ASCII   * load ascii char into buffer            
+            SUBQ.B  #$1,D4      * subtract from counter
+            JMP     b2bLoop     * keep looping until counter hits zero
+            
+rtnEA0      MOVE.W  D7,D6       * re-load current word for temp storage            
+            ADDQ.W  #2,A0       * advancing memory pointer by word   
+            RTS                 * return from subroutine
             
 appendWordBuffer 
             MOVE.B  #'$',(A2)+  
@@ -932,6 +971,16 @@ appendWordBuffer
             MOVE.W  (A0),D2       * move current word into D2 for rolling purposes
             CLR.L   D4          * pre-emptive clearout
             MOVE.B  #4,D4       * load a counter
+
+w2bLoop                 
+            CMP.B   #$00,D4     * compare counter with 0
+            BEQ     rtnEA1      * if zero, return
+            ROL.W   #4,D2       * roll the bits in D2 to the left
+            MOVE.W  D2,D6       * move rolled bits into temp storage
+            ANDI.W  #$000F,D6   * and the bits to isolate ascii char   
+            JSR     Hex2ASCII   * load ascii char into buffer            
+            SUBQ.B  #$1,D4      * subtract from counter
+            JMP     w2bLoop     * keep looping until counter hits zero
             
 long2Buffer
             MOVE.B  #'$',(A2)+
@@ -940,6 +989,24 @@ long2Buffer
             CLR.L   D4          * pre-emptive clearout
             MOVE.B  #8,D4       * load a counter
 
+<<<<<<< HEAD
+=======
+l2bLoop                 
+            CMP.B   #$00,D4     * compare counter with 0
+            BEQ     rtnEA2      * if zero, return
+            ROL.L   #4,D2       * roll the bits in D2 to the left
+            MOVE.W  D2,D6       * move rolled bits into temp storage
+            ANDI.W  #$000F,D6   * and the bits to isolate ascii char   
+            JSR     Hex2ASCII   * load ascii char into buffer            
+            SUBQ.B  #$1,D4      * subtract from counter
+            JMP     l2bLoop     * keep looping until counter hits zero
+            
+rtnEA2      MOVE.W  D7,D6       * re-load current word for temp storage
+            ADDQ.W  #4,A0       * advancing memory pointer by long
+            RTS                 * return from subroutine
+
+
+>>>>>>> parent of 6e83393 (Update disassembler.X68)
                    
              ORG   $4000 ; Make sure data starts at $4000
 intro        DC.B    'Hello, please enter beginning and ending addresses',CR,LF
