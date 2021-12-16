@@ -832,83 +832,79 @@ hexToBuffer MOVE.B D6, (A2)+
             RTS
             
 getEA       
-            LEA         ea_mode_table,A5 * load EA_mode jump table
+            LEA         ea_mode_table,A5 
             CLR.L   D2
             CLR.L   D3
             CLR.L   D4           
             CLR.L   D6
-            MOVE.W  D7,D6                 * move word into D6 for manipulation
-            ANDI.W  #$003F,D6             * leave only the mode bits
-            MOVE.B      #3,D1                 * Store number of bits we wish to shift            
-            LSR.W       D1,D6                 * Shift to the Right to isolate mode bits            
+            MOVE.W  D7,D6                 
+            ANDI.W  #$003F,D6            
+            MOVE.B      #3,D1                       
+            LSR.W       D1,D6                       
 
-            MULU      #6,D6            * Form Offset for passing to Jump Index table            
-            JSR         00(A5,D6)          * Now we have the index, back to Index table        
+            MULU      #6,D6                     
+            JSR         00(A5,D6)               
 
-            RTS                                * return from EA routine
-        
-            JMP         END                    * Return
+            RTS                                
+            JMP         END                    
 
-ea_mode_table                             * table holds the different EA modes
-            JMP     EAcode000             * Direct Data Register
-            JMP     EAcode001             * Direct Address Register
-            JMP     EAcode010             * Indirect Address Register
-            JMP     EAcode011             * Indirect Address Register with Post Increment
-            JMP     EAcode100             * Indirect Address Register with Pre Decrement
-            JMP     EAcode101             * Indirect Address Register using Index
-            JMP     EAcode110             * 
-            JMP     EAcode111             * Absolute or Immediate EA
+ea_mode_table                             
+            JMP     EAcode000             ; Data Register Direct (mode 0)
+            JMP     EAcode001             ; Address Register Direct (mode 1)
+            JMP     EAcode010             ; Address Register Diret (mode 2)
+            JMP     EAcode011             ; Address Register Indirect with Post Increment (mode 3)
+            JMP     EAcode100             ; Address Register Indirect with Pre Decrement (mode 4)
+            JMP     EAcode101             ; Absolute Word Address (mode 7 subclass 0)
+            JMP     EAcode110             ; Absolute Long Address (mode 7 subclass 1)
+            JMP     EAcode111             ; Immediate Data (mode 7 subclass 4)
 
 EAcode000
-            MOVE.W      D7,D6                   * move current working word into temp storage
-            ANDI.W      #$7,D6                  * isolate register bits (last 3)
-            MOVE.B      #'D',(A2)+              * add "D" to buffer
-            ADD.B       #$30,D6                 * convert data register # to hex digit
-            MOVE.B      D6,(A2)+                * register # to buffer                  
-            
-        RTS                                     * Return
+            MOVE.W      D7,D6                 
+            ANDI.W      #$7,D6                 
+            MOVE.B      #'D',(A2)+              
+            ADD.B       #$30,D6                 
+            MOVE.B      D6,(A2)+                            
+            RTS
  
 EAcode001
-            MOVE.W      D7,D6                   * move current working word into temp storage
-            ANDI.W      #$7,D6                  * isolate register bits (last 3)
-            MOVE.B      #'A',(A2)+              * add "A" to buffer
-            ADD.B       #$30,D6                 * convert data register # to hex digit
-            MOVE.B      D6,(A2)+                * register # to buffer
-              
-            RTS                                 * Return
+            MOVE.W      D7,D6                   
+            ANDI.W      #$7,D6                  
+            MOVE.B      #'A',(A2)+              
+            ADD.B       #$30,D6                
+            MOVE.B      D6,(A2)+                
+            RTS
 
 EAcode010
-            MOVE.W      D7,D6                   * move current working word into temp storage
-            ANDI.W      #$7,D6                  * isolate register bits (last 3)
-            MOVE.B      #'(',(A2)+              * add "(" to buffer            
-            MOVE.B      #'A',(A2)+              * add "A" to buffer
-            ADD.B       #$30,D6                 * convert data register # to hex digit
-            MOVE.B      D6,(A2)+                * register # to buffer
-            MOVE.B      #')',(A2)+              * add ")" to buffer
-             
-            RTS                                 * Return
+            MOVE.W      D7,D6                   
+            ANDI.W      #$7,D6                  
+            MOVE.B      #'(',(A2)+                       
+            MOVE.B      #'A',(A2)+              
+            ADD.B       #$30,D6                 
+            MOVE.B      D6,(A2)+                
+            MOVE.B      #')',(A2)+              
+            RTS
  
 EAcode011
             
-            MOVE.W      D7,D6                   * move current working word into temp storage
-            ANDI.W      #$7,D6                  * isolate register bits (last 3)
-            MOVE.B      #'(',(A2)+              * add "(" to buffer            
-            MOVE.B      #'A',(A2)+              * add "A" to buffer
-            ADD.B       #$30,D6                 * convert data register # to hex digit
-            MOVE.B      D6,(A2)+                * register # to buffer
-            MOVE.B      #')',(A2)+              * add ")" to buffer
-            MOVE.B      #'+',(A2)+              * add "+" to buffer
+            MOVE.W      D7,D6                   
+            ANDI.W      #$7,D6                  
+            MOVE.B      #'(',(A2)+                      
+            MOVE.B      #'A',(A2)+             
+            ADD.B       #$30,D6                 
+            MOVE.B      D6,(A2)+                
+            MOVE.B      #')',(A2)+              
+            MOVE.B      #'+',(A2)+              
             RTS
 
-EAcode100   MOVE.W      D7,D6                   * move current working word into temp storage
-            ANDI.W      #$7,D6                  * isolate register bits (last 3)
-            MOVE.B      #'-',(A2)+              * add "-" to buffer
-            MOVE.B      #'(',(A2)+              * add "(" to buffer            
-            MOVE.B      #'A',(A2)+              * add "A" to buffer
-            ADD.B       #$30,D6                 * convert data register # to hex digit
-            MOVE.B      D6,(A2)+                * register # to buffer
-            MOVE.B      #')',(A2)+              * add ")" to buffer
-            RTS                                     * Return
+EAcode100   MOVE.W      D7,D6                   
+            ANDI.W      #$7,D6                  
+            MOVE.B      #'-',(A2)+              
+            MOVE.B      #'(',(A2)+                          
+            MOVE.B      #'A',(A2)+              
+            ADD.B       #$30,D6                 
+            MOVE.B      D6,(A2)+                
+            MOVE.B      #')',(A2)+              
+            RTS                                     
             
 EAcode101
              JMP    illegalCode          * set bad instruction flag
