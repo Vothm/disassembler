@@ -950,8 +950,8 @@ word2Buffer
             MOVE.W  (A0),D2       
             CLR.L   D4          
             MOVE.B  #4,D4       
-            
-rtnEA1      MOVE.W  D7,D6                
+           
+            MOVE.W  D7,D6                
             ADDQ.W  #2,A0         
             RTS                 
 
@@ -962,7 +962,7 @@ long2Buffer
             CLR.L   D4          
             MOVE.B  #8,D4      
             
-rtnEA2      MOVE.W  D7,D6       
+            MOVE.W  D7,D6       
             ADDQ.W  #4,A0      
             RTS                 
 
